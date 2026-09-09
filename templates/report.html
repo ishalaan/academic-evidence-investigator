@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Research Report</title>
+</head>
+<body>
+    <h1>Research Report</h1>
+
+    <h2>Research Question</h2>
+    <p>{{ report.research_question }}</p>
+
+    <h2>Summary</h2>
+    <p>{{ report.summary }}</p>
+
+    <h2>Findings</h2>
+    <ul>
+        {% for finding in report.findings %}
+            <li>{{ finding }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Limitations</h2>
+    <ul>
+        {% for limitation in report.limitations %}
+            <li>{{ limitation }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Sources</h2>
+
+    {% if report.sources %}
+        <ul>
+            {% for paper in report.sources %}
+                <li>
+                    <strong>{{ paper.title }}</strong>
+
+                    {% if paper.authors %}
+                        <br>
+                        Authors: {{ paper.authors | join(", ") }}
+                    {% endif %}
+
+                    {% if paper.year %}
+                        <br>
+                        Year: {{ paper.year }}
+                    {% endif %}
+
+                    {% if paper.doi %}
+                        <br>
+                        DOI: {{ paper.doi }}
+                    {% endif %}
+
+                    {% if paper.url %}
+                        <br>
+                        <a href="{{ paper.url }}" target="_blank">
+                            View source
+                        </a>
+                    {% endif %}
+                </li>
+                <br>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No sources were available.</p>
+    {% endif %}
+
+    {% if report_id %}
+        <p>Saved report ID: {{ report_id }}</p>
+    {% endif %}
+
+    <p>
+        <a href="/">Start another investigation</a>
+    </p>
+</body>
+</html>

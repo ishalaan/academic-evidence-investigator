@@ -1,0 +1,10 @@
+Flask
+langgraph
+pydantic>=2
+python-dotenv
+requests
+httpx
+pandas
+huggingface-hub
+pytest
+pytest-cov

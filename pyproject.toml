@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "academic-evidence-investigator"
+version = "0.1.0"
+description = "An LLM-powered multi-agent system for academic research and evidence gathering."
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = [
+    "Flask",
+    "langgraph",
+    "pydantic>=2",
+    "python-dotenv",
+    "requests",
+    "httpx",
+    "pandas",
+    "huggingface-hub"
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov"
+]
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["package*"]
+
+
+[tool.setuptools.package-data]
+package = [
+    "prompts/*.txt"
+]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

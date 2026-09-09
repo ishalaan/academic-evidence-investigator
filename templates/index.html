@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Evidence Investigator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <main class="container">
+        <h1>Academic Evidence Investigator</h1>
+
+        <p>
+            Enter a research question and the system will plan, retrieve,
+            analyse and summarise relevant academic evidence.
+        </p>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form id="research-form" method="POST">
+            <label for="research_question">
+                Research Question
+            </label>
+
+            <textarea
+                name="research_question"
+                id="research_question"
+                rows="5"
+                required
+            >What are the main applications of large language models in education?</textarea>
+
+            <button id="submit-button" type="submit">
+                Start Investigation
+            </button>
+        </form>
+    </main>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <h2>Investigating academic evidence...</h2>
+            <p>
+                The agents are planning, retrieving and analysing sources.
+                This may take a moment.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("research-form");
+        const submitButton = document.getElementById("submit-button");
+        const loadingOverlay = document.getElementById("loading-overlay");
+
+        form.addEventListener("submit", function () {
+            submitButton.disabled = true;
+            submitButton.textContent = "Processing...";
+
+            loadingOverlay.classList.add("visible");
+        });
+    </script>
+
+</body>
+</html>

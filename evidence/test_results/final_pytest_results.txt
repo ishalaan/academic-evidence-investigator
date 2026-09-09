@@ -1,0 +1,26 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collected 26 items
+
+tests\functional\test_app.py ...                                         [ 11%]
+tests\integration\test_critic.py .                                       [ 15%]
+tests\integration\test_critic_routing.py ...                             [ 26%]
+tests\integration\test_crossref_service.py .                             [ 30%]
+tests\integration\test_planner.py .                                      [ 34%]
+tests\integration\test_processing_node.py .                              [ 38%]
+tests\integration\test_reporter.py .                                     [ 42%]
+tests\integration\test_retrieval.py ...                                  [ 53%]
+tests\integration\test_semantic_scholar_service.py .                     [ 57%]
+tests\unit\test_database.py .                                            [ 61%]
+tests\unit\test_deduplication.py .                                       [ 65%]
+tests\unit\test_json_utils.py ...                                        [ 76%]
+tests\unit\test_llm.py ..                                                [ 84%]
+tests\unit\test_pipeline.py .                                            [ 88%]
+tests\unit\test_ranking.py ..                                            [ 96%]
+tests\unit\test_validation.py .                                          [100%]
+
+============================= 26 passed in 0.90s ==============================

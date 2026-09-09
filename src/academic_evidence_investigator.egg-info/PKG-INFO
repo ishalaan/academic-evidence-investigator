@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: academic-evidence-investigator
+Version: 0.1.0
+Summary: An LLM-powered multi-agent system for academic research and evidence gathering.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: Flask
+Requires-Dist: langgraph
+Requires-Dist: pydantic>=2
+Requires-Dist: python-dotenv
+Requires-Dist: requests
+Requires-Dist: httpx
+Requires-Dist: pandas
+Requires-Dist: huggingface-hub
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"

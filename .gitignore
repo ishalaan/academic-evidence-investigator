@@ -1,0 +1,33 @@
+# Git shortcuts
+git-pull.bat
+git-push.bat
+python-activate.bat
+python-freeze.bat
+python-install.bat
+
+# Virtual environment
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# PyTest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# SQLite database
+data/*.db
+
+# IDE files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

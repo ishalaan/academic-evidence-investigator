@@ -1,0 +1,59 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collected 23 items
+
+tests\functional\test_app.py ...                                         [ 13%]
+tests\integration\test_critic.py .                                       [ 17%]
+tests\integration\test_critic_routing.py ...                             [ 30%]
+tests\integration\test_crossref_service.py .                             [ 34%]
+tests\integration\test_planner.py .                                      [ 39%]
+tests\integration\test_processing_node.py .                              [ 43%]
+tests\integration\test_reporter.py .                                     [ 47%]
+tests\integration\test_retrieval.py .                                    [ 52%]
+tests\integration\test_semantic_scholar_service.py .                     [ 56%]
+tests\unit\test_database.py .                                            [ 60%]
+tests\unit\test_deduplication.py .                                       [ 65%]
+tests\unit\test_json_utils.py ...                                        [ 78%]
+tests\unit\test_llm.py ..                                                [ 86%]
+tests\unit\test_pipeline.py .                                            [ 91%]
+tests\unit\test_ranking.py .                                             [ 95%]
+tests\unit\test_validation.py .                                          [100%]
+
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.14.0-final-0 _______________
+
+Name                                       Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------
+src\package\__init__.py                        0      0   100%
+src\package\agents\__init__.py                 0      0   100%
+src\package\agents\critic.py                  21      1    95%   71
+src\package\agents\planner.py                 21      1    95%   62
+src\package\agents\reporter.py                24      1    96%   78
+src\package\agents\retrieval.py               13      0   100%
+src\package\config.py                          9      0   100%
+src\package\processing\__init__.py             0      0   100%
+src\package\processing\deduplication.py       17      1    94%   24
+src\package\processing\pipeline.py             8      0   100%
+src\package\processing\ranking.py              3      0   100%
+src\package\processing\validation.py           8      0   100%
+src\package\schemas.py                        15      0   100%
+src\package\services\__init__.py               0      0   100%
+src\package\services\crossref.py              27      0   100%
+src\package\services\json_utils.py             9      0   100%
+src\package\services\llm.py                    7      0   100%
+src\package\services\prompts.py                5      0   100%
+src\package\services\semantic_scholar.py      17      1    94%   30
+src\package\storage\__init__.py                0      0   100%
+src\package\storage\database.py               21      1    95%   76
+src\package\web.py                            15      0   100%
+src\package\workflow\__init__.py               0      0   100%
+src\package\workflow\graph.py                 31      0   100%
+src\package\workflow\nodes.py                  5      0   100%
+src\package\workflow\state.py                  3      0   100%
+------------------------------------------------------------------------
+TOTAL                                        279      6    98%
+============================= 23 passed in 1.14s ==============================

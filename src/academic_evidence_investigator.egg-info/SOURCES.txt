@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+src/academic_evidence_investigator.egg-info/PKG-INFO
+src/academic_evidence_investigator.egg-info/SOURCES.txt
+src/academic_evidence_investigator.egg-info/dependency_links.txt
+src/academic_evidence_investigator.egg-info/requires.txt
+src/academic_evidence_investigator.egg-info/top_level.txt
+src/package/__init__.py
+src/package/config.py
+src/package/schemas.py
+src/package/agents/__init__.py
+src/package/processing/__init__.py
+src/package/services/__init__.py
+src/package/storage/__init__.py
+src/package/workflow/__init__.py

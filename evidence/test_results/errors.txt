@@ -1,0 +1,112 @@
+1. Error encountered:
+400 Bad Request – Qwen/Qwen2.5-7B-Instruct was not available through the Hugging Face serverless provider.
+
+Reason:
+The selected model was not supported by the active inference provider.
+
+Remedy:
+Switched to the configurable Qwen/Qwen3-8B model and retested live inference successfully.
+
+
+2. Error encountered:
+content=None while Qwen returned reasoning_content.
+
+Reason:
+The model used its token budget for reasoning before producing the final response.
+
+Remedy:
+Increased token limits for the Planner, Critic and Reporter so structured output could be completed.
+
+
+3. Error encountered:
+429 Too Many Requests from Semantic Scholar.
+
+Reason:
+Unauthenticated requests were being rate-limited.
+
+Remedy:
+Requested and configured an API key and added request-rate controls.
+
+
+4. Error encountered:
+Semantic Scholar later returned HTTP 500 errors and read timeouts.
+
+Reason:
+The external service remained unreliable during live testing.
+
+Remedy:
+Made Semantic Scholar optional and allowed the Retrieval Agent to continue with Crossref when it failed.
+
+
+5. Error encountered:
+AttributeError: 'FakeResponse' object has no attribute 'status_code'.
+
+Reason:
+The Semantic Scholar service was updated to inspect HTTP status codes, but the mocked test response had not been updated.
+
+Remedy:
+Added status_code = 200 to the fake response and mocked time.sleep() in the integration test.
+
+
+6. Error encountered:
+Processing tests failed because 0 papers were returned instead of 2.
+
+Reason:
+The new relevance filter rejected old placeholder test data such as “Older Paper” and “Newer Paper”.
+
+Remedy:
+Updated the test fixtures with realistic relevant and irrelevant academic papers instead of weakening the production filter.
+
+
+7. Error encountered:
+Processing tests later returned 1 paper instead of 2 after the relevance threshold was increased.
+
+Reason:
+One test paper was no longer sufficiently relevant under the stricter scoring rule.
+
+Remedy:
+Kept the stricter production threshold and strengthened the test data so genuinely relevant papers met the requirement.
+
+
+8. Error encountered:
+Reports contained weak or unsuitable Crossref records such as figures, tables and front matter.
+
+Reason:
+Crossref can return document fragments and broadly matched metadata records.
+
+Remedy:
+Added deterministic validation rules and capped the final ranked evidence set.
+
+
+9. Error encountered:
+Different preprint versions appeared as separate sources.
+
+Reason:
+DOIs ending in /v1 and /v2 were treated as different records.
+
+Remedy:
+Normalised versioned DOIs before deduplication.
+
+
+10. Error encountered:
+The Reporter generated publication years that were not present in the retrieved metadata.
+
+Reason:
+The LLM inferred plausible citation details despite prompt instructions.
+
+Remedy:
+Removed LLM-generated author-year citations from findings and limitations and kept bibliographic traceability in the deterministic Sources section.
+
+
+11. Error encountered:
+Off-topic LLM papers still appeared in the final source list.
+
+Reason:
+Generic terms such as “large language models” were scoring too highly even when the paper did not match the research domain.
+
+Remedy:
+Updated the ranking logic to distinguish generic LLM terms from domain-specific terms derived from the user’s research question.
+
+
+Final outcome:
+All 26 automated tests passed after remediation.
