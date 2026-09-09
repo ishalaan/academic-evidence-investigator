@@ -562,15 +562,25 @@ Used for automated unit, integration, and functional testing.
 
 The following academic concepts informed the design and implementation.
 
-Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K. and Cao, Y. (2023) 'ReAct: Synergizing reasoning and acting in language models', International Conference on Learning Representations (ICLR).
+Bommasani, R., Hudson, D.A., Adeli, E., Altman, R., Arora, S., von Arx, S., Bernstein, M.S., Bohg, J., Bosselut, A., Brunskill, E. et al. (2021) ‘On the opportunities and risks of foundation models’. Stanford Center for Research on Foundation Models. Available at: https://crfm.stanford.edu/report.html (Accessed: 9 September 2026).
 
-Shinn, N., Cassano, F., Gopinath, A., Narasimhan, K. and Yao, S. (2023) 'Reflexion: Language agents with verbal reinforcement learning', Advances in Neural Information Processing Systems, 36.
+Ji, Z., Lee, N., Frieske, R., Yu, T., Su, D., Xu, Y., Ishii, E., Bang, Y.J., Madotto, A. and Fung, P. (2023) ‘Survey of hallucination in natural language generation’, ACM Computing Surveys, 55(12), pp. 1–38. Available at: https://doi.org/10.1145/3571730 (Accessed: 9 September 2026).
 
-Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W., Rocktäschel, T., Riedel, S. and Kiela, D. (2020) 'Retrieval-augmented generation for knowledge-intensive NLP tasks', Advances in Neural Information Processing Systems, 33, pp. 9459-9474.
+Laux, J. (2024) ‘Institutionalised distrust and human oversight of artificial intelligence: towards a democratic design of AI governance under the European Union AI Act’, AI & Society, 39(6), pp. 2853–2866. Available at: https://doi.org/10.1007/s00146-023-01777-z (Accessed: 9 September 2026).
 
-Rao, A.S. and Georgeff, M.P. (1995) 'BDI agents: From theory to practice', Proceedings of the First International Conference on Multi-Agent Systems, pp. 312-319.
+Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W., Rocktäschel, T., Riedel, S. and Kiela, D. (2020) ‘Retrieval-augmented generation for knowledge-intensive NLP tasks’, Advances in Neural Information Processing Systems, 33. Available at: https://papers.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html (Accessed: 9 September 2026).
 
-Ji, Z., Lee, N., Frieske, R., Yu, T., Su, D., Xu, Y., Ishii, E., Bang, Y.J., Madotto, A. and Fung, P. (2023) 'Survey of hallucination in natural language generation', ACM Computing Surveys, 55(12), pp. 1-38.
+Rao, A.S. and Georgeff, M.P. (1995) ‘BDI agents: from theory to practice’, in Proceedings of the First International Conference on Multiagent Systems, pp. 312–319. Available at: https://aaai.org/papers/icmas95-042-bdi-agents-from-theory-to-practice/ (Accessed: 9 September 2026).
+
+Shinn, N., Cassano, F., Gopinath, A., Narasimhan, K. and Yao, S. (2023) ‘Reflexion: language agents with verbal reinforcement learning’, Advances in Neural Information Processing Systems, 36. Available at: https://papers.neurips.cc/paper_files/paper/2023/hash/1b44b878bb782e6954cd888628510e90-Abstract-Conference.html (Accessed: 9 September 2026).
+
+Wang, L., Ma, C., Feng, X., Zhang, Z., Yang, H., Zhang, J., Chen, Z., Tang, J., Chen, X., Lin, Y., Zhao, W.X., Wei, Z. and Wen, J. (2024) ‘A survey on large language model based autonomous agents’, Frontiers of Computer Science, 18(6), article 186345. Available at: https://doi.org/10.1007/s11704-024-40231-1 (Accessed: 9 September 2026).
+
+Weidinger, L., Uesato, J., Rauh, M., Griffin, C., Huang, P.-S., Mellor, J., Glaese, A., Cheng, M., Balle, B., Kasirzadeh, A. et al. (2022) ‘Taxonomy of risks posed by language models’, in Proceedings of the 2022 ACM Conference on Fairness, Accountability, and Transparency, pp. 214–229. Available at: https://doi.org/10.1145/3531146.3533088 (Accessed: 9 September 2026).
+
+Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K.R. and Cao, Y. (2023) ‘ReAct: synergizing reasoning and acting in language models’, International Conference on Learning Representations. Available at: https://mlanthology.org/iclr/2023/yao2023iclr-react/ (Accessed: 9 September 2026).
+
+Zhao, W.X., Zhou, K., Li, J., Tang, T., Wang, X., Hou, Y., Min, Y., Zhang, B., Zhang, J., Dong, Z. et al. (2023) ‘A survey of large language models’, arXiv preprint arXiv:2303.18223. Available at: https://arxiv.org/abs/2303.18223 (Accessed: 9 September 2026).
 
 Additional framework and API documentation used during implementation should also be acknowledged where appropriate in the final submission.
 

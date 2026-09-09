@@ -1,0 +1,18 @@
+Development Progress Summary
+
+1. Initial project structure and package layout created.
+2. Pydantic schemas and shared LangGraph state implemented.
+3. Planner, Retrieval, Critic and Reporter agents added.
+4. Semantic Scholar and Crossref service integrations added.
+5. Deterministic validation, deduplication and ranking pipeline implemented.
+6. LangGraph conditional routing and Critic-to-Planner replanning loop added.
+7. SQLite persistence added for completed reports.
+8. Flask web interface added for research-question submission and report display.
+9. Hugging Face live inference integrated and model changed to Qwen/Qwen3-8B after provider compatibility testing.
+10. Retrieval was hardened so evidence accumulates across search cycles and one API failure does not terminate the workflow.
+11. Semantic Scholar rate-limit and timeout handling added, with Crossref fallback.
+12. Relevance ranking was improved to reduce off-topic evidence.
+13. Duplicate preprint versions and document-fragment results were filtered.
+14. Reporter safeguards were added to prevent fabricated bibliographic metadata.
+15. User experience was improved with automatic browser launch, a default example question, a loading overlay and disabled submit button during processing.
+16. Final automated test suite reached 26 passing tests across unit, integration and functional testing.
