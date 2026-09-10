@@ -1,4 +1,18 @@
-from huggingface_hub import InferenceClient
+import ssl
+
+import httpx
+import truststore
+from huggingface_hub import InferenceClient, set_client_factory
+
+
+def create_http_client():
+    """Use operating-system certificate trust without disabling TLS verification."""
+    return httpx.Client(verify=truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT),
+                        follow_redirects=True)
+
+
+# Register once: the Hub owns and reuses this client across agent requests.
+set_client_factory(create_http_client)
 
 from package.config import HF_TOKEN
 

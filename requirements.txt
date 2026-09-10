@@ -5,6 +5,7 @@ python-dotenv
 requests
 httpx
 pandas
-huggingface-hub
+huggingface-hub>=1.0
+truststore>=0.10
 pytest
 pytest-cov

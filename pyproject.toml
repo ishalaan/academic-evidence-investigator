@@ -18,7 +18,8 @@ dependencies = [
     "requests",
     "httpx",
     "pandas",
-    "huggingface-hub"
+    "huggingface-hub>=1.0",
+    "truststore>=0.10"
 ]
 
 
@@ -44,3 +45,4 @@ package = [
 pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-ra"
+

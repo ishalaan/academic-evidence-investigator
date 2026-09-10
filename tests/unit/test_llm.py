@@ -31,3 +31,15 @@ def test_llm_client_is_created_when_token_exists(monkeypatch):
 
     assert client.model == llm.MODEL_NAME
     assert client.token == "fake-token"
+
+def test_model_http_client_uses_verified_system_trust(monkeypatch):
+    import ssl
+    captured = {}
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    monkeypatch.setattr(llm.truststore, 'SSLContext', lambda protocol: context)
+    monkeypatch.setattr(llm.httpx, 'Client', lambda **kwargs: captured.update(kwargs) or captured)
+    llm.create_http_client()
+    assert captured['verify'] is context
+    assert context.verify_mode == ssl.CERT_REQUIRED
+    assert context.check_hostname is True
+    assert captured['follow_redirects'] is True
