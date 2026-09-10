@@ -16,9 +16,17 @@ The Reporter receives stable source IDs (`S1`, `S2`, …) for its supplied evide
 It places tokens such as `[S1]` at supported claims. The application checks IDs,
 requires citations in each summary paragraph and finding, and converts valid
 tokens into author-year citations. Adjacent tokens become a semicolon-separated
-group. Unknown, malformed or missing required tokens fail the reporting stage
-before persistence. The system does not silently attach arbitrary sources to
+group. Grouped forms such as `[S1, S2]` and exact known author-year citations are
+normalised without guessing sources. Unknown, malformed or missing required
+tokens trigger up to two correction attempts before the reporting stage fails.
+Malformed, empty and truncated JSON responses also receive correction attempts.
+Qwen thinking is explicitly disabled for the Reporter so the output allowance
+is available for the final report. The system does not silently attach arbitrary sources to
 uncited text. General limitations of the investigation need not be cited.
+
+Correction attempts are recorded in the activity log. Terminal failures store
+safe error categories and show an actionable reporting error in the browser;
+private model output and provider exception text are not exposed.
 
 Citation validation establishes that referenced sources exist; it does not prove
 that a source supports every claim. Human review is still needed. The prompt

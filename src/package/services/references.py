@@ -94,6 +94,12 @@ def reference_entries(papers):
 def cited_text(text, entries, *, require_citation=False):
     """Resolve validated source tokens. Never fabricate a citation for uncited prose."""
     lookup = {entry["id"]: entry["citation"] for entry in entries}
+    # Accept ordinary model variations without guessing which source was intended.
+    text = re.sub(r"\[\s*S\d+(?:\s*[,;]\s*S\d+)*\s*\]",
+                  lambda match: " ".join(f"[{source_id}]" for source_id in re.findall(r"S\d+", match.group(0))), text)
+    # Exact known author-year citations can also be mapped back unambiguously.
+    for source_id, citation in lookup.items():
+        text = text.replace(citation, f"[{source_id}]")
     if re.search(r"\([^)]*(?:\b(?:19|20)\d{2}[a-z]?\b|no date)[^)]*\)", text, flags=re.I):
         raise ValueError("Reporter must use source IDs instead of author-year citations.")
     tokens = re.findall(r"\[(S\d+)\]", text)
@@ -101,6 +107,8 @@ def cited_text(text, entries, *, require_citation=False):
         raise ValueError("Reporter cited an unknown source identifier.")
     if require_citation:
         for paragraph in text.split("\n\n"):
+            if re.fullmatch(r"\s*#{1,6} [^\n]+\s*", paragraph):
+                continue
             if paragraph.strip() and not re.search(r"\[S\d+\]", paragraph):
                 raise ValueError("Reporter omitted a supporting source citation.")
     def citation_group(match):

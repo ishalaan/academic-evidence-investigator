@@ -165,3 +165,12 @@ def test_activity_retains_short_stages_and_replanning_without_private_details():
     assert "PRIVATE" not in first.text
     assert events == client.get(f"/runs/{run_id}/status").json["events"]
     assert all(set(e) == {"id", "timestamp", "component", "action", "cycle", "message"} for e in events)
+
+
+def test_report_failure_shows_safe_actionable_reason():
+    run_id = create_run()
+    record_event(run_id, "Reporter", "failed", {"error_code": "report_citations_invalid", "message": "PRIVATE"},
+                 stage="failed", status="failed")
+    response = create_app().test_client().get(f"/runs/{run_id}/status")
+    assert "citations could not be verified" in response.json["message"]
+    assert "PRIVATE" not in response.text

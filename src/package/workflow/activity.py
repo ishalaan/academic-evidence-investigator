@@ -16,6 +16,8 @@ def activity_events(events):
         if action == "started":
             stage = "replanning" if stage == "planner" and cycle and cycle > 1 else stage
             message = STAGE_MESSAGES.get(stage, "Starting investigation")
+        elif action == "retrying" and component == "Reporter":
+            message = "Checking report formatting and citations; generating a corrected report."
         elif action == "failed":
             message = "This stage could not be completed."
         elif action == "provider_failed" and component == "Retrieval":

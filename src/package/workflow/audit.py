@@ -5,6 +5,7 @@ from time import perf_counter
 import re
 
 from package.storage.audit import create_run, record_event
+from package.services.report_errors import failure_details
 
 
 STAGE_MESSAGES = {
@@ -77,9 +78,9 @@ def observed_node(component, node, route=None):
                          status="completed" if component == "reporter" else "running",
                          metrics=metrics, report_id=result.get("report_id"))
             return {**result, "run_id": run_id, "run_started": started, "metrics": metrics}
-        except Exception:
+        except Exception as exc:
             metrics["elapsed_seconds"] = round(perf_counter() - started, 3)
-            record_event(run_id, component.title(), "failed", {"message": STAGE_MESSAGES["failed"]},
+            record_event(run_id, component.title(), "failed", failure_details(exc),
                          stage="failed", status="failed", metrics=metrics)
             raise
     return invoke

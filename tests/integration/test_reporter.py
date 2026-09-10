@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 import json
 import pytest
+from package.services.report_errors import ReportGenerationError
 
 from package.agents.reporter import reporter_node
 from package.schemas import Paper
@@ -104,7 +105,7 @@ def test_reporter_rejects_untraceable_text_before_saving(monkeypatch, summary):
 
     monkeypatch.setattr("package.agents.reporter.get_llm_client", lambda: InvalidClient())
     monkeypatch.setattr("package.agents.reporter.save_report", lambda report: saved.append(report))
-    with pytest.raises(ValueError):
+    with pytest.raises(ReportGenerationError):
         reporter_node({"research_question": "Q", "processed_papers": [Paper(title="Study")]})
     assert saved == []
 

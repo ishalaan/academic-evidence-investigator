@@ -1,12 +1,41 @@
 import json
+import httpx
+from pydantic import ValidationError
 
 from package.schemas import ResearchReport
 from package.services.json_utils import clean_json_response
 from package.services.llm import get_llm_client
 from package.services.prompts import load_prompt
 from package.services.references import cited_text, reference_entries
+from package.services.report_errors import ReportGenerationError
+from package.storage.audit import record_event
 from package.storage.database import save_report
 from package.workflow.state import ResearchState
+
+MAX_REPORT_ATTEMPTS = 3
+
+
+def validate_report_content(content, papers, entries, research_question):
+    try:
+        data = json.loads(clean_json_response(content))
+        if not isinstance(data, dict):
+            raise ValueError("Expected an object.")
+        data["sources"] = [paper.model_dump() for paper in papers]
+        data["research_question"] = research_question
+        report = ResearchReport.model_validate(data)
+        if not report.summary.strip():
+            raise ValueError("Empty summary.")
+    except (json.JSONDecodeError, ValidationError, ValueError, TypeError):
+        raise ReportGenerationError("report_format_invalid") from None
+    try:
+        report.summary = cited_text(report.summary, entries, require_citation=bool(papers))
+        report.findings = [cited_text(text, entries, require_citation=bool(papers)) for text in report.findings]
+        report.limitations = [cited_text(text, entries) for text in report.limitations]
+        if not papers and report.findings:
+            raise ValueError("Findings without evidence.")
+    except ValueError:
+        raise ReportGenerationError("report_citations_invalid") from None
+    return report
 
 
 def reporter_node(state: ResearchState) -> dict:
@@ -73,57 +102,48 @@ Return sources as []; the application fills this with the original evidence.
 
     client = get_llm_client()
 
-    response = client.chat_completion(
-        messages=[
-            {
-                "role": "system",
-                "content": reporter_prompt,
-            },
-            {
-                "role": "user",
-                "content": user_content,
-            },
-        ],
-        # A low temperature is used because the Reporter should favour factual
-        # consistency and stable synthesis over creative variation.
-        temperature=0.2,
-        # Qwen3 may consume part of the output allowance during reasoning, so a
-        # larger token budget is reserved for the final structured briefing.
-        max_tokens=6000,
-    )
-
-    content = response.choices[0].message.content
-
-    # An empty response cannot be safely rendered or persisted, so the workflow
-    # fails explicitly rather than saving an incomplete research report.
-    if not content:
-        raise RuntimeError("Reporter LLM returned an empty response.")
-
-    cleaned_content = clean_json_response(content)
-    report_data = json.loads(cleaned_content)
-
-    # Resolve evidence IDs before persistence. Missing/unknown IDs fail explicitly;
-    # attaching arbitrary references would misrepresent evidential support.
-    report_data["summary"] = cited_text(report_data["summary"], entries, require_citation=bool(papers))
-    report_data["findings"] = [cited_text(text, entries, require_citation=bool(papers))
-                               for text in report_data.get("findings", [])]
-    report_data["limitations"] = [cited_text(text, entries) for text in report_data.get("limitations", [])]
-    if not papers and report_data.get("findings"):
-        raise ValueError("Reporter returned findings without evidence.")
-    report_data["research_question"] = research_question
-
-    # Bibliographic metadata is deliberately overwritten with the retrieved
-    # Paper objects instead of trusting the LLM-generated sources field.
-    # This decision was introduced after testing showed that generative models
-    # can invent or alter citation details such as publication years.
-    report_data["sources"] = [
-        paper.model_dump()
-        for paper in papers
-    ]
-
-    # Pydantic validation creates a deterministic boundary between generated
-    # narrative content and the application layer before anything is stored.
-    report = ResearchReport.model_validate(report_data)
+    messages = [{"role": "system", "content": reporter_prompt},
+                {"role": "user", "content": user_content}]
+    for attempt in range(1, MAX_REPORT_ATTEMPTS + 1):
+        try:
+            response = client.chat_completion(
+                messages=messages, temperature=0.2, max_tokens=6000,
+                extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+            )
+        except httpx.HTTPError:
+            raise ReportGenerationError("report_model_unavailable") from None
+        try:
+            if not response.choices:
+                raise ReportGenerationError("report_format_invalid")
+            choice = response.choices[0]
+            if getattr(choice, "finish_reason", None) == "length":
+                raise ReportGenerationError("report_output_truncated")
+            content = choice.message.content
+            if not content:
+                raise ReportGenerationError("report_format_invalid")
+            report = validate_report_content(content, papers, entries, research_question)
+            break
+        except ReportGenerationError as exc:
+            if attempt == MAX_REPORT_ATTEMPTS:
+                raise
+            if state.get("run_id"):
+                record_event(state["run_id"], "Reporter", "retrying",
+                             {"attempt": attempt + 1, "error_code": exc.code}, stage="reporter")
+            # Retry with explicit constraints; never record or expose the raw output.
+            correction = (
+                "Generate the entire report again as one complete JSON object. "
+                "Use only supplied [S1] source IDs. Every summary paragraph and every "
+                "finding needs a supporting source ID; do not invent citations. "
+                "Use plain prose without standalone headings. Keep the requested detail "
+                "where evidence supports it, and finish all JSON fields. "
+            )
+            if exc.code == "report_output_truncated":
+                correction += "The last response was cut off. Keep this attempt shorter so it fits."
+            elif exc.code == "report_citations_invalid":
+                correction += "The last response contained missing or invalid citations."
+            else:
+                correction += "The last response was empty or did not match the JSON schema."
+            messages = messages[:2] + [{"role": "user", "content": correction}]
 
     # Persisting the validated report provides an execution record and allows
     # the browser interface to show a saved report identifier.

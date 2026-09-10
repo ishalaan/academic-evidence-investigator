@@ -8,6 +8,7 @@ from package.workflow.audit import STAGE_MESSAGES
 from package.workflow.activity import activity_events
 from package.workflow.graph import workflow
 from package.services.references import reference_entries
+from package.services.report_errors import REPORT_ERRORS, failure_details
 
 
 def create_app() -> Flask:
@@ -72,7 +73,9 @@ def create_app() -> Flask:
         # An explicit allowlist keeps audit details and model output out of progress.
         response = jsonify(
             run_id=run_id, status=run["status"], stage=run["stage"],
-            message=STAGE_MESSAGES.get(run["stage"], STAGE_MESSAGES["queued"]),
+            message=(REPORT_ERRORS.get(run["events"][-1]["details"].get("error_code"), STAGE_MESSAGES["failed"])
+                     if run["status"] == "failed" and run["events"]
+                     else STAGE_MESSAGES.get(run["stage"], STAGE_MESSAGES["queued"])),
             events=activity_events(run["events"]),
             report_url=url_for("run_report", run_id=run_id) if run["status"] == "completed" else None,
         )
@@ -105,8 +108,8 @@ def create_app() -> Flask:
             run_id = create_run()
             try:
                 result = investigate(research_question, run_id)
-            except Exception:
-                return render_template("index.html", error=STAGE_MESSAGES["failed"]), 500
+            except Exception as exc:
+                return render_template("index.html", error=failure_details(exc)["message"]), 500
 
             return render_template(
                 "report.html",
