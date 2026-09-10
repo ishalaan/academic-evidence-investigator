@@ -41,6 +41,36 @@ def has_repeated_passages(text):
                for index, sentence in enumerate(substantive) for earlier in substantive[:index])
 
 
+def parse_section(content, field):
+    """Accept lossless formatting variations without repairing incomplete JSON."""
+    cleaned = clean_json_response(content)
+    decoder = json.JSONDecoder(strict=False)
+    try:
+        data = decoder.decode(cleaned)
+    except ValueError:
+        # Some models introduce the JSON with a sentence or a Markdown label.
+        start = cleaned.find("{")
+        if start < 0:
+            raise ValueError("Return a complete JSON object, not plain prose.") from None
+        try:
+            data, end = decoder.raw_decode(cleaned, start)
+        except ValueError:
+            raise ValueError("Return complete JSON with escaped quotes and closed brackets.") from None
+        if cleaned[end:].strip() not in ("", "```"):
+            raise ValueError("Return one JSON object without trailing commentary.")
+    if not isinstance(data, dict) or field not in data:
+        raise ValueError(f"Return a JSON object containing the exact key '{field}'.")
+    value = data[field]
+    if field == "summary" and isinstance(value, list) and value and all(isinstance(v, str) and v.strip() for v in value):
+        value = "\n\n".join(value)
+    if field == "summary":
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("The summary must be a non-empty string of paragraphs.")
+    elif not isinstance(value, list) or not value or not all(isinstance(v, str) and v.strip() for v in value):
+        raise ValueError(f"The {field} must be a non-empty array of strings.")
+    return value
+
+
 def clean_abstract(text):
     return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text or "")).split())
 
@@ -87,8 +117,16 @@ def validate_report_content(content, papers, entries, research_question):
         report.limitations = [cited_text(text, entries) for text in report.limitations]
         if not papers and report.findings:
             raise ValueError("Findings without evidence.")
-    except ValueError:
-        raise ReportGenerationError("report_citations_invalid") from None
+    except ValueError as exc:
+        reasons = {
+            "Reporter must use source IDs instead of author-year citations.": "author_year_format",
+            "Reporter cited an unknown source identifier.": "unknown_source",
+            "Reporter omitted a supporting source citation.": "missing_citation",
+            "Reporter returned an invalid source citation.": "invalid_syntax",
+        }
+        error = ReportGenerationError("report_citations_invalid")
+        error.validation_reason = reasons.get(str(exc), "invalid_syntax")
+        raise error from None
     report.cited_source_ids = [entry["id"] for entry in entries if entry["id"] in used]
     return report
 
@@ -99,11 +137,29 @@ def section_event(state, action, section, **details):
                      {"section": section, **details}, stage="reporter")
 
 
+def request_section(client, messages, state, section):
+    """Transport retries do not consume the section's content-correction budget."""
+    for connection_attempt in range(1, 4):
+        try:
+            return client.chat_completion(messages=messages, temperature=0.2,
+                max_tokens=MAX_SECTION_TOKENS,
+                extra_body={"chat_template_kwargs": {"enable_thinking": False}})
+        except httpx.HTTPError as exc:
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            transient = isinstance(exc, (httpx.TimeoutException, httpx.NetworkError, httpx.RemoteProtocolError)) or status in (429, 500, 502, 503, 504)
+            if "CERTIFICATE_VERIFY_FAILED" in str(exc):
+                transient = False
+            if transient and connection_attempt < 3:
+                section_event(state, "retrying", section, attempt=connection_attempt + 1,
+                              error_code="report_model_unavailable")
+                time.sleep(2 ** connection_attempt)
+                continue
+            raise ReportGenerationError("report_model_unavailable") from None
+
+
 def generate_section(client, state, papers, entries, context, descriptor, previous):
     section, field, instruction, minimum_words = descriptor
     available_ids = [entry["id"] for entry in entries]
-    rich_evidence = sum(len(clean_abstract(p.abstract).split()) for p in papers) >= 250
-    source_count = sum(bool(clean_abstract(p.abstract)) for p in papers)
     schema = {field: "paragraphs of prose" if field == "summary" else ["developed point"]}
     prompt = (
         f"SECTION: {section}\nResearch question: {state['research_question'][:2000]}\n"
@@ -121,39 +177,22 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
     if sum(len(m["content"]) for m in base) > MAX_CONTEXT_CHARACTERS - 1000:
         raise ReportGenerationError("report_context_too_large")
     correction = ""
+    format_hint = "Return a complete JSON object with the requested section key."
     section_event(state, "section_started", section)
     for attempt in range(1, MAX_REPORT_ATTEMPTS + 1):
         messages = base + ([{"role": "user", "content": correction}] if correction else [])
-        try:
-            response = client.chat_completion(messages=messages, temperature=0.2,
-                max_tokens=MAX_SECTION_TOKENS,
-                extra_body={"chat_template_kwargs": {"enable_thinking": False}})
-        except httpx.HTTPError as exc:
-            status = getattr(getattr(exc, "response", None), "status_code", None)
-            transient = isinstance(exc, (httpx.TimeoutException, httpx.NetworkError)) or status in (429, 500, 502, 503, 504)
-            if transient and attempt < MAX_REPORT_ATTEMPTS:
-                section_event(state, "retrying", section, attempt=attempt + 1, error_code="report_model_unavailable")
-                time.sleep(attempt)
-                continue
-            raise ReportGenerationError("report_model_unavailable") from None
+        response = request_section(client, messages, state, section)
         try:
             if not response.choices or not response.choices[0].message.content:
                 raise ReportGenerationError("report_format_invalid")
             if getattr(response.choices[0], "finish_reason", None) == "length":
                 raise ReportGenerationError("report_output_truncated")
             try:
-                data = json.loads(clean_json_response(response.choices[0].message.content))
-                value = data[field]
-                if field == "summary":
-                    if not isinstance(value, str) or not value.strip():
-                        raise ValueError("Empty section")
-                    body = {"summary": value}
-                else:
-                    if not isinstance(value, list) or not value or not all(isinstance(v, str) and v.strip() for v in value):
-                        raise ValueError("Empty section")
-                    # Summary is used only to reuse validation; it is not returned.
-                    body = {"summary": f"Evidence overview [{available_ids[0]}].", field: value}
-            except (KeyError, TypeError, ValueError):
+                value = parse_section(response.choices[0].message.content, field)
+                body = ({"summary": value} if field == "summary" else
+                        {"summary": f"Evidence overview [{available_ids[0]}].", field: value})
+            except ValueError as format_error:
+                format_hint = str(format_error)
                 raise ReportGenerationError("report_format_invalid") from None
             validated = validate_report_content(json.dumps(body), papers, entries, state["research_question"])
             raw_text = value if isinstance(value, str) else "\n\n".join(value)
@@ -161,15 +200,8 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
                 raise ReportGenerationError("report_repetition")
             ids = used_source_ids(raw_text, entries)
             word_count = len(raw_text.split())
-            # Quality retries are advisory: valid shorter sections remain usable.
-            too_brief = rich_evidence and word_count < minimum_words
-            narrow_coverage = field != "limitations" and source_count >= 3 and len(ids) < 2
-            if attempt < MAX_REPORT_ATTEMPTS and (too_brief or narrow_coverage):
-                correction = (f"Expand this section to the requested depth. All of {json.dumps(available_ids)} remain available. "
-                    "Explain only mechanisms and examples actually described in relevant abstracts; fewer grounded points are preferable to invented detail. "
-                    "Do not pad with repeated caveats or claims about an artificial source restriction. Return the same JSON section.")
-                section_event(state, "retrying", section, attempt=attempt + 1, error_code="report_section_development")
-                continue
+            # Accept valid grounded sections regardless of length or number of sources.
+            # Cosmetic expansion must not consume credits or replace usable content.
             section_event(state, "section_completed", section, word_count=word_count, cited_sources=len(ids))
             return getattr(validated, field), ids
         except ReportGenerationError as exc:
@@ -181,11 +213,21 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
                 "Correct missing or unknown citations, finish the JSON, and answer the research question directly. "
                 "Keep evidence-based detail and omit invented restrictions. "
             )
+            if exc.code == "report_citations_invalid":
+                correction += {
+                    "missing_citation": " Every non-empty summary paragraph and every finding must contain a supporting [Snumber] token. Remove unsupported claims; do not invent a citation.",
+                    "unknown_source": " A cited source ID was not in the supplied list. Use only an existing ID whose abstract supports the claim; remove unsupported claims.",
+                    "author_year_format": " Use bracketed source IDs, not author-year citations. The application adds author names and years.",
+                    "invalid_syntax": " Write citation tokens exactly as [S1] or [S2], choosing actual supplied IDs.",
+                }.get(getattr(exc, "validation_reason", ""), "")
+            if exc.code == "report_format_invalid":
+                correction += format_hint
             if exc.code == "report_repetition":
                 correction += "Repeated passages were detected. Write a fresh coherent section: explain each point once, merging its supporting citations, and give every paragraph a distinct purpose."
             if exc.code == "report_output_truncated":
                 correction += "Keep this section shorter so the response completes."
-            section_event(state, "retrying", section, attempt=attempt + 1, error_code=exc.code)
+            section_event(state, "retrying", section, attempt=attempt + 1, error_code=exc.code,
+                          validation_reason=getattr(exc, "validation_reason", None))
 
 
 def reporter_node(state: ResearchState) -> dict:

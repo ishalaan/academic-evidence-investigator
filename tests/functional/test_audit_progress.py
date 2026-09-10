@@ -17,7 +17,11 @@ def test_status_returns_only_safe_stage_fields(stage):
                  stage=stage, status=status, metrics={"private": "hidden"})
     response = create_app().test_client().get(f"/runs/{run_id}/status")
     assert response.status_code == 200
-    assert response.json["message"] == STAGE_MESSAGES[stage]
+    if stage == "failed":
+        assert "workflow_stage_failed" in response.json["message"]
+        assert run_id in response.json["message"]
+    else:
+        assert response.json["message"] == STAGE_MESSAGES[stage]
     assert set(response.json) == {"run_id", "stage", "status", "message", "report_url", "events"}
     assert "PRIVATE" not in response.text
     assert "private" not in response.text
@@ -174,3 +178,4 @@ def test_report_failure_shows_safe_actionable_reason():
     response = create_app().test_client().get(f"/runs/{run_id}/status")
     assert "citations could not be verified" in response.json["message"]
     assert "PRIVATE" not in response.text
+

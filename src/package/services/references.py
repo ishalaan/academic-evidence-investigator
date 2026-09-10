@@ -91,7 +91,14 @@ def reference_entries(papers):
     return entries
 
 
+def normalise_source_tokens(text):
+    return re.sub(r"\[\s*s\d+(?:\s*[,;]\s*s\d+)*\s*\]",
+                  lambda m: " ".join(f"[{token.upper()}]" for token in re.findall(r"s\d+", m.group(0), re.I)),
+                  text, flags=re.I)
+
+
 def used_source_ids(text, entries):
+    text = normalise_source_tokens(text)
     valid = {entry["id"] for entry in entries}
     bracket_text = " ".join(re.findall(r"\[([^\]]+)\]", text))
     used = set(re.findall(r"\bS\d+\b", bracket_text)) & valid
@@ -110,6 +117,7 @@ def report_references(report):
 
 def cited_text(text, entries, *, require_citation=False):
     """Resolve validated source tokens. Never fabricate a citation for uncited prose."""
+    text = normalise_source_tokens(text)
     lookup = {entry["id"]: entry["citation"] for entry in entries}
     # Accept ordinary model variations without guessing which source was intended.
     text = re.sub(r"\[\s*S\d+(?:\s*[,;]\s*S\d+)*\s*\]",

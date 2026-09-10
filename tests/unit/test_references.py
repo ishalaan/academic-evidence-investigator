@@ -76,3 +76,10 @@ def test_doi_url_normalisation_and_fallback():
 def test_adjacent_citations_form_one_harvard_group(tokens):
     entries = reference_entries([Paper(title='One', authors=['Jane Smith'], year=2025), Paper(title='Two', authors=['Joe Jones'], year=2024)])
     assert cited_text('Evidence ' + tokens + '.', entries) == 'Evidence (Smith, 2025; Jones, 2024).'
+
+
+def test_lowercase_citation_ids_preserve_reference_tracking():
+    from package.services.references import used_source_ids
+    entries = reference_entries([Paper(title='One')])
+    assert cited_text('Evidence [ s1 ].', entries) == 'Evidence (One, no date).'
+    assert used_source_ids('Evidence [s1].', entries) == {'S1'}

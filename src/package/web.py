@@ -8,7 +8,7 @@ from package.workflow.audit import STAGE_MESSAGES
 from package.workflow.activity import activity_events
 from package.workflow.graph import workflow
 from package.services.references import reference_entries, report_references, source_url
-from package.services.report_errors import REPORT_ERRORS, failure_details
+from package.services.report_errors import REPORT_ERRORS, failure_details, run_failure_message
 
 
 def create_app() -> Flask:
@@ -35,10 +35,10 @@ def create_app() -> Flask:
     def investigate(question, run_id):
         try:
             return workflow.invoke({"research_question": question, "search_cycle": 0, "run_id": run_id})
-        except Exception:
+        except Exception as exc:
             run = get_run(run_id, include_events=False)
             if run["status"] != "failed":
-                record_event(run_id, "Workflow", "failed", {"message": STAGE_MESSAGES["failed"]},
+                record_event(run_id, "Workflow", "failed", failure_details(exc),
                              stage="failed", status="failed")
             raise
 
@@ -74,8 +74,7 @@ def create_app() -> Flask:
         # An explicit allowlist keeps audit details and model output out of progress.
         response = jsonify(
             run_id=run_id, status=run["status"], stage=run["stage"],
-            message=(REPORT_ERRORS.get(run["events"][-1]["details"].get("error_code"), STAGE_MESSAGES["failed"])
-                     if run["status"] == "failed" and run["events"]
+            message=(run_failure_message(run) if run["status"] == "failed"
                      else STAGE_MESSAGES.get(run["stage"], STAGE_MESSAGES["queued"])),
             events=activity_events(run["events"]),
             report_url=url_for("run_report", run_id=run_id) if run["status"] == "completed" else None,
@@ -110,7 +109,7 @@ def create_app() -> Flask:
             try:
                 result = investigate(research_question, run_id)
             except Exception as exc:
-                return render_template("index.html", error=failure_details(exc)["message"]), 500
+                return render_template("index.html", error=run_failure_message(get_run(run_id))), 500
 
             return render_template(
                 "report.html",

@@ -83,3 +83,63 @@ def test_network_failure_has_safe_category(monkeypatch):
         reporter_node({"research_question": "Q", "processed_papers": [Paper(title="Study", abstract="Evidence.")]})
     assert error.value.code == "report_model_unavailable"
     assert "PRIVATE" not in str(error.value)
+
+
+def test_remote_disconnect_retries_without_repeating_completed_content(monkeypatch):
+    from package.agents.reporter import request_section
+    client = SequenceClient([httpx.RemoteProtocolError('PRIVATE server disconnected'), response(valid_payload())])
+    monkeypatch.setattr('package.agents.reporter.time.sleep', lambda _: None)
+    result = request_section(client, [{'role': 'user', 'content': 'Section'}], {}, 'findings')
+    assert result.choices
+    assert len(client.calls) == 2
+
+
+def test_authentication_errors_are_not_retried(monkeypatch):
+    from package.agents.reporter import request_section
+    request = httpx.Request('POST', 'https://example.com')
+    error = httpx.HTTPStatusError('PRIVATE', request=request, response=httpx.Response(401, request=request))
+    client = SequenceClient([error])
+    with pytest.raises(ReportGenerationError):
+        request_section(client, [], {}, 'summary')
+    assert len(client.calls) == 1
+
+
+def test_missing_citation_retry_explains_defect(monkeypatch):
+    client = SequenceClient([response(valid_payload('Unsupported paragraph.')), response(valid_payload())])
+    monkeypatch.setattr('package.agents.reporter.get_llm_client', lambda: client)
+    result = reporter_node({'research_question': 'Q', 'processed_papers': [Paper(title='Study', abstract='Evidence.')]})
+    assert result['final_report']
+    assert 'Every non-empty summary paragraph' in client.calls[1]['messages'][-1]['content']
+
+
+def test_persistent_unknown_citation_has_safe_diagnostic(monkeypatch):
+    from package.services.report_errors import failure_details
+    client = SequenceClient([response(valid_payload('Unsupported [S99].'))] * MAX_REPORT_ATTEMPTS)
+    monkeypatch.setattr('package.agents.reporter.get_llm_client', lambda: client)
+    with pytest.raises(ReportGenerationError) as caught:
+        reporter_node({'research_question': 'Q', 'processed_papers': [Paper(title='Study', abstract='Evidence.')]})
+    assert failure_details(caught.value)['validation_reason'] == 'unknown_source'
+
+
+def test_provider_402_is_reported_as_credits_required(monkeypatch):
+    from huggingface_hub.errors import HfHubHTTPError
+    from package.agents.reporter import request_section
+    from package.services.report_errors import failure_details
+    request = httpx.Request('POST', 'https://example.com')
+    error = HfHubHTTPError('PRIVATE provider content', response=httpx.Response(402, request=request))
+    client = SequenceClient([error])
+    with pytest.raises(ReportGenerationError) as caught:
+        request_section(client, [], {}, 'summary')
+    assert len(client.calls) == 1
+    details = failure_details(caught.value)
+    assert details['error_code'] == 'model_credits_required'
+    assert 'PRIVATE' not in str(details)
+
+
+def test_valid_short_section_is_not_rewritten_for_cosmetic_depth(monkeypatch):
+    client = SequenceClient([response(valid_payload())] * 3)
+    monkeypatch.setattr('package.agents.reporter.get_llm_client', lambda: client)
+    papers = [Paper(title=f'Study {i}', abstract='Evidence about education. ' * 100) for i in range(3)]
+    report = reporter_node({'research_question': 'Q', 'processed_papers': papers})['final_report']
+    assert report.summary
+    assert len(client.calls) == 3
