@@ -132,7 +132,7 @@ def cited_text(text, entries, *, require_citation=False):
         ids = list(dict.fromkeys(re.findall(r"\[(S\d+)\]", match.group(0))))
         return "(" + "; ".join(lookup[source_id][1:-1] for source_id in ids) + ")"
 
-    result = re.sub(r"\[S\d+\](?:[ \t]+\[S\d+\])*", citation_group, text)
+    result = re.sub(r"\[S\d+\](?:[ \t]*\[S\d+\])*", citation_group, text)
     if re.search(r"\[S[^\]]*\]", result):
         raise ValueError("Reporter returned an invalid source citation.")
     return result

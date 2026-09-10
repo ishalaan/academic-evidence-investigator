@@ -70,3 +70,9 @@ def test_access_dates_and_extra_metadata_survive_database_round_trip():
 def test_doi_url_normalisation_and_fallback():
     assert source_url(Paper(title="Study", doi="https://doi.org/10.1234/test")) == "https://doi.org/10.1234/test"
     assert source_url(Paper(title="Study", doi="bad", url="https://example.org/article")) == "https://example.org/article"
+
+
+@pytest.mark.parametrize('tokens', ['[S1][S2]', '[S1] [S2]', '[S1, S2]', '[S1][S2][S1]'])
+def test_adjacent_citations_form_one_harvard_group(tokens):
+    entries = reference_entries([Paper(title='One', authors=['Jane Smith'], year=2025), Paper(title='Two', authors=['Joe Jones'], year=2024)])
+    assert cited_text('Evidence ' + tokens + '.', entries) == 'Evidence (Smith, 2025; Jones, 2024).'

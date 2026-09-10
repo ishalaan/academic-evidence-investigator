@@ -41,7 +41,7 @@ def test_invalid_report_gets_corrected_before_save(monkeypatch, invalid):
     run_id = create_run()
     result = reporter_node({"run_id": run_id, "research_question": "Q", "processed_papers": [Paper(title="Study", abstract="Evidence.")]})
     assert result["final_report"].summary.startswith("Supported finding (Study, no date).")
-    assert len(client.calls) == 6
+    assert len(client.calls) == 4
     assert client.calls[0]["extra_body"]["chat_template_kwargs"]["enable_thinking"] is False
     events = [e for e in get_run(run_id)["events"] if e["action"] == "retrying"]
     assert len(events) == 1 and events[0]["action"] == "retrying"
@@ -55,7 +55,7 @@ def test_grouped_ids_and_known_author_year_formats_are_accepted(monkeypatch):
         Paper(title="First", authors=["Jane Smith"], year=2025, abstract="Evidence."),
         Paper(title="Second", authors=["Jo Jones"], year=2024, abstract="Evidence.")]})
     assert result["final_report"].summary.startswith("Comparison (Smith, 2025; Jones, 2024).\n\nA known citation (Smith, 2025).")
-    assert len(client.calls) == 5
+    assert len(client.calls) == 3
 
 
 def test_retries_are_bounded_and_failure_reason_is_safe(monkeypatch):

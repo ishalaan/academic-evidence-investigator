@@ -42,3 +42,15 @@ observed study results. Do not claim effectiveness merely because a method was
 proposed. Keep each summary section focused on its assigned purpose.
 Use source IDs only inside bracketed citation tokens, never as names in prose.
 Use British spelling, including personalised, analysing and judgement.
+
+Answer the specific research question, not merely the broad topic of LLMs.
+A paper about software testing or scientific research is not evidence about
+education unless its abstract explicitly connects that application to education.
+Do not force every supplied source into the answer. Combine corroborating sources
+in one thematic discussion instead of repeating that discussion per source.
+Do not claim small samples, self-reporting, measured workload reductions, broad
+adoption, or bias findings unless those details appear in the abstract. Distinguish
+potential benefits and recommendations from demonstrated outcomes. Limitations
+must describe documented issues or gaps in the retrieved evidence, not guessed
+study methods. Findings should add concrete study detail to the summary, not copy
+its sentences. Use fewer meaningful findings instead of generic padding.

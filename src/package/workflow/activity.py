@@ -13,7 +13,7 @@ def activity_events(events):
         stage = component.lower()
         if stage not in ("planner", "retrieval", "processing", "critic", "reporter", "workflow"):
             continue
-        section_names = {"summary_answer": "the main answer", "summary_analysis": "the evidence analysis",
+        section_names = {"summary": "the summary", "summary_answer": "the main answer", "summary_analysis": "the evidence analysis",
                          "summary_implications": "the practical implications", "findings": "the findings", "limitations": "the limitations"}
         if action in ("section_started", "section_completed") and component == "Reporter":
             name = section_names.get(details.get("section"), "a report section")

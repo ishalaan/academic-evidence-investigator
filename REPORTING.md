@@ -11,11 +11,11 @@ The report has three tabs:
 
 ## Report depth and context limits
 
-The Reporter composes five bounded sections: three connected parts of the Summary,
-Findings and Limitations. Targets are approximately 620–800 summary words, 5–8
-findings of 70–110 words each, and 3–5 limitations of 35–60 words each. These are
-writing targets, not a demand to invent evidence or to fail an otherwise usable
-answer because it is shorter.
+The Reporter writes one coherent Summary in a single request, then separate
+Findings and Limitations. It no longer joins three overlapping summaries.
+The Summary targets 450–650 words in 4–6 distinct thematic paragraphs; fewer are
+appropriate for thin evidence. Findings provide study-level detail. Substantial
+near-identical sentences trigger a bounded rewrite of only the current section.
 
 Each request receives the same complete list of available evidence IDs. An old
 retry instruction mentioning only [S1] was removed because it could be mistaken
@@ -26,10 +26,10 @@ single source. Evidence-supported negative findings are still allowed.
 Abstract excerpts use a shared 15,000-character evidence budget. Requests have a
 24,000-character input ceiling and a 2,400-token output allowance per section.
 Character limits are a conservative engineering budget, not an exact token count.
-Previous model conversations are not accumulated; at most three short previous
-openings help reduce repetition. Thinking is disabled for the Reporter. Up to two
+Previous model conversations are not accumulated; a bounded excerpt of the summary
+provides context for subsequent sections. Thinking is disabled for the Reporter. Up to two
 correction attempts apply to the current section only. Short but valid sections
-remain usable after advisory depth retries. This takes more model calls than the
+remain usable after advisory depth retries; the summary has no minimum-length retry. This takes more model calls than the
 old one-shot report, but avoids squeezing the whole answer into one response.
 
 The prose leads with supported applications, mechanisms, examples and comparisons.

@@ -18,7 +18,7 @@ class SectionClient:
         self.calls.append(kwargs)
         section = kwargs["messages"][1]["content"].splitlines()[0].split(": ")[1]
         body = {
-            "summary_answer": {"summary": "Contextual question answering supports teaching [S2]."},
+            "summary": {"summary": "Knowledge graphs support contextual question answering for teaching [S2]."},
             "summary_analysis": {"summary": "Knowledge graphs ground contextual answers [S2]."},
             "summary_implications": {"summary": "Teachers can use contextual support [S2]."},
             "findings": {"findings": ["Contextual answers draw on a knowledge graph [S2]."]},
@@ -39,7 +39,7 @@ def test_all_sources_remain_available_and_only_cited_references_are_shown(monkey
     assert [entry["id"] for entry in report_references(report)] == ["S2"]
     assert "knowledge graphs" in report.summary.lower()
     assert "excluded" not in report.summary and "restriction" not in report.summary
-    assert len(client.calls) == 5
+    assert len(client.calls) == 3
     for call in client.calls:
         assert 'ALL AVAILABLE SOURCE IDS: ["S1", "S2"]' in call["messages"][1]["content"]
         assert "Use only supplied [S1] source IDs" not in str(call)
@@ -90,4 +90,67 @@ def test_temporary_failure_retries_only_current_section(monkeypatch):
     report = reporter_node({"research_question": "Q", "processed_papers": [
         Paper(title="First", abstract="Evidence."), Paper(title="Second", abstract="Evidence.")]})["final_report"]
     assert report.findings
-    assert client.failures == 1 and len(client.calls) == 5
+    assert client.failures == 1 and len(client.calls) == 3
+
+
+def test_summary_is_written_once_and_repeated_draft_is_retried(monkeypatch):
+    from package.agents.reporter import has_repeated_passages
+    duplicate = 'Large language models can support teachers by generating practice questions and providing contextual explanations [S2].'
+    assert has_repeated_passages(duplicate + '\n\n' + duplicate)
+    assert not has_repeated_passages('Teachers create practice questions using the system [S2]. Students receive contextual explanations [S2].')
+
+    class RepeatingClient(SectionClient):
+        attempts = 0
+        def chat_completion(self, **kwargs):
+            if 'SECTION: summary\n' in kwargs['messages'][1]['content']:
+                self.attempts += 1
+                if self.attempts == 1:
+                    self.calls.append(kwargs)
+                    return SimpleNamespace(choices=[SimpleNamespace(finish_reason='stop', message=SimpleNamespace(content=json.dumps({'summary': duplicate + '\n\n' + duplicate})))])
+            return super().chat_completion(**kwargs)
+
+    client = RepeatingClient()
+    monkeypatch.setattr('package.agents.reporter.get_llm_client', lambda: client)
+    report = reporter_node({'research_question': 'Education', 'processed_papers': [Paper(title='First'), Paper(title='Second', abstract='Knowledge graphs support educational answers.')]})['final_report']
+    assert client.attempts == 2
+    assert len(client.calls) == 4
+    assert report.summary.count('Knowledge graphs') == 1
+    assert 'Repeated passages were detected' in str(client.calls[1]['messages'])
+    assert report.cited_source_ids == ['S2']
+
+
+def test_persistent_repetition_is_not_saved(monkeypatch):
+    duplicate = 'Large language models can support teachers by generating practice questions and providing contextual explanations [S1].'
+    client = SectionClient()
+    client.chat_completion = lambda **kwargs: SimpleNamespace(choices=[SimpleNamespace(finish_reason='stop', message=SimpleNamespace(content=json.dumps({'summary': duplicate + '\n\n' + duplicate})))])
+    monkeypatch.setattr('package.agents.reporter.get_llm_client', lambda: client)
+    saved = []
+    monkeypatch.setattr('package.agents.reporter.save_report', lambda report: saved.append(report))
+    with pytest.raises(ReportGenerationError) as error:
+        reporter_node({'research_question': 'Education', 'processed_papers': [Paper(title='Study', abstract='Evidence.')]})
+    assert error.value.code == 'report_repetition'
+    assert saved == []
+
+
+def test_findings_cannot_copy_summary_passages(monkeypatch):
+    sentence = 'The proposed knowledge graph system supports teachers by retrieving contextual explanations from structured educational materials [S2].'
+    class CopyingClient(SectionClient):
+        finding_attempts = 0
+        def chat_completion(self, **kwargs):
+            prompt = kwargs['messages'][1]['content']
+            body = None
+            if 'SECTION: summary\n' in prompt:
+                body = {'summary': sentence}
+            if 'SECTION: findings\n' in prompt:
+                self.finding_attempts += 1
+                if self.finding_attempts == 1:
+                    body = {'findings': [sentence]}
+            if body:
+                self.calls.append(kwargs)
+                return SimpleNamespace(choices=[SimpleNamespace(finish_reason='stop', message=SimpleNamespace(content=json.dumps(body)))])
+            return super().chat_completion(**kwargs)
+    client = CopyingClient()
+    monkeypatch.setattr('package.agents.reporter.get_llm_client', lambda: client)
+    report = reporter_node({'research_question': 'Education', 'processed_papers': [Paper(title='First'), Paper(title='Second', abstract='Knowledge graphs support educational answers.')]})['final_report']
+    assert client.finding_attempts == 2
+    assert report.findings[0] != report.summary

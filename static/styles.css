@@ -87,7 +87,7 @@ button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
 .ranked-sources { padding-left: 1.7rem; }
 .ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
 .ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
-.ranked-heading span { font-size: 0.85rem; color: #526476; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
 .ranked-sources summary { cursor: pointer; color: #213f55; }
 .audit-table { overflow-x: auto; }
 .audit-table table { border-collapse: collapse; width: 100%; }

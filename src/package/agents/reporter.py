@@ -4,6 +4,7 @@ import html
 import json
 import re
 import time
+from difflib import SequenceMatcher
 
 import httpx
 from pydantic import ValidationError
@@ -24,12 +25,20 @@ MAX_EVIDENCE_CHARACTERS = 15000
 MAX_SECTION_TOKENS = 2400
 
 SECTIONS = (
-    ("summary_answer", "summary", "Answer the research question directly and explain the main themes, with concrete examples from the abstracts. Write 220–280 words in 2–3 paragraphs.", 170),
-    ("summary_analysis", "summary", "Develop the mechanisms, approaches and practical applications. Compare and connect the available studies. Write 220–280 words in 2–3 paragraphs without repeating the opening.", 170),
-    ("summary_implications", "summary", "Explain the practical implications, relevant differences between studies and an evidence-based conclusion answering the question. Write 180–240 words in 2 paragraphs. Keep general caveats for Limitations.", 140),
+    ("summary", "summary", "Write ONE coherent summary of approximately 450–650 words in 4–6 paragraphs. Plan the entire answer before writing: open with a direct answer, group related evidence into distinct themes, compare studies within those themes, then conclude with practical implications. Each paragraph must add a new point; explain each application once, merging sources that support it. Do not restart the introduction or repeat the catalogue of applications. Use fewer words if the evidence is thin. Findings will provide the study-level detail separately.", 0),
     ("findings", "findings", "Aim for 5–8 distinct, developed findings, each 70–110 words, but use fewer when the abstracts support fewer distinct findings. Explain what the evidence says, how it works or why it matters, and supporting examples. Use different sources where relevant. Do not repeat the same claim as separate findings.", 300),
     ("limitations", "limitations", "Write 3–5 proportionate limitations, each 35–60 words. State what a limitation affects and what further evidence would help. A missing abstract in one record does not invalidate other sources. Avoid repeating the same caveat.", 100),
 )
+
+
+def has_repeated_passages(text):
+    """Catch substantial near-identical sentences, not merely shared topic words."""
+    plain = re.sub(r"\[S[^\]]*\]|\([^)]*(?:\d{4}|no date)[^)]*\)", "", text)
+    sentences = [" ".join(re.findall(r"\w+", sentence.lower()))
+                 for sentence in re.split(r"[.!?]+(?:\s+|$)|\n\n", plain)]
+    substantive = [sentence for sentence in sentences if len(sentence.split()) >= 12]
+    return any(SequenceMatcher(None, sentence, earlier, autojunk=False).ratio() >= 0.9
+               for index, sentence in enumerate(substantive) for earlier in substantive[:index])
 
 
 def clean_abstract(text):
@@ -148,6 +157,8 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
                 raise ReportGenerationError("report_format_invalid") from None
             validated = validate_report_content(json.dumps(body), papers, entries, state["research_question"])
             raw_text = value if isinstance(value, str) else "\n\n".join(value)
+            if has_repeated_passages(raw_text) or (field == "findings" and has_repeated_passages("\n\n".join(previous + [raw_text]))):
+                raise ReportGenerationError("report_repetition")
             ids = used_source_ids(raw_text, entries)
             word_count = len(raw_text.split())
             # Quality retries are advisory: valid shorter sections remain usable.
@@ -170,6 +181,8 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
                 "Correct missing or unknown citations, finish the JSON, and answer the research question directly. "
                 "Keep evidence-based detail and omit invented restrictions. "
             )
+            if exc.code == "report_repetition":
+                correction += "Repeated passages were detected. Write a fresh coherent section: explain each point once, merging its supporting citations, and give every paragraph a distinct purpose."
             if exc.code == "report_output_truncated":
                 correction += "Keep this section shorter so the response completes."
             section_event(state, "retrying", section, attempt=attempt + 1, error_code=exc.code)
@@ -187,19 +200,19 @@ def reporter_node(state: ResearchState) -> dict:
     else:
         client = get_llm_client()
         context = evidence_context(papers)
-        summary, findings, limitations, previous = [], [], [], []
+        summary, findings, limitations, previous = "", [], [], []
         used = set()
         for descriptor in SECTIONS:
             value, ids = generate_section(client, state, papers, entries, context, descriptor, previous)
             used.update(ids)
             if descriptor[1] == "summary":
-                summary.append(value)
+                summary = value
                 previous.append(value[:900])
             elif descriptor[1] == "findings":
                 findings = value
             else:
                 limitations = value
-        report = ResearchReport(research_question=state["research_question"], summary="\n\n".join(summary),
+        report = ResearchReport(research_question=state["research_question"], summary=summary,
             findings=findings, limitations=limitations, sources=papers,
             cited_source_ids=[entry["id"] for entry in entries if entry["id"] in used],
             ranked_sources=state.get("ranked_sources"))
