@@ -41,5 +41,6 @@ package = [
 
 
 [tool.pytest.ini_options]
+pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-ra"

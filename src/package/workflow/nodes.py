@@ -11,11 +11,14 @@ def processing_node(state: ResearchState) -> dict:
     reasoning.
     """
 
+    metrics = {}
     processed_papers = process_papers(
         papers=state.get("raw_papers", []),
         research_question=state["research_question"],
+        metrics=metrics,
     )
 
     return {
         "processed_papers": processed_papers,
+        "processing_metrics": metrics,
     }

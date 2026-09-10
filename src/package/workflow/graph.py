@@ -7,6 +7,7 @@ from package.agents.retrieval import retrieval_node
 from package.config import MAX_SEARCH_CYCLES
 from package.workflow.nodes import processing_node
 from package.workflow.state import ResearchState
+from package.workflow.audit import observed_node
 
 
 def route_after_critic(state: ResearchState) -> str:
@@ -56,11 +57,11 @@ def build_workflow():
     # Each responsibility is represented as a separate node so planning,
     # retrieval, deterministic processing, evaluation and reporting can be
     # tested independently while still cooperating through shared state.
-    graph.add_node("planner", planner_node)
-    graph.add_node("retrieval", retrieval_node)
-    graph.add_node("processing", processing_node)
-    graph.add_node("critic", critic_node)
-    graph.add_node("reporter", reporter_node)
+    graph.add_node("planner", observed_node("planner", planner_node))
+    graph.add_node("retrieval", observed_node("retrieval", retrieval_node))
+    graph.add_node("processing", observed_node("processing", processing_node))
+    graph.add_node("critic", observed_node("critic", critic_node, route_after_critic))
+    graph.add_node("reporter", observed_node("reporter", reporter_node))
 
     # The normal execution path follows the evidence-investigation lifecycle:
     # interpret the goal, retrieve evidence, process it, then evaluate quality.

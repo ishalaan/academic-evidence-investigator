@@ -1,4 +1,5 @@
 import sqlite3
+import json
 
 from package.config import PROJECT_ROOT
 from package.schemas import ResearchReport
@@ -101,5 +102,22 @@ def save_report(report: ResearchReport) -> int:
 
         return report_id
 
+    finally:
+        connection.close()
+
+
+def load_report(report_id: int) -> ResearchReport | None:
+    connection = sqlite3.connect(DATABASE_PATH)
+    connection.row_factory = sqlite3.Row
+    try:
+        row = connection.execute("SELECT * FROM reports WHERE id=?", (report_id,)).fetchone()
+        if row is None:
+            return None
+        return ResearchReport(
+            research_question=row["research_question"], summary=row["summary"],
+            findings=json.loads(row["findings"])["findings"],
+            limitations=json.loads(row["limitations"])["limitations"],
+            sources=json.loads(row["sources"])["sources"],
+        )
     finally:
         connection.close()

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +11,12 @@
 
     <h2>Research Question</h2>
     <p>{{ report.research_question }}</p>
+
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="summary-tab" aria-controls="summary-panel" aria-selected="true">Report</button>
+        <button type="button" role="tab" id="audit-tab" aria-controls="audit-panel" aria-selected="false" tabindex="-1">Investigation and audit</button>
+    </div>
+    <section id="summary-panel" role="tabpanel" aria-labelledby="summary-tab">
 
     <h2>Summary</h2>
     <p>{{ report.summary }}</p>
@@ -69,9 +75,43 @@
     {% if report_id %}
         <p>Saved report ID: {{ report_id }}</p>
     {% endif %}
+    </section>
+
+    <section id="audit-panel" role="tabpanel" aria-labelledby="audit-tab">
+        <h2>Investigation and audit</h2>
+        {% if audit %}
+        <p>Run ID: {{ audit.id }} · Report ID: {{ report_id or 'Not saved' }}</p>
+        <p>Started: {{ audit.created_at }} · Updated: {{ audit.updated_at }} (UTC)</p>
+        <h3>Run metrics</h3>
+        <p>Retrieval totals include all search cycles. Processing counts describe the accumulated corpus at its latest processing stage; repeated processing is not counted twice. Raw papers are records returned by the provider adapters.</p>
+        <dl class="metrics">
+        {% for key, value in audit.metrics.items() %}
+            <dt>{{ key | replace('_', ' ') | capitalize }}</dt><dd>{{ value }}</dd>
+        {% endfor %}
+        </dl>
+        <h3>Critic decisions</h3>
+        {% for event in audit.events if event.component == 'Critic' and event.action == 'completed' %}
+        <article>
+            <p><strong>{{ 'Sufficient evidence' if event.details.sufficient else 'Insufficient evidence' }}</strong></p>
+            <p>{{ event.details.reason }}</p>
+            <p>Next step: {{ 'Replanning search' if event.details.next_stage == 'planner' else 'Generating report' }}{% if event.details.cycle_limit_reached %} — search cycle limit reached{% endif %}.</p>
+        </article>
+        {% else %}<p>No Critic decision was recorded.</p>{% endfor %}
+        <h3>Workflow worklog</h3>
+        <div class="audit-table">
+        <table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Component</th><th>Action</th><th>Details</th></tr></thead>
+            <tbody>{% for event in audit.events %}
+            <tr><td>{{ event.timestamp }}</td><td>{{ event.component }}</td><td>{{ event.action | replace('_', ' ') }}</td><td><pre>{{ event.details | tojson(indent=2) }}</pre></td></tr>
+            {% endfor %}</tbody>
+        </table>
+        </div>
+        {% else %}<p>No audit information is available for this report.</p>{% endif %}
+    </section>
 
     <p>
         <a href="/">Start another investigation</a>
     </p>
+    <script src="{{ url_for('static', filename='report-tabs.js') }}" defer></script>
 </body>
 </html>

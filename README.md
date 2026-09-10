@@ -582,8 +582,6 @@ Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K.R. and Cao, Y. (20
 
 Zhao, W.X., Zhou, K., Li, J., Tang, T., Wang, X., Hou, Y., Min, Y., Zhang, B., Zhang, J., Dong, Z. et al. (2023) ‘A survey of large language models’, arXiv preprint arXiv:2303.18223. Available at: https://arxiv.org/abs/2303.18223 (Accessed: 9 September 2026).
 
-Additional framework and API documentation used during implementation should also be acknowledged where appropriate in the final submission.
-
 ---
 
 ## Final Status

@@ -12,3 +12,8 @@ class ResearchState(TypedDict, total=False):
     search_cycle: int
     final_report: ResearchReport
     report_id: int
+    run_id: str
+    run_started: float
+    metrics: dict
+    processing_metrics: dict
+    provider_failures: list[dict]

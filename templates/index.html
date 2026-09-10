@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,8 +20,9 @@
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
+        <p id="progress-error" class="error" role="alert" hidden></p>
 
-        <form id="research-form" method="POST">
+        <form id="research-form" method="POST" data-start-url="{{ url_for('start_run') }}">
             <label for="research_question">
                 Research Question
             </label>
@@ -43,25 +44,21 @@
         <div class="loading-box">
             <div class="spinner"></div>
             <h2>Investigating academic evidence...</h2>
-            <p>
-                The agents are planning, retrieving and analysing sources.
-                This may take a moment.
-            </p>
+            <p id="progress-status" role="status" aria-live="polite">Waiting to start</p>
+            <p>Updates reflect the current workflow stage.</p>
         </div>
+        <aside class="activity-pane" aria-labelledby="activity-heading">
+            <header>
+                <p class="activity-eyebrow">LIVE INVESTIGATION</p>
+                <h2 id="activity-heading">Agent activity</h2>
+                <p>Follow each step as it happens. Previous actions stay here throughout the investigation.</p>
+            </header>
+            <ol id="activity-list" role="log" aria-label="Investigation activity" aria-live="polite" aria-relevant="additions text"></ol>
+            <p id="activity-empty">Waiting for the first agent to start…</p>
+        </aside>
     </div>
 
-    <script>
-        const form = document.getElementById("research-form");
-        const submitButton = document.getElementById("submit-button");
-        const loadingOverlay = document.getElementById("loading-overlay");
-
-        form.addEventListener("submit", function () {
-            submitButton.disabled = true;
-            submitButton.textContent = "Processing...";
-
-            loadingOverlay.classList.add("visible");
-        });
-    </script>
+    <script src="{{ url_for('static', filename='progress.js') }}" defer></script>
 
 </body>
 </html>

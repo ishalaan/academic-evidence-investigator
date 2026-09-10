@@ -27,6 +27,7 @@ def retrieval_node(state: ResearchState) -> dict:
     # adds new evidence to the investigation instead of replacing earlier
     # results. Deduplication is handled later in the deterministic pipeline.
     papers: list[Paper] = list(state.get("raw_papers", []))
+    failures = []
 
     for query in search_plan.queries:
         try:
@@ -41,7 +42,7 @@ def retrieval_node(state: ResearchState) -> dict:
             # Logging and continuing allows Crossref to act as a fallback and
             # keeps temporary external-service failures from terminating the
             # complete autonomous workflow.
-            print(f"Semantic Scholar retrieval failed: {exc}")
+            failures.append({"provider": "Semantic Scholar", "message": "Provider request failed."})
 
         try:
             crossref_results = search_crossref(
@@ -54,9 +55,9 @@ def retrieval_node(state: ResearchState) -> dict:
             # Crossref failures are isolated for the same reason: retrieval
             # sources should fail independently rather than bringing down the
             # entire agent system.
-            print(f"Crossref retrieval failed: {exc}")
+            failures.append({"provider": "Crossref", "message": "Provider request failed."})
 
     # Raw results are returned without ranking or filtering here because those
     # responsibilities belong to the processing stage. Keeping these concerns
     # separate makes the workflow easier to test, explain, and maintain.
-    return {"raw_papers": papers}
+    return {"raw_papers": papers, "provider_failures": failures}

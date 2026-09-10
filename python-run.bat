@@ -7,7 +7,7 @@ REM Activate the virtual environment
 call venv\Scripts\activate
 
 REM Run the Python entry point
-python main.py
+python app.py
 
 REM Wait for keypress before closing
 pause

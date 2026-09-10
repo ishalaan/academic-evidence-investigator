@@ -13,6 +13,8 @@ MAX_EVIDENCE_PAPERS = 10
 def process_papers(
     papers: list[Paper],
     research_question: str,
+    *,
+    metrics: dict | None = None,
 ) -> list[Paper]:
     """
     Clean, deduplicate, filter and rank retrieved evidence.
@@ -36,4 +38,15 @@ def process_papers(
         research_question,
     )
 
-    return ranked[:MAX_EVIDENCE_PAPERS]
+    retained = ranked[:MAX_EVIDENCE_PAPERS]
+    if metrics is not None:
+        metrics.update(
+            valid_papers_retained=len(validated),
+            noisy_records_removed=len(papers) - len(validated),
+            duplicates_removed=len(validated) - len(deduplicated),
+            relevant_papers_retained=len(relevant),
+            irrelevant_records_removed=len(deduplicated) - len(relevant),
+            evidence_limit_removed=len(ranked) - len(retained),
+            final_evidence_count=len(retained),
+        )
+    return retained

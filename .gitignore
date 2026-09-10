@@ -5,29 +5,45 @@ python-activate.bat
 python-freeze.bat
 python-install.bat
 
-# Virtual environment
+# Virtual environments
 .venv/
 venv/
 
-# Environment variables
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
 
-# Python cache
+# Python cache / compiled files
 __pycache__/
 *.py[cod]
+*$py.class
 
 # PyTest / coverage
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+coverage.xml
 
-# SQLite database
+# SQLite / local data
 data/*.db
+data/*.sqlite
+data/*.sqlite3
 
-# IDE files
+# IDE / editor files
 .idea/
 .vscode/
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Build / packaging artefacts
+build/
+dist/
+*.egg-info/
+
+# Temporary files
+*.tmp
+*.log
