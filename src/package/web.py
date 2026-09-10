@@ -7,6 +7,7 @@ from package.storage.audit import create_run, get_run, record_event
 from package.workflow.audit import STAGE_MESSAGES
 from package.workflow.activity import activity_events
 from package.workflow.graph import workflow
+from package.services.references import reference_entries
 
 
 def create_app() -> Flask:
@@ -24,6 +25,10 @@ def create_app() -> Flask:
     )
     initialise_database()
     available_workers = BoundedSemaphore(2)
+
+    @app.context_processor
+    def report_helpers():
+        return {"reference_entries": reference_entries, "activity_events": activity_events}
 
     def investigate(question, run_id):
         try:

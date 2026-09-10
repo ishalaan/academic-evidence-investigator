@@ -22,6 +22,10 @@ class FakeResponse:
                             },
                         ],
                         "abstract": "Example abstract.",
+                        "container-title": ["Journal of Education"],
+                        "volume": "12",
+                        "issue": "3",
+                        "page": "20-30",
                         "DOI": "10.5678/example",
                         "URL": "https://example.com/crossref-paper",
                         "published-online": {
@@ -57,3 +61,7 @@ def test_crossref_response_is_normalised(monkeypatch):
     assert paper.year == 2024
     assert paper.doi == "10.5678/example"
     assert paper.source == "Crossref"
+    assert paper.author_details[0].family == "Author"
+    assert paper.journal == "Journal of Education"
+    assert paper.volume == "12" and paper.issue == "3" and paper.pages == "20-30"
+    assert paper.accessed_on is not None

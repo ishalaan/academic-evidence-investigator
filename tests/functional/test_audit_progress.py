@@ -55,7 +55,7 @@ def test_start_returns_before_workflow_finishes_and_can_be_polled(monkeypatch):
     assert status["status"] == "completed"
     report = client.get(status["report_url"])
     assert b"Persisted briefing" in report.data
-    assert b"Investigation and audit" in report.data
+    assert b"Investigation and Audit" in report.data
 
 
 def test_report_tab_shows_persisted_critic_metrics_and_escapes_reason():

@@ -121,8 +121,8 @@ test('activity preserves history, avoids duplicates and highlights current actio
 });
 
 test('tabs support click and keyboard selection with matching panel visibility', () => {
-    const tabs = [element(), element()];
-    const panels = [element(), element()];
+    const tabs = Array.from({length: 6}, element);
+    const panels = Array.from({length: 6}, element);
     tabs.forEach((tab, index) => {
         tab.attributes = {'aria-controls': `panel-${index}`};
         tab.setAttribute = (key, value) => tab.attributes[key] = value;
@@ -140,7 +140,11 @@ test('tabs support click and keyboard selection with matching panel visibility',
     assert.equal(panels[0].hidden, true);
     assert.equal(panels[1].hidden, false);
     assert.equal(tabs[1].attributes['aria-selected'], 'true');
-    tabs[1].listeners.keydown({key: 'ArrowRight', preventDefault() {}});
+    tabs[1].listeners.keydown({key: 'End', preventDefault() {}});
+    assert.equal(tabs[5].focused, true);
+    assert.equal(panels[5].hidden, false);
+    assert.ok(panels.slice(0, 5).every(panel => panel.hidden));
+    tabs[5].listeners.keydown({key: 'ArrowRight', preventDefault() {}});
     assert.equal(tabs[0].focused, true);
     assert.equal(tabs[0].tabIndex, 0);
     assert.equal(tabs[1].tabIndex, -1);

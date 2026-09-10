@@ -13,72 +13,65 @@
     <p>{{ report.research_question }}</p>
 
     <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
-        <button type="button" role="tab" id="summary-tab" aria-controls="summary-panel" aria-selected="true">Report</button>
-        <button type="button" role="tab" id="audit-tab" aria-controls="audit-panel" aria-selected="false" tabindex="-1">Investigation and audit</button>
+        <button type="button" role="tab" id="summary-tab" aria-controls="summary-panel" aria-selected="true">Summary</button>
+        <button type="button" role="tab" id="findings-tab" aria-controls="findings-panel" aria-selected="false" tabindex="-1">Findings</button>
+        <button type="button" role="tab" id="limitations-tab" aria-controls="limitations-panel" aria-selected="false" tabindex="-1">Limitations</button>
+        <button type="button" role="tab" id="sources-tab" aria-controls="sources-panel" aria-selected="false" tabindex="-1">Sources</button>
+        <button type="button" role="tab" id="audit-tab" aria-controls="audit-panel" aria-selected="false" tabindex="-1">Investigation and Audit</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Activity Log</button>
     </div>
     <section id="summary-panel" role="tabpanel" aria-labelledby="summary-tab">
 
     <h2>Summary</h2>
-    <p>{{ report.summary }}</p>
+    {% for paragraph in report.summary.split('\n\n') if paragraph.strip() %}
+        <p>{{ paragraph }}</p>
+    {% endfor %}
+    </section>
 
+    <section id="findings-panel" role="tabpanel" aria-labelledby="findings-tab">
     <h2>Findings</h2>
     <ul>
         {% for finding in report.findings %}
             <li>{{ finding }}</li>
         {% endfor %}
     </ul>
+    {% if not report.findings %}<p>No evidence-supported findings were available.</p>{% endif %}
+    </section>
 
+    <section id="limitations-panel" role="tabpanel" aria-labelledby="limitations-tab">
     <h2>Limitations</h2>
     <ul>
         {% for limitation in report.limitations %}
             <li>{{ limitation }}</li>
         {% endfor %}
     </ul>
+    {% if not report.limitations %}<p>No limitations were recorded.</p>{% endif %}
+    </section>
 
+    <section id="sources-panel" role="tabpanel" aria-labelledby="sources-tab">
     <h2>Sources</h2>
 
     {% if report.sources %}
-        <ul>
-            {% for paper in report.sources %}
-                <li>
-                    <strong>{{ paper.title }}</strong>
-
-                    {% if paper.authors %}
-                        <br>
-                        Authors: {{ paper.authors | join(", ") }}
-                    {% endif %}
-
-                    {% if paper.year %}
-                        <br>
-                        Year: {{ paper.year }}
-                    {% endif %}
-
-                    {% if paper.doi %}
-                        <br>
-                        DOI: {{ paper.doi }}
-                    {% endif %}
-
-                    {% if paper.url %}
-                        <br>
-                        <a href="{{ paper.url }}" target="_blank">
-                            View source
-                        </a>
-                    {% endif %}
-                </li>
-                <br>
-            {% endfor %}
+        <p>Harvard references using the available metadata. Access dates record retrieval of metadata and abstracts; full texts were not retrieved. Missing publication details should be checked before academic submission.</p>
+        <ul class="reference-list">
+        {% for entry in reference_entries(report.sources) | sort(attribute='sort_key') %}
+            <li id="source-{{ entry.id }}">
+                {{ entry.opening }}{% if entry.paper.journal %}, <em>{{ entry.paper.journal }}</em>{% endif %}{% if entry.publication %}, {{ entry.publication }}{% endif %}.
+                {% if entry.url %}
+                Available at: <a href="{{ entry.url }}" target="_blank" rel="noopener noreferrer">{{ entry.url }}</a>
+                {% if entry.access_date %}(Accessed: {{ entry.access_date }}).{% else %}(Access date not recorded).{% endif %}
+                {% else %}<span class="reference-note">No DOI or web link was supplied.</span>{% endif %}
+            </li>
+        {% endfor %}
         </ul>
     {% else %}
         <p>No sources were available.</p>
     {% endif %}
 
-    {% if report_id %}
-        <p>Saved report ID: {{ report_id }}</p>
-    {% endif %}
     </section>
 
     <section id="audit-panel" role="tabpanel" aria-labelledby="audit-tab">
-        <h2>Investigation and audit</h2>
+        <h2>Investigation and Audit</h2>
         {% if audit %}
         <p>Run ID: {{ audit.id }} · Report ID: {{ report_id or 'Not saved' }}</p>
         <p>Started: {{ audit.created_at }} · Updated: {{ audit.updated_at }} (UTC)</p>
@@ -97,17 +90,25 @@
             <p>Next step: {{ 'Replanning search' if event.details.next_stage == 'planner' else 'Generating report' }}{% if event.details.cycle_limit_reached %} — search cycle limit reached{% endif %}.</p>
         </article>
         {% else %}<p>No Critic decision was recorded.</p>{% endfor %}
-        <h3>Workflow worklog</h3>
+        {% else %}<p>No audit information is available for this report.</p>{% endif %}
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Activity Log</h2>
+        <p>Recorded agent actions throughout the investigation.</p>
+        {% if audit and audit.events %}
         <div class="audit-table">
         <table>
-            <thead><tr><th>Timestamp (UTC)</th><th>Component</th><th>Action</th><th>Details</th></tr></thead>
-            <tbody>{% for event in audit.events %}
-            <tr><td>{{ event.timestamp }}</td><td>{{ event.component }}</td><td>{{ event.action | replace('_', ' ') }}</td><td><pre>{{ event.details | tojson(indent=2) }}</pre></td></tr>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>{% for event in activity_events(audit.events) %}
+            <tr><td>{{ event.timestamp }}</td><td>{{ event.component }}{% if event.cycle %}<br>Cycle {{ event.cycle }}{% endif %}</td><td>{{ event.action | replace('_', ' ') }}</td><td>{{ event.message }}</td></tr>
             {% endfor %}</tbody>
         </table>
         </div>
-        {% else %}<p>No audit information is available for this report.</p>{% endif %}
+        {% else %}<p>No activity was recorded for this report.</p>{% endif %}
     </section>
+
+    {% if report_id %}<p>Saved report ID: {{ report_id }}</p>{% endif %}
 
     <p>
         <a href="/">Start another investigation</a>

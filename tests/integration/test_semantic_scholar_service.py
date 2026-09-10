@@ -18,6 +18,7 @@ class FakeResponse:
                     ],
                     "abstract": "Example abstract about generative AI.",
                     "year": 2025,
+                    "journal": {"name": "Learning Review", "volume": "2", "pages": "1-8"},
                     "url": "https://example.com/paper",
                     "externalIds": {
                         "DOI": "10.1000/example",
@@ -57,3 +58,6 @@ def test_semantic_scholar_response_is_normalised(monkeypatch):
     assert paper.url == "https://example.com/paper"
     assert paper.doi == "10.1000/example"
     assert paper.source == "Semantic Scholar"
+    assert paper.journal == "Learning Review"
+    assert paper.volume == "2" and paper.pages == "1-8"
+    assert paper.accessed_on is not None

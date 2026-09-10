@@ -4,6 +4,7 @@ from package.schemas import ResearchReport
 from package.services.json_utils import clean_json_response
 from package.services.llm import get_llm_client
 from package.services.prompts import load_prompt
+from package.services.references import cited_text, reference_entries
 from package.storage.database import save_report
 from package.workflow.state import ResearchState
 
@@ -32,8 +33,10 @@ def reporter_node(state: ResearchState) -> dict:
     # Only the evidence required for synthesis is supplied to the model.
     # Retaining titles, abstracts and source metadata supports grounded report
     # generation while preserving traceability back to retrieved records.
+    entries = reference_entries(papers)
     papers_payload = [
         {
+            "source_id": f"S{index}",
             "title": paper.title,
             "authors": paper.authors,
             "abstract": paper.abstract,
@@ -42,7 +45,7 @@ def reporter_node(state: ResearchState) -> dict:
             "year": paper.year,
             "source": paper.source,
         }
-        for paper in papers
+        for index, paper in enumerate(papers, 1)
     ]
 
     # A strict JSON response is requested because the report is subsequently
@@ -64,7 +67,8 @@ Return JSON only in this exact structure:
   "sources": []
 }}
 
-The sources field must contain the academic papers supplied above.
+Use the supplied [S1], [S2], etc. citation tokens in the text.
+Return sources as []; the application fills this with the original evidence.
 """.strip()
 
     client = get_llm_client()
@@ -85,7 +89,7 @@ The sources field must contain the academic papers supplied above.
         temperature=0.2,
         # Qwen3 may consume part of the output allowance during reasoning, so a
         # larger token budget is reserved for the final structured briefing.
-        max_tokens=2000,
+        max_tokens=6000,
     )
 
     content = response.choices[0].message.content
@@ -97,6 +101,16 @@ The sources field must contain the academic papers supplied above.
 
     cleaned_content = clean_json_response(content)
     report_data = json.loads(cleaned_content)
+
+    # Resolve evidence IDs before persistence. Missing/unknown IDs fail explicitly;
+    # attaching arbitrary references would misrepresent evidential support.
+    report_data["summary"] = cited_text(report_data["summary"], entries, require_citation=bool(papers))
+    report_data["findings"] = [cited_text(text, entries, require_citation=bool(papers))
+                               for text in report_data.get("findings", [])]
+    report_data["limitations"] = [cited_text(text, entries) for text in report_data.get("limitations", [])]
+    if not papers and report_data.get("findings"):
+        raise ValueError("Reporter returned findings without evidence.")
+    report_data["research_question"] = research_question
 
     # Bibliographic metadata is deliberately overwritten with the retrieved
     # Paper objects instead of trusting the LLM-generated sources field.

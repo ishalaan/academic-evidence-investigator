@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime, timezone
 
 from package.schemas import Paper
 
@@ -41,6 +42,7 @@ def search_crossref(
         title = titles[0] if titles else ""
 
         authors = []
+        author_details = []
 
         for author in item.get("author", []):
             given = author.get("given", "")
@@ -49,6 +51,7 @@ def search_crossref(
 
             if full_name:
                 authors.append(full_name)
+                author_details.append({"given": given, "family": family})
 
         published = item.get("published-print") or item.get("published-online") or {}
         date_parts = published.get("date-parts") or []
@@ -67,6 +70,13 @@ def search_crossref(
                 url=item.get("URL"),
                 year=year,
                 source="Crossref",
+                author_details=author_details,
+                journal=(item.get("container-title") or [None])[0],
+                volume=str(item["volume"]) if item.get("volume") else None,
+                issue=str(item["issue"]) if item.get("issue") else None,
+                pages=str(item["page"]) if item.get("page") else None,
+                article_number=str(item["article-number"]) if item.get("article-number") else None,
+                accessed_on=datetime.now(timezone.utc).date(),
             )
         )
 

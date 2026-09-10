@@ -1,9 +1,15 @@
 from pydantic import BaseModel, Field
+from datetime import date
 
 
 class SearchPlan(BaseModel):
     research_goal: str
     queries: list[str]
+
+
+class AuthorName(BaseModel):
+    given: str = ""
+    family: str = ""
 
 
 class Paper(BaseModel):
@@ -14,6 +20,13 @@ class Paper(BaseModel):
     url: str | None = None
     year: int | None = None
     source: str | None = None
+    author_details: list[AuthorName] = Field(default_factory=list)
+    journal: str | None = None
+    volume: str | None = None
+    issue: str | None = None
+    pages: str | None = None
+    article_number: str | None = None
+    accessed_on: date | None = None
 
 
 class CriticDecision(BaseModel):

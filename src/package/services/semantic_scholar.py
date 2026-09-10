@@ -1,4 +1,5 @@
 import time
+from datetime import datetime, timezone
 
 import requests
 
@@ -45,7 +46,7 @@ def search_semantic_scholar(
     params = {
         "query": query,
         "limit": limit,
-        "fields": "title,authors,abstract,year,url,externalIds",
+        "fields": "title,authors,abstract,year,url,externalIds,journal",
     }
 
     # The assigned Semantic Scholar key permits one request per second. The
@@ -78,6 +79,7 @@ def search_semantic_scholar(
         ]
 
         external_ids = item.get("externalIds") or {}
+        journal = item.get("journal") or {}
 
         # External API data is normalised immediately into the shared Paper
         # schema so downstream agents do not need provider-specific logic.
@@ -90,6 +92,10 @@ def search_semantic_scholar(
                 url=item.get("url"),
                 year=item.get("year"),
                 source="Semantic Scholar",
+                journal=journal.get("name"),
+                volume=str(journal["volume"]) if journal.get("volume") else None,
+                pages=str(journal["pages"]) if journal.get("pages") else None,
+                accessed_on=datetime.now(timezone.utc).date(),
             )
         )
 

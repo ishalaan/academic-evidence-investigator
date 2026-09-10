@@ -73,11 +73,14 @@ button:disabled {
 }
 
 [hidden] { display: none !important; }
-[role="tablist"] { display: flex; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
 [role="tab"][aria-selected="true"] { background: #213f55; color: white; }
 button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
 .metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
 .metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
 .audit-table { overflow-x: auto; }
 .audit-table table { border-collapse: collapse; width: 100%; }
 .audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
