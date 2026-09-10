@@ -55,7 +55,7 @@ def test_start_returns_before_workflow_finishes_and_can_be_polled(monkeypatch):
     assert status["status"] == "completed"
     report = client.get(status["report_url"])
     assert b"Persisted briefing" in report.data
-    assert b"Investigation and Audit" in report.data
+    assert b"Agent Activity" in report.data
 
 
 def test_report_tab_shows_persisted_critic_metrics_and_escapes_reason():
@@ -70,8 +70,8 @@ def test_report_tab_shows_persisted_critic_metrics_and_escapes_reason():
     # A fresh application still reads the saved audit and report.
     response = create_app().test_client().get(f"/runs/{run_id}/report")
     assert response.status_code == 200
-    assert b'role="tab" id="audit-tab"' in response.data
-    assert b'role="tabpanel" aria-labelledby="audit-tab"' in response.data
+    assert b'role="tab" id="activity-tab"' in response.data
+    assert b'role="tabpanel" aria-labelledby="activity-tab"' in response.data
     assert b"Insufficient evidence" in response.data
     assert b"search cycle limit reached" in response.data
     assert b"Search cycles" in response.data

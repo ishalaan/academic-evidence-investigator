@@ -7,81 +7,71 @@
     <title>Research Report</title>
 </head>
 <body>
-    <h1>Research Report</h1>
-
-    <h2>Research Question</h2>
-    <p>{{ report.research_question }}</p>
-
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>{{ report.research_question }}</p>
+    </header>
     <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
-        <button type="button" role="tab" id="summary-tab" aria-controls="summary-panel" aria-selected="true">Summary</button>
-        <button type="button" role="tab" id="findings-tab" aria-controls="findings-panel" aria-selected="false" tabindex="-1">Findings</button>
-        <button type="button" role="tab" id="limitations-tab" aria-controls="limitations-panel" aria-selected="false" tabindex="-1">Limitations</button>
-        <button type="button" role="tab" id="sources-tab" aria-controls="sources-panel" aria-selected="false" tabindex="-1">Sources</button>
-        <button type="button" role="tab" id="audit-tab" aria-controls="audit-panel" aria-selected="false" tabindex="-1">Investigation and Audit</button>
-        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Agent Activity</button>
     </div>
-    <section id="summary-panel" role="tabpanel" aria-labelledby="summary-tab">
-
-    <h2>Summary</h2>
-    {% for paragraph in report.summary.split('\n\n') if paragraph.strip() %}
-        <p>{{ paragraph }}</p>
-    {% endfor %}
-    </section>
-
-    <section id="findings-panel" role="tabpanel" aria-labelledby="findings-tab">
-    <h2>Findings</h2>
-    <ul>
-        {% for finding in report.findings %}
-            <li>{{ finding }}</li>
-        {% endfor %}
-    </ul>
-    {% if not report.findings %}<p>No evidence-supported findings were available.</p>{% endif %}
-    </section>
-
-    <section id="limitations-panel" role="tabpanel" aria-labelledby="limitations-tab">
-    <h2>Limitations</h2>
-    <ul>
-        {% for limitation in report.limitations %}
-            <li>{{ limitation }}</li>
-        {% endfor %}
-    </ul>
-    {% if not report.limitations %}<p>No limitations were recorded.</p>{% endif %}
-    </section>
-
-    <section id="sources-panel" role="tabpanel" aria-labelledby="sources-tab">
-    <h2>Sources</h2>
-
-    {% if report.sources %}
-        <p>Harvard references using the available metadata. Access dates record retrieval of metadata and abstracts; full texts were not retrieved. Missing publication details should be checked before academic submission.</p>
-        <ul class="reference-list">
-        {% for entry in reference_entries(report.sources) | sort(attribute='sort_key') %}
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        {% for paragraph in report.summary.split('\n\n') if paragraph.strip() %}<p>{{ paragraph }}</p>{% endfor %}
+        <h2>Findings</h2>
+        {% if report.findings %}<ol class="developed-findings">
+        {% for finding in report.findings %}<li>{{ finding }}</li>{% endfor %}
+        </ol>{% else %}<p>No evidence-supported findings were available.</p>{% endif %}
+        <h2>Limitations</h2>
+        <ul>{% for limitation in report.limitations %}<li>{{ limitation }}</li>{% endfor %}</ul>
+        {% if not report.limitations %}<p>No limitations were recorded.</p>{% endif %}
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        {% set references = report_references(report) %}
+        {% if references %}<ul class="reference-list">
+        {% for entry in references | sort(attribute='sort_key') %}
             <li id="source-{{ entry.id }}">
                 {{ entry.opening }}{% if entry.paper.journal %}, <em>{{ entry.paper.journal }}</em>{% endif %}{% if entry.publication %}, {{ entry.publication }}{% endif %}.
-                {% if entry.url %}
-                Available at: <a href="{{ entry.url }}" target="_blank" rel="noopener noreferrer">{{ entry.url }}</a>
+                {% if entry.url %}Available at: <a href="{{ entry.url }}" target="_blank" rel="noopener noreferrer">{{ entry.url }}</a>
                 {% if entry.access_date %}(Accessed: {{ entry.access_date }}).{% else %}(Access date not recorded).{% endif %}
                 {% else %}<span class="reference-note">No DOI or web link was supplied.</span>{% endif %}
             </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No sources were available.</p>
-    {% endif %}
-
+        {% endfor %}</ul>{% else %}<p>No source citations were recorded in this overview.</p>{% endif %}
     </section>
 
-    <section id="audit-panel" role="tabpanel" aria-labelledby="audit-tab">
-        <h2>Investigation and Audit</h2>
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        {% if report.ranked_sources is not none %}
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set favours relevant papers with abstracts. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        {% for item in report.ranked_sources %}
+            <li>
+                <div class="ranked-heading"><strong>{{ item.paper.title }}</strong><span>Relevance score: {{ item.relevance_score }}</span></div>
+                <p class="reference-note">{{ item.paper.authors | join(', ') or 'Author not supplied' }} · {{ item.paper.year or 'No date' }}{% if item.paper.source %} · {{ item.paper.source }}{% endif %}</p>
+                <p><strong>{% if item.source_id and report.cited_source_ids is not none and item.source_id in report.cited_source_ids %}Cited in Overview{% elif item.selected %}Available to Reporter; not cited{% elif item.eligible %}Outside the {{ report.sources | length }}-paper writing evidence set{% else %}Below the relevance filter{% endif %}</strong></p>
+                {% if item.paper.abstract %}<details><summary>Read abstract</summary><p>{{ item.paper.abstract }}</p></details>{% else %}<p class="reference-note">Abstract not supplied.</p>{% endif %}
+                {% set link = source_url(item.paper) %}{% if link %}<a href="{{ link }}" target="_blank" rel="noopener noreferrer">View source</a>{% endif %}
+            </li>
+        {% else %}<li>No valid source records were retained.</li>{% endfor %}
+        </ol>
+        {% else %}
+        <p>The complete ranking was not saved for this older report. These are its saved evidence sources in their original order.</p>
+        <ol>{% for paper in report.sources %}<li>{{ paper.title }}{% set link = source_url(paper) %}{% if link %} — <a href="{{ link }}" target="_blank" rel="noopener noreferrer">View source</a>{% endif %}</li>{% else %}<li>No sources were available.</li>{% endfor %}</ol>
+        {% endif %}
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Agent Activity</h2>
         {% if audit %}
         <p>Run ID: {{ audit.id }} · Report ID: {{ report_id or 'Not saved' }}</p>
         <p>Started: {{ audit.created_at }} · Updated: {{ audit.updated_at }} (UTC)</p>
-        <h3>Run metrics</h3>
-        <p>Retrieval totals include all search cycles. Processing counts describe the accumulated corpus at its latest processing stage; repeated processing is not counted twice. Raw papers are records returned by the provider adapters.</p>
-        <dl class="metrics">
-        {% for key, value in audit.metrics.items() %}
-            <dt>{{ key | replace('_', ' ') | capitalize }}</dt><dd>{{ value }}</dd>
-        {% endfor %}
-        </dl>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics">{% for key, value in audit.metrics.items() %}<dt>{{ key | replace('_', ' ') | capitalize }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>
         <h3>Critic decisions</h3>
         {% for event in audit.events if event.component == 'Critic' and event.action == 'completed' %}
         <article>
@@ -90,29 +80,17 @@
             <p>Next step: {{ 'Replanning search' if event.details.next_stage == 'planner' else 'Generating report' }}{% if event.details.cycle_limit_reached %} — search cycle limit reached{% endif %}.</p>
         </article>
         {% else %}<p>No Critic decision was recorded.</p>{% endfor %}
-        {% else %}<p>No audit information is available for this report.</p>{% endif %}
-    </section>
-
-    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
-        <h2>Activity Log</h2>
-        <p>Recorded agent actions throughout the investigation.</p>
-        {% if audit and audit.events %}
-        <div class="audit-table">
-        <table>
+        <h3>Activity log</h3>
+        <div class="audit-table"><table>
             <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
             <tbody>{% for event in activity_events(audit.events) %}
             <tr><td>{{ event.timestamp }}</td><td>{{ event.component }}{% if event.cycle %}<br>Cycle {{ event.cycle }}{% endif %}</td><td>{{ event.action | replace('_', ' ') }}</td><td>{{ event.message }}</td></tr>
             {% endfor %}</tbody>
-        </table>
-        </div>
-        {% else %}<p>No activity was recorded for this report.</p>{% endif %}
+        </table></div>
+        {% else %}<p>No agent activity was recorded for this report.</p>{% endif %}
     </section>
-
     {% if report_id %}<p>Saved report ID: {{ report_id }}</p>{% endif %}
-
-    <p>
-        <a href="/">Start another investigation</a>
-    </p>
+    <p><a href="/">Start another investigation</a></p>
     <script src="{{ url_for('static', filename='report-tabs.js') }}" defer></script>
 </body>
 </html>

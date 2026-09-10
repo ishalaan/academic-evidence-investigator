@@ -35,9 +35,21 @@ class CriticDecision(BaseModel):
     suggested_queries: list[str] = Field(default_factory=list)
 
 
+class RankedSource(BaseModel):
+    paper: Paper
+    rank: int
+    relevance_score: int
+    eligible: bool
+    selected: bool
+    source_id: str | None = None
+
+
 class ResearchReport(BaseModel):
     research_question: str
     summary: str
     findings: list[str] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
     sources: list[Paper] = Field(default_factory=list)
+    cited_source_ids: list[str] | None = None
+    ranked_sources: list[RankedSource] | None = None
+    report_notes: list[str] = Field(default_factory=list)

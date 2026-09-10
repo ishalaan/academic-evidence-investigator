@@ -51,6 +51,7 @@ def deduplicate_papers(papers: list[Paper]) -> list[Paper]:
     unique: list[Paper] = []
 
     seen_dois: set[str] = set()
+    doi_positions: dict[str, int] = {}
     seen_titles: set[str] = set()
 
     for paper in papers:
@@ -61,9 +62,22 @@ def deduplicate_papers(papers: list[Paper]) -> list[Paper]:
             # DOI equality is treated as strong evidence that the records refer
             # to the same work, including normalised preprint revisions.
             if doi in seen_dois:
+                position = doi_positions[doi]
+                first = unique[position]
+                # Do not lose a usable abstract supplied by another provider for
+                # the exact same DOI. Preserve first-record values and never mix
+                # different versioned DOIs that happen to share a normalised key.
+                if (first.doi or '').strip().lower() == (paper.doi or '').strip().lower():
+                    updates = {field: getattr(paper, field) for field in
+                        ("abstract", "journal", "volume", "issue", "pages", "article_number", "url")
+                        if not getattr(first, field) and getattr(paper, field)}
+                    if first.authors == paper.authors and not first.author_details:
+                        updates["author_details"] = paper.author_details
+                    unique[position] = first.model_copy(update=updates)
                 continue
 
             seen_dois.add(doi)
+            doi_positions[doi] = len(unique)
 
         elif title:
             # When DOI metadata is missing, normalised title matching provides

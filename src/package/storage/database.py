@@ -29,6 +29,7 @@ def initialise_database() -> None:
 
     try:
         # IF NOT EXISTS makes initialisation idempotent, allowing the application
+        connection.execute("BEGIN IMMEDIATE")
         # to start repeatedly without recreating or destroying existing data.
         connection.execute(
             """
@@ -44,6 +45,9 @@ def initialise_database() -> None:
             """
         )
 
+        columns = {row[1] for row in connection.execute("PRAGMA table_info(reports)")}
+        if "report_payload" not in columns:
+            connection.execute("ALTER TABLE reports ADD COLUMN report_payload TEXT")
         connection.commit()
 
     finally:
@@ -73,9 +77,10 @@ def save_report(report: ResearchReport) -> int:
                 summary,
                 findings,
                 limitations,
-                sources
+                sources,
+                report_payload
             )
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
                 report.research_question,
@@ -86,6 +91,7 @@ def save_report(report: ResearchReport) -> int:
                 report.model_dump_json(include={"findings"}),
                 report.model_dump_json(include={"limitations"}),
                 report.model_dump_json(include={"sources"}),
+                report.model_dump_json(),
             ),
         )
 
@@ -113,6 +119,8 @@ def load_report(report_id: int) -> ResearchReport | None:
         row = connection.execute("SELECT * FROM reports WHERE id=?", (report_id,)).fetchone()
         if row is None:
             return None
+        if "report_payload" in row.keys() and row["report_payload"]:
+            return ResearchReport.model_validate_json(row["report_payload"])
         return ResearchReport(
             research_question=row["research_question"], summary=row["summary"],
             findings=json.loads(row["findings"])["findings"],

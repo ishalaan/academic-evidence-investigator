@@ -1,10 +1,11 @@
 from package.processing.deduplication import deduplicate_papers
 from package.processing.ranking import (
+    _relevance_score,
     filter_relevant_papers,
     rank_papers,
 )
 from package.processing.validation import validate_papers
-from package.schemas import Paper
+from package.schemas import Paper, RankedSource
 
 
 MAX_EVIDENCE_PAPERS = 10
@@ -15,6 +16,7 @@ def process_papers(
     research_question: str,
     *,
     metrics: dict | None = None,
+    ranked_sources: list[RankedSource] | None = None,
 ) -> list[Paper]:
     """
     Clean, deduplicate, filter and rank retrieved evidence.
@@ -38,7 +40,17 @@ def process_papers(
         research_question,
     )
 
-    retained = ranked[:MAX_EVIDENCE_PAPERS]
+    # Prefer usable abstracts for synthesis; the complete relevance ranking is
+    # retained independently, including metadata-only and below-threshold papers.
+    evidence_order = sorted(ranked, key=lambda paper: bool((paper.abstract or '').strip()), reverse=True)
+    retained = evidence_order[:MAX_EVIDENCE_PAPERS]
+    if ranked_sources is not None:
+        for index, paper in enumerate(rank_papers(deduplicated, research_question), 1):
+            selected = paper in retained
+            ranked_sources.append(RankedSource(paper=paper, rank=index,
+                relevance_score=_relevance_score(paper, research_question)[0],
+                eligible=paper in relevant, selected=selected,
+                source_id=f"S{retained.index(paper) + 1}" if selected else None))
     if metrics is not None:
         metrics.update(
             valid_papers_retained=len(validated),

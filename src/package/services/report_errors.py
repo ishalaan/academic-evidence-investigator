@@ -1,6 +1,8 @@
 """Safe diagnostic categories, without model output or provider exception text."""
 
 REPORT_ERRORS = {
+    "report_invented_restriction": "The reporting model repeatedly invented a source restriction. Please try again.",
+    "report_context_too_large": "The evidence is too large for this reporting request. Please use a shorter research question.",
     "report_model_unavailable": "The reporting model could not be reached. Please try again shortly.",
     "report_citations_invalid": "The report's citations could not be verified after retrying. Please try the investigation again.",
     "report_format_invalid": "The reporting model could not produce a complete report after retrying. Please try again.",

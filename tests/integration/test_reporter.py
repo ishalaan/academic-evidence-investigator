@@ -62,7 +62,8 @@ def test_reporter_returns_structured_report(monkeypatch):
 
     report = result["final_report"]
 
-    assert report.summary == "The evidence suggests mixed outcomes (Author, 2025)."
+    assert report.summary.startswith("The evidence suggests mixed outcomes (Author, 2025).")
+    assert report.cited_source_ids == ["S1"]
     assert len(report.findings) == 1
     assert len(report.limitations) == 1
     assert len(report.sources) == 1
@@ -82,16 +83,16 @@ def test_reporter_uses_real_metadata_for_citations_and_bibliography(monkeypatch)
             return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(payload)))])
 
     monkeypatch.setattr("package.agents.reporter.get_llm_client", lambda: CitedClient())
-    papers = [Paper(title="Alpha", authors=["Jane Smith"], year=2025),
-              Paper(title="Beta", authors=["Jane Smith"], year=2025)]
+    papers = [Paper(title="Alpha", authors=["Jane Smith"], year=2025, abstract="A relevant result."),
+              Paper(title="Beta", authors=["Jane Smith"], year=2025, abstract="Another result.")]
     report = reporter_node({"research_question": "Actual question", "processed_papers": papers})["final_report"]
     assert report.research_question == "Actual question"
-    assert report.summary == "A detailed comparison (Smith, 2025a; Smith, 2025b)."
+    assert report.summary.startswith("A detailed comparison (Smith, 2025a; Smith, 2025b).")
     assert report.findings == ["Evidence-supported finding (Smith, 2025b)."]
     assert report.sources == papers
-    assert captured["max_tokens"] == 6000
+    assert captured["max_tokens"] == 2400
     assert '"source_id": "S1"' in captured["messages"][1]["content"]
-    assert "600–900" in captured["messages"][0]["content"]
+    assert "ALL AVAILABLE SOURCE IDS" in captured["messages"][1]["content"]
 
 
 @pytest.mark.parametrize("summary", ["An invented citation [S99].", "Uncited claims."])
@@ -106,7 +107,7 @@ def test_reporter_rejects_untraceable_text_before_saving(monkeypatch, summary):
     monkeypatch.setattr("package.agents.reporter.get_llm_client", lambda: InvalidClient())
     monkeypatch.setattr("package.agents.reporter.save_report", lambda report: saved.append(report))
     with pytest.raises(ReportGenerationError):
-        reporter_node({"research_question": "Q", "processed_papers": [Paper(title="Study")]})
+        reporter_node({"research_question": "Q", "processed_papers": [Paper(title="Study", abstract="Evidence.")]})
     assert saved == []
 
 

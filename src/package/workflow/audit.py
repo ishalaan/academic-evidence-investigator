@@ -72,6 +72,9 @@ def observed_node(component, node, route=None):
                 details["cycle_limit_reached"] = not decision.sufficient and details["next_stage"] == "reporter"
             elif component == "reporter":
                 metrics["final_evidence_count"] = len(result["final_report"].sources)
+                used = result["final_report"].cited_source_ids
+                if used is not None:
+                    metrics["sources_cited"] = len(used)
             metrics["elapsed_seconds"] = round(perf_counter() - started, 3)
             record_event(run_id, component.title(), "completed", details,
                          stage="completed" if component == "reporter" else stage,

@@ -91,6 +91,23 @@ def reference_entries(papers):
     return entries
 
 
+def used_source_ids(text, entries):
+    valid = {entry["id"] for entry in entries}
+    bracket_text = " ".join(re.findall(r"\[([^\]]+)\]", text))
+    used = set(re.findall(r"\bS\d+\b", bracket_text)) & valid
+    used.update(entry["id"] for entry in entries if entry["citation"] in text)
+    return used
+
+
+def report_references(report):
+    entries = reference_entries(report.sources)
+    if report.cited_source_ids is None:
+        # Legacy reports did not preserve source IDs; do not invent citation use.
+        text = " ".join([report.summary, *report.findings, *report.limitations])
+        return [entry for entry in entries if entry["citation"][1:-1] in text]
+    return [entry for entry in entries if entry["id"] in report.cited_source_ids]
+
+
 def cited_text(text, entries, *, require_citation=False):
     """Resolve validated source tokens. Never fabricate a citation for uncited prose."""
     lookup = {entry["id"]: entry["citation"] for entry in entries}

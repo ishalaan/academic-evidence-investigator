@@ -13,7 +13,12 @@ def activity_events(events):
         stage = component.lower()
         if stage not in ("planner", "retrieval", "processing", "critic", "reporter", "workflow"):
             continue
-        if action == "started":
+        section_names = {"summary_answer": "the main answer", "summary_analysis": "the evidence analysis",
+                         "summary_implications": "the practical implications", "findings": "the findings", "limitations": "the limitations"}
+        if action in ("section_started", "section_completed") and component == "Reporter":
+            name = section_names.get(details.get("section"), "a report section")
+            message = ("Developing " if action == "section_started" else "Completed ") + name + "."
+        elif action == "started":
             stage = "replanning" if stage == "planner" and cycle and cycle > 1 else stage
             message = STAGE_MESSAGES.get(stage, "Starting investigation")
         elif action == "retrying" and component == "Reporter":

@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from package.schemas import CriticDecision, Paper, ResearchReport, SearchPlan
+from package.schemas import CriticDecision, Paper, ResearchReport, SearchPlan, RankedSource
 
 
 class ResearchState(TypedDict, total=False):
@@ -12,6 +12,7 @@ class ResearchState(TypedDict, total=False):
     search_cycle: int
     final_report: ResearchReport
     report_id: int
+    ranked_sources: list[RankedSource]
     run_id: str
     run_started: float
     metrics: dict

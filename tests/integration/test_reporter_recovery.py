@@ -16,7 +16,7 @@ def response(content, finish_reason="stop"):
 
 
 def valid_payload(summary="Supported finding [S1]."):
-    return json.dumps({"summary": summary, "findings": ["Finding [S1]."], "limitations": []})
+    return json.dumps({"summary": summary, "findings": ["Finding [S1]."], "limitations": ["Abstract-level review."]})
 
 
 class SequenceClient:
@@ -26,7 +26,7 @@ class SequenceClient:
 
     def chat_completion(self, **kwargs):
         self.calls.append(kwargs)
-        item = next(self.responses)
+        item = next(self.responses, response(valid_payload()))
         if isinstance(item, Exception):
             raise item
         return item
@@ -39,11 +39,11 @@ def test_invalid_report_gets_corrected_before_save(monkeypatch, invalid):
     client = SequenceClient([invalid, response(valid_payload())])
     monkeypatch.setattr("package.agents.reporter.get_llm_client", lambda: client)
     run_id = create_run()
-    result = reporter_node({"run_id": run_id, "research_question": "Q", "processed_papers": [Paper(title="Study")]})
-    assert result["final_report"].summary == "Supported finding (Study, no date)."
-    assert len(client.calls) == 2
+    result = reporter_node({"run_id": run_id, "research_question": "Q", "processed_papers": [Paper(title="Study", abstract="Evidence.")]})
+    assert result["final_report"].summary.startswith("Supported finding (Study, no date).")
+    assert len(client.calls) == 6
     assert client.calls[0]["extra_body"]["chat_template_kwargs"]["enable_thinking"] is False
-    events = get_run(run_id)["events"]
+    events = [e for e in get_run(run_id)["events"] if e["action"] == "retrying"]
     assert len(events) == 1 and events[0]["action"] == "retrying"
     assert events[0]["details"]["attempt"] == 2
 
@@ -52,10 +52,10 @@ def test_grouped_ids_and_known_author_year_formats_are_accepted(monkeypatch):
     client = SequenceClient([response(valid_payload("Comparison [S1, S2].\n\nA known citation (Smith, 2025)."))])
     monkeypatch.setattr("package.agents.reporter.get_llm_client", lambda: client)
     result = reporter_node({"research_question": "Q", "processed_papers": [
-        Paper(title="First", authors=["Jane Smith"], year=2025),
-        Paper(title="Second", authors=["Jo Jones"], year=2024)]})
-    assert result["final_report"].summary == "Comparison (Smith, 2025; Jones, 2024).\n\nA known citation (Smith, 2025)."
-    assert len(client.calls) == 1
+        Paper(title="First", authors=["Jane Smith"], year=2025, abstract="Evidence."),
+        Paper(title="Second", authors=["Jo Jones"], year=2024, abstract="Evidence.")]})
+    assert result["final_report"].summary.startswith("Comparison (Smith, 2025; Jones, 2024).\n\nA known citation (Smith, 2025).")
+    assert len(client.calls) == 5
 
 
 def test_retries_are_bounded_and_failure_reason_is_safe(monkeypatch):
@@ -66,7 +66,7 @@ def test_retries_are_bounded_and_failure_reason_is_safe(monkeypatch):
     run_id = create_run()
     with pytest.raises(ReportGenerationError):
         observed_node("reporter", reporter_node)({"run_id": run_id, "research_question": "Q",
-                                                  "processed_papers": [Paper(title="Study")]})
+                                                  "processed_papers": [Paper(title="Study", abstract="Evidence.")]})
     assert len(client.calls) == MAX_REPORT_ATTEMPTS
     assert saved == []
     run = get_run(run_id)
@@ -76,9 +76,10 @@ def test_retries_are_bounded_and_failure_reason_is_safe(monkeypatch):
 
 
 def test_network_failure_has_safe_category(monkeypatch):
-    client = SequenceClient([httpx.ConnectError("PRIVATE credentials")])
+    client = SequenceClient([httpx.ConnectError("PRIVATE credentials")] * MAX_REPORT_ATTEMPTS)
+    monkeypatch.setattr("package.agents.reporter.time.sleep", lambda _: None)
     monkeypatch.setattr("package.agents.reporter.get_llm_client", lambda: client)
     with pytest.raises(ReportGenerationError) as error:
-        reporter_node({"research_question": "Q", "processed_papers": []})
+        reporter_node({"research_question": "Q", "processed_papers": [Paper(title="Study", abstract="Evidence.")]})
     assert error.value.code == "report_model_unavailable"
     assert "PRIVATE" not in str(error.value)

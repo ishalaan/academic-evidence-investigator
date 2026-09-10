@@ -12,13 +12,16 @@ def processing_node(state: ResearchState) -> dict:
     """
 
     metrics = {}
+    ranked_sources = []
     processed_papers = process_papers(
         papers=state.get("raw_papers", []),
         research_question=state["research_question"],
         metrics=metrics,
+        ranked_sources=ranked_sources,
     )
 
     return {
         "processed_papers": processed_papers,
         "processing_metrics": metrics,
+        "ranked_sources": ranked_sources,
     }
