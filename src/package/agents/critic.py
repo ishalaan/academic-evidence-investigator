@@ -1,4 +1,6 @@
 import json
+from package.services.presentation import british_prose
+from package.rag.context import evidence_payload
 
 from package.schemas import CriticDecision
 from package.services.json_utils import clean_json_response
@@ -47,11 +49,18 @@ def critic_node(state: ResearchState) -> dict:
     # The exact JSON schema is included in the request because the Critic's
     # decision controls workflow routing. A predictable structure is therefore
     # more important than free-form explanatory prose.
+    if "evidence_chunks" in state:
+        papers_payload = json.loads(evidence_payload(state["evidence_chunks"]))
+
     user_content = f"""
 Research question:
 {research_question}
 
-Retrieved and processed papers:
+Discovery availability: {json.dumps(state.get("semantic_policy", {}))}
+Evidence coverage: {json.dumps(state.get("evidence_coverage", {}))}
+Judge whether the selected passages answer the question; full text alone is not proof of sufficiency.
+
+Selected evidence (abstracts for legacy runs):
 {json.dumps(papers_payload, ensure_ascii=False)}
 
 Return JSON only in this exact structure:
@@ -98,6 +107,7 @@ Return JSON only in this exact structure:
     # Pydantic validation creates a deterministic boundary around the LLM's
     # probabilistic output before the decision is used for graph routing.
     decision = CriticDecision.model_validate(decision_data)
+    decision.reason = british_prose(decision.reason)
 
     return {
         "critic_decision": decision,

@@ -9,7 +9,9 @@ from difflib import SequenceMatcher
 import httpx
 from pydantic import ValidationError
 
+from package.services.presentation import british_prose
 from package.schemas import ResearchReport
+from package.rag.context import evidence_payload
 from package.services.json_utils import clean_json_response
 from package.services.llm import get_llm_client
 from package.services.prompts import load_prompt
@@ -233,7 +235,7 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
 def reporter_node(state: ResearchState) -> dict:
     papers = state.get("processed_papers", [])
     entries = reference_entries(papers)
-    if not papers or not any(clean_abstract(p.abstract) for p in papers):
+    if not papers or not (state.get("evidence_chunks") or any(clean_abstract(p.abstract) for p in papers)):
         report = ResearchReport(research_question=state["research_question"],
             summary="The search identified no usable abstracts from which to develop an evidence-based answer. "
                     "The source records remain available for follow-up in Ranked Sources.",
@@ -241,7 +243,7 @@ def reporter_node(state: ResearchState) -> dict:
             sources=papers, cited_source_ids=[], ranked_sources=state.get("ranked_sources"))
     else:
         client = get_llm_client()
-        context = evidence_context(papers)
+        context = evidence_payload(state["evidence_chunks"]) if "evidence_chunks" in state else evidence_context(papers)
         summary, findings, limitations, previous = "", [], [], []
         used = set()
         for descriptor in SECTIONS:
@@ -258,4 +260,9 @@ def reporter_node(state: ResearchState) -> dict:
             findings=findings, limitations=limitations, sources=papers,
             cited_source_ids=[entry["id"] for entry in entries if entry["id"] in used],
             ranked_sources=state.get("ranked_sources"))
+    report.summary = british_prose(report.summary)
+    report.findings = [british_prose(text) for text in report.findings]
+    report.limitations = [british_prose(text) for text in report.limitations]
+    report.evidence_provenance = [c.model_dump(exclude={"text"}) for c in state.get("evidence_chunks", [])]
+    report.evidence_coverage = state.get("evidence_coverage", {})
     return {"final_report": report, "report_id": save_report(report)}

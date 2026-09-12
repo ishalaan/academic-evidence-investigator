@@ -47,3 +47,18 @@ dist/
 # Temporary files
 *.tmp
 *.log
+# Hybrid RAG runtime artefacts
+data/vector_store/
+data/faiss/
+data/fulltext/
+data/pdfs/
+data/chunks/
+data/cache/
+data/tmp/
+.cache/
+huggingface/
+sentence_transformers/
+*.faiss
+*.index
+*.npy
+*.npz

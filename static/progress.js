@@ -35,7 +35,7 @@ function renderActivity(events) {
         message.textContent = event.message;
         const timestamp = document.createElement("time");
         timestamp.dateTime = event.timestamp;
-        timestamp.textContent = new Date(event.timestamp).toLocaleTimeString("en-GB");
+        timestamp.textContent = event.display_timestamp || new Date(event.timestamp).toISOString().slice(0, 19).replace("T", " ");
         row.append(heading, message, timestamp);
         activityList.append(row);
         if (event.action === "started") activeSteps.set(event.component, {row, badge});

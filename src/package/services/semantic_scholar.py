@@ -46,7 +46,7 @@ def search_semantic_scholar(
     params = {
         "query": query,
         "limit": limit,
-        "fields": "title,authors,abstract,year,url,externalIds,journal",
+        "fields": "title,authors,abstract,year,url,externalIds,journal,openAccessPdf",
     }
 
     # The assigned Semantic Scholar key permits one request per second. The
@@ -89,6 +89,7 @@ def search_semantic_scholar(
                 authors=authors,
                 abstract=item.get("abstract"),
                 doi=external_ids.get("DOI"),
+                open_access_url=(item.get("openAccessPdf") or {}).get("url"),
                 url=item.get("url"),
                 year=item.get("year"),
                 source="Semantic Scholar",

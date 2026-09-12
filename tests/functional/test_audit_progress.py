@@ -168,7 +168,7 @@ def test_activity_retains_short_stages_and_replanning_without_private_details():
     assert "Crossref was unavailable" in events[3]["message"]
     assert "PRIVATE" not in first.text
     assert events == client.get(f"/runs/{run_id}/status").json["events"]
-    assert all(set(e) == {"id", "timestamp", "component", "action", "cycle", "message"} for e in events)
+    assert all(set(e) == {"id", "timestamp", "display_timestamp", "component", "action", "cycle", "message"} for e in events)
 
 
 def test_report_failure_shows_safe_actionable_reason():

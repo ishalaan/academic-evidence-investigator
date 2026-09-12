@@ -56,6 +56,12 @@ def observed_node(component, node, route=None):
             elif component == "retrieval":
                 metrics["raw_papers_retrieved"] = len(result["raw_papers"])
                 failures = result.get("provider_failures", [])
+                policy = result.get("semantic_policy", {})
+                metrics["semantic_scholar_requests"] = policy.get("requests", 0)
+                metrics["semantic_scholar_disabled"] = policy.get("disabled", False)
+                if policy.get("disabled") and not state.get("semantic_policy", {}).get("disabled"):
+                    record_event(run_id, "Retrieval", "provider_paused",
+                                 {"provider": "Semantic Scholar"}, stage=stage)
                 metrics["provider_failures"] += len(failures)
                 details.update(raw_papers_retrieved=len(result["raw_papers"]), provider_failures=failures)
                 for failure in failures:

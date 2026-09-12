@@ -7,6 +7,8 @@ from package.storage.audit import create_run, get_run, record_event
 from package.workflow.audit import STAGE_MESSAGES
 from package.workflow.activity import activity_events
 from package.workflow.graph import workflow
+from package.processing.chunking import paper_key
+from package.services.presentation import display_timestamp, plain_abstract
 from package.services.references import reference_entries, report_references, source_url
 from package.services.report_errors import REPORT_ERRORS, failure_details, run_failure_message
 
@@ -30,7 +32,7 @@ def create_app() -> Flask:
     @app.context_processor
     def report_helpers():
         return {"reference_entries": reference_entries, "report_references": report_references,
-                "source_url": source_url, "activity_events": activity_events}
+                "paper_key": paper_key, "display_timestamp": display_timestamp, "plain_abstract": plain_abstract, "source_url": source_url, "activity_events": activity_events}
 
     def investigate(question, run_id):
         try:

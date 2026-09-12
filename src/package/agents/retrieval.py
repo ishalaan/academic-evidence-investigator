@@ -1,9 +1,14 @@
+import requests
+
 from package.config import MAX_RESULTS_PER_QUERY
 from package.schemas import Paper
 from package.services.crossref import search_crossref
 from package.services.semantic_scholar import search_semantic_scholar
 from package.workflow.state import ResearchState
 
+
+SEMANTIC_MAX_REQUESTS = 6
+SEMANTIC_MAX_FAILURES = 2
 
 def retrieval_node(state: ResearchState) -> dict:
     """
@@ -28,21 +33,32 @@ def retrieval_node(state: ResearchState) -> dict:
     # results. Deduplication is handled later in the deterministic pipeline.
     papers: list[Paper] = list(state.get("raw_papers", []))
     failures = []
+    policy = dict(state.get("semantic_policy", {"requests": 0, "failures": 0, "disabled": False}))
 
     for query in search_plan.queries:
         try:
-            semantic_scholar_results = search_semantic_scholar(
-                query,
-                limit=MAX_RESULTS_PER_QUERY,
-            )
-            papers.extend(semantic_scholar_results)
+            if policy["disabled"] or policy["requests"] >= SEMANTIC_MAX_REQUESTS:
+                policy["disabled"] = True
+            else:
+                policy["requests"] += 1
+                semantic_scholar_results = search_semantic_scholar(
+                    query,
+                    limit=MAX_RESULTS_PER_QUERY,
+                )
+                papers.extend(semantic_scholar_results)
 
         except Exception as exc:
             # Semantic Scholar is treated as an optional retrieval provider.
             # Logging and continuing allows Crossref to act as a fallback and
             # keeps temporary external-service failures from terminating the
             # complete autonomous workflow.
-            failures.append({"provider": "Semantic Scholar", "message": "Provider request failed."})
+            policy["failures"] += 1
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            reason = ("rate_limit" if status == 429 else "authentication" if status in (401, 403)
+                      else "timeout" if isinstance(exc, requests.Timeout) else "service_error" if status and status >= 500 else "request_failed")
+            policy["disabled"] = policy["failures"] >= SEMANTIC_MAX_FAILURES or status in (401, 403, 429)
+            failures.append({"provider": "Semantic Scholar", "message": "Provider request failed.",
+                             "reason": reason, "disabled_for_run": policy["disabled"]})
 
         try:
             crossref_results = search_crossref(
@@ -60,4 +76,5 @@ def retrieval_node(state: ResearchState) -> dict:
     # Raw results are returned without ranking or filtering here because those
     # responsibilities belong to the processing stage. Keeping these concerns
     # separate makes the workflow easier to test, explain, and maintain.
-    return {"raw_papers": papers, "provider_failures": failures}
+    policy["disabled"] = policy["disabled"] or policy["requests"] >= SEMANTIC_MAX_REQUESTS
+    return {"raw_papers": papers, "provider_failures": failures, "semantic_policy": policy}

@@ -46,14 +46,17 @@
         <h2>Ranked Sources</h2>
         {% if report.ranked_sources is not none %}
         <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
-        <p>The writing evidence set favours relevant papers with abstracts. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
         <ol class="ranked-sources">
         {% for item in report.ranked_sources %}
             <li>
                 <div class="ranked-heading"><strong>{{ item.paper.title }}</strong><span>Relevance score: {{ item.relevance_score }}</span></div>
+                <p class="reference-note">Paper ID: {{ paper_key(item.paper) }}</p>
+                {% if item.evidence_type %}<p><strong>{{ {'full_text': 'Full-text evidence', 'abstract': 'Abstract-only evidence', 'metadata_only': 'Metadata-only'}[item.evidence_type] }}</strong></p>{% endif %}
+                {% if item.source_id %}<details><summary>Selected passage provenance</summary><ul>{% for chunk in report.evidence_provenance if chunk.source_id == item.source_id %}<li>Chunk {{ chunk.chunk_index + 1 }}{% if chunk.page_number %}, PDF page {{ chunk.page_number }}{% endif %} · {{ chunk.evidence_type }} · Similarity {{ '%.3f'|format(chunk.similarity_score) }}</li>{% else %}<li>No passage provenance saved for this report.</li>{% endfor %}</ul></details>{% endif %}
                 <p class="reference-note">{{ item.paper.authors | join(', ') or 'Author not supplied' }} · {{ item.paper.year or 'No date' }}{% if item.paper.source %} · {{ item.paper.source }}{% endif %}</p>
-                <p><strong>{% if item.source_id and report.cited_source_ids is not none and item.source_id in report.cited_source_ids %}Cited in Overview{% elif item.selected %}Available to Reporter; not cited{% elif item.eligible %}Outside the {{ report.sources | length }}-paper writing evidence set{% else %}Below the relevance filter{% endif %}</strong></p>
-                {% if item.paper.abstract %}<details><summary>Read abstract</summary><p>{{ item.paper.abstract }}</p></details>{% else %}<p class="reference-note">Abstract not supplied.</p>{% endif %}
+                <p><strong>{% if item.source_id and report.cited_source_ids is not none and item.source_id in report.cited_source_ids %}Cited in Overview{% elif item.evidence_type == 'metadata_only' %}No usable text available; excluded from synthesis{% elif item.selected %}Available to Reporter; not cited{% elif item.eligible %}Outside the {{ report.sources | length }}-paper writing evidence set{% else %}Below the relevance filter{% endif %}</strong></p>
+                {% if item.paper.abstract %}<details><summary>Read abstract</summary><p>{{ plain_abstract(item.paper.abstract) }}</p></details>{% else %}<p class="reference-note">Abstract not supplied.</p>{% endif %}
                 {% set link = source_url(item.paper) %}{% if link %}<a href="{{ link }}" target="_blank" rel="noopener noreferrer">View source</a>{% endif %}
             </li>
         {% else %}<li>No valid source records were retained.</li>{% endfor %}
@@ -68,7 +71,7 @@
         <h2>Agent Activity</h2>
         {% if audit %}
         <p>Run ID: {{ audit.id }} · Report ID: {{ report_id or 'Not saved' }}</p>
-        <p>Started: {{ audit.created_at }} · Updated: {{ audit.updated_at }} (UTC)</p>
+        <p>Started: {{ display_timestamp(audit.created_at) }} · Updated: {{ display_timestamp(audit.updated_at) }} (UTC)</p>
         <h3>Investigation metrics</h3>
         <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
         <dl class="metrics">{% for key, value in audit.metrics.items() %}<dt>{{ key | replace('_', ' ') | capitalize }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>
@@ -80,11 +83,13 @@
             <p>Next step: {{ 'Replanning search' if event.details.next_stage == 'planner' else 'Generating report' }}{% if event.details.cycle_limit_reached %} — search cycle limit reached{% endif %}.</p>
         </article>
         {% else %}<p>No Critic decision was recorded.</p>{% endfor %}
+        <h3>Hybrid evidence coverage</h3>
+        {% if report.evidence_coverage %}<dl class="metrics">{% for key, value in report.evidence_coverage.items() %}<dt>{{ key|replace('_', ' ')|capitalize }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>{% endif %}
         <h3>Activity log</h3>
         <div class="audit-table"><table>
             <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
             <tbody>{% for event in activity_events(audit.events) %}
-            <tr><td>{{ event.timestamp }}</td><td>{{ event.component }}{% if event.cycle %}<br>Cycle {{ event.cycle }}{% endif %}</td><td>{{ event.action | replace('_', ' ') }}</td><td>{{ event.message }}</td></tr>
+            <tr><td>{{ event.display_timestamp }}</td><td>{{ event.component }}{% if event.cycle %}<br>Cycle {{ event.cycle }}{% endif %}</td><td>{{ event.action | replace('_', ' ') }}</td><td>{{ event.message }}</td></tr>
             {% endfor %}</tbody>
         </table></div>
         {% else %}<p>No agent activity was recorded for this report.</p>{% endif %}

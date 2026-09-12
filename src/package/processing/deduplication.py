@@ -69,7 +69,7 @@ def deduplicate_papers(papers: list[Paper]) -> list[Paper]:
                 # different versioned DOIs that happen to share a normalised key.
                 if (first.doi or '').strip().lower() == (paper.doi or '').strip().lower():
                     updates = {field: getattr(paper, field) for field in
-                        ("abstract", "journal", "volume", "issue", "pages", "article_number", "url")
+                        ("open_access_url", "abstract", "journal", "volume", "issue", "pages", "article_number", "url")
                         if not getattr(first, field) and getattr(paper, field)}
                     if first.authors == paper.authors and not first.author_details:
                         updates["author_details"] = paper.author_details

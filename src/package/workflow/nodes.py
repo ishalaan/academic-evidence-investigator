@@ -1,4 +1,5 @@
 from package.processing.pipeline import process_papers
+from package.rag.pipeline import build_evidence
 from package.workflow.state import ResearchState
 
 
@@ -20,8 +21,11 @@ def processing_node(state: ResearchState) -> dict:
         ranked_sources=ranked_sources,
     )
 
+    hybrid = build_evidence(state, ranked_sources)
+    metrics.update(hybrid.pop("rag_metrics"))
     return {
-        "processed_papers": processed_papers,
+        **hybrid,
+
         "processing_metrics": metrics,
         "ranked_sources": ranked_sources,
     }

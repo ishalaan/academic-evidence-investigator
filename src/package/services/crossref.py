@@ -67,6 +67,9 @@ def search_crossref(
                 authors=authors,
                 abstract=item.get("abstract"),
                 doi=item.get("DOI"),
+                open_access_url=next((link.get("URL") for link in item.get("link", [])
+                    if link.get("content-type") == "application/pdf" and
+                    any("creativecommons.org/licenses/" in licence.get("URL", "") for licence in item.get("license", []))), None),
                 url=item.get("URL"),
                 year=year,
                 source="Crossref",

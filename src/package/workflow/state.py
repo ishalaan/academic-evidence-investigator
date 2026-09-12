@@ -18,3 +18,9 @@ class ResearchState(TypedDict, total=False):
     metrics: dict
     processing_metrics: dict
     provider_failures: list[dict]
+
+    evidence_chunks: list
+    evidence_coverage: dict
+    rag_cache: dict
+    rag_failures: dict
+    semantic_policy: dict
