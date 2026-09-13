@@ -3,7 +3,10 @@ from time import perf_counter
 from uuid import uuid4
 import html
 import re
-from package.processing.chunking import chunk_pages, paper_key
+from package.processing.chunking import chunk_pages, chunk_html, paper_key
+from package.services.html_loader import load_html_article
+from package.services.source_locations import html_candidates, stable_url
+from package.services.bibliographic_metadata import enrich_writing_sources
 from package.processing.semantic_retrieval import select_chunks
 from package.services.fulltext_resolver import resolve_fulltext
 from package.services.pdf_loader import download_pdf, extract_pages, failure_details
@@ -16,7 +19,8 @@ def build_evidence(state, ranked):
     directory = run_directory(run_id or uuid4().hex)
     metrics = dict(fulltext_papers_resolved=0, abstract_fallbacks=0, metadata_only_papers=0,
                    total_chunks_created=0, chunks_selected=0, pdf_extraction_failures=0,
-                   fulltext_access_failures=0, papers_discovered=len(state.get("raw_papers", [])))
+                   fulltext_access_failures=0, html_papers_resolved=0, pdf_papers_resolved=0,
+                   papers_discovered=len(state.get("raw_papers", [])))
     chunks, types, ranks = [], {}, {}
     cache = dict(state.get("rag_cache", {}))
     failures = dict(state.get("rag_failures", {}))
@@ -39,7 +43,7 @@ def build_evidence(state, ranked):
                 try:
                     url = resolve_fulltext(paper)
                     if url:
-                        event("fulltext_located", paper_id=key, doi=paper.doi, source_url=url)
+                        event("fulltext_located", paper_id=key, doi=paper.doi, source_url=stable_url(url))
                         phase = "download"
                         download_details = {}
                         path = download_pdf(url, directory, key, download_details)
@@ -61,10 +65,23 @@ def build_evidence(state, ranked):
                     failures[key] = "pdf_extraction_failures" if phase == "extraction" else "fulltext_access_failures"
                     event("pdf_failed" if url else "fulltext_unavailable", paper_id=key,
                           **failure_details(exc, phase))
+                for html_url in html_candidates(paper, url) if not paper_chunks else []:
+                    try:
+                        event("html_started", paper_id=key, source_url=stable_url(html_url))
+                        paragraphs, html_url = load_html_article(html_url, paper)
+                        paper_chunks = chunk_html(paper, paragraphs, html_url)[:80]
+                        kind = "full_text"
+                        event("html_extracted", paper_id=key, source_url=html_url,
+                              paragraphs=len(paragraphs), retained_chunks=len(paper_chunks))
+                        break
+                    except Exception as exc:
+                        event("html_failed", paper_id=key, source_url=stable_url(html_url), **failure_details(exc, "html"))
+                        # Count a terminal HTML-only failure once; preserve an earlier PDF failure category.
+                        failures.setdefault(key, "fulltext_access_failures")
                 if not paper_chunks:
                     abstract = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", paper.abstract or "")).split())
                     if abstract:
-                        paper_chunks = chunk_pages(paper, [(None, abstract)], "abstract", paper.url)
+                        paper_chunks = chunk_pages(paper, [(None, abstract)], "abstract", stable_url(paper.url))
                         kind = "abstract"
                         event("abstract_fallback", paper_id=key)
                 cache[key] = (paper_chunks, kind)
@@ -72,12 +89,18 @@ def build_evidence(state, ranked):
             if key in failures:
                 metrics[failures[key]] += 1
             item.evidence_type = kind
+            item.source_format = paper_chunks[0].source_format if paper_chunks and kind == "full_text" else None
+            if item.source_format:
+                metrics[item.source_format + "_papers_resolved"] += 1
             item.evidence_status = "Text available" if paper_chunks else "No usable text"
             types[key] = kind
             metrics[{"full_text": "fulltext_papers_resolved", "abstract": "abstract_fallbacks", "metadata_only": "metadata_only_papers"}[kind]] += 1
             metrics["total_chunks_created"] += len(paper_chunks)
         # Preserve deterministic relevance and the ten-paper writing limit.
         eligible = [item for item in ranked if item.eligible and cache[paper_key(item.paper)][0]][:10]
+        for item, (verified, status) in zip(eligible, enrich_writing_sources(eligible)):
+            item.paper = verified
+            event("metadata_checked", paper_id=paper_key(verified), status=status)
         papers = [item.paper for item in eligible]
         for item in ranked:
             item.selected = item in eligible
@@ -99,6 +122,8 @@ def build_evidence(state, ranked):
         metrics["final_evidence_count"] = len(papers)
         coverage = {"writing_sources": len(papers),
                     "full_text_sources": sum(types[paper_key(p)] == "full_text" for p in papers),
+                    "html_sources": sum(item.selected and item.source_format == "html" for item in ranked),
+                    "pdf_sources": sum(item.selected and item.source_format == "pdf" for item in ranked),
                     "abstract_only_sources": sum(types[paper_key(p)] == "abstract" for p in papers),
                     "selected_chunks": len(selected), "retrieval_mode": mode,
                     "access_failures": metrics["fulltext_access_failures"],

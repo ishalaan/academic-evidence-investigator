@@ -22,7 +22,8 @@ dependencies = [
     "truststore>=0.10",
     "PyMuPDF",
     "sentence-transformers",
-    "faiss-cpu"
+    "faiss-cpu",
+    "beautifulsoup4>=4.12,<5"
 ]
 
 

@@ -18,7 +18,18 @@ def chunk_pages(paper, pages, evidence_type, source_url=None, size=750, overlap=
         for start in range(0, len(words), size - overlap):
             chunks.append(EvidenceChunk(paper_id=paper_key(paper), source_id="", title=paper.title,
                 doi=paper.doi, page_number=page, chunk_index=len(chunks),
-                text=" ".join(words[start:start + size]), evidence_type=evidence_type, source_url=source_url))
+                text=" ".join(words[start:start + size]), evidence_type=evidence_type, source_url=source_url,
+                source_format="pdf" if evidence_type == "full_text" else None))
             if start + size >= len(words):
                 break
+    return chunks
+
+
+def chunk_html(paper, paragraphs, source_url):
+    chunks = []
+    for paragraph in paragraphs:
+        for chunk in chunk_pages(paper, [(None, paragraph['text'])], 'full_text', source_url):
+            chunks.append(chunk.model_copy(update={'chunk_index': len(chunks), 'source_format': 'html',
+                'section_title': paragraph['section_title'], 'paragraph_number': paragraph['paragraph_number'],
+                'html_anchor': paragraph.get('html_anchor')}))
     return chunks

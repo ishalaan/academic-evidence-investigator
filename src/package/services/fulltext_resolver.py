@@ -25,7 +25,12 @@ def http_client():
 
 def resolve_fulltext(paper):
     if paper.open_access_url:
-        return public_https(paper.open_access_url)
+        # Some OA providers advertise HTTP even when their HTTPS endpoint works.
+        # Try HTTPS only; public_https still rejects credentials/private hosts.
+        url = paper.open_access_url
+        if url.startswith('http://'):
+            url = 'https://' + url[7:]
+        return public_https(url)
     # Unpaywall requires an email; absence is an ordinary abstract fallback.
     email = os.environ.get("UNPAYWALL_EMAIL")
     if paper.doi and email:
@@ -34,7 +39,7 @@ def resolve_fulltext(paper):
             response.raise_for_status()
             data = response.json()
             location = data.get("best_oa_location") or {}
-            url = location.get("url_for_pdf")
+            url = location.get("url_for_pdf") or location.get("url_for_landing_page")
             if data.get("is_oa") and url:
                 return public_https(url)
     return None

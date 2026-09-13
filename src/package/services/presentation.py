@@ -20,6 +20,13 @@ def plain_abstract(value):
 
 def british_prose(text):
     replacements = {
+        "organize":"organise", "organizes":"organises", "organized":"organised", "organizing":"organising",
+        "personalize":"personalise",
+        "democratize":"democratise", "democratizes":"democratises", "democratizing":"democratising",
+        "recognize":"recognise", "recognized":"recognised", "recognizes":"recognises", "recognizing":"recognising",
+        "customization":"customisation", "customized":"customised", "customize":"customise",
+        "maximize":"maximise", "maximizes":"maximises", "maximized":"maximised", "maximizing":"maximising",
+        "emphasizing":"emphasising", "optimize":"optimise", "optimized":"optimised", "optimizing":"optimising",
         "personalized":"personalised", "personalization":"personalisation",
         "personalizes":"personalises", "personalizing":"personalising",
         "analyze":"analyse", "analyzes":"analyses", "analyzed":"analysed", "analyzing":"analysing",
@@ -30,6 +37,8 @@ def british_prose(text):
         "judgment":"judgement", "judgments":"judgements", "rigor":"rigour",
         "prioritizing":"prioritising", "realizing":"realising", "organization":"organisation",
     }
+    # Educational programmes; preserve the computing sense of 'program'.
+    text = re.sub(r"\b(training|education|educational|degree|academic) programs\b", r"\1 programmes", text, flags=re.I)
     pattern = r"\b(" + "|".join(replacements) + r")\b"
     def substitute(match):
         word = match.group(0); new = replacements[word.lower()]

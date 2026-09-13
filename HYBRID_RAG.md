@@ -1,5 +1,30 @@
 # Hybrid full-text RAG
 
+## Report 55 remediation
+
+HTML candidates now prioritise DOI/publisher resolution and explicit OA locations,
+exclude Semantic Scholar catalogue pages, and try at most two distinct candidates.
+Each attempt records its URL. The verified RSIS article-body container is supported
+without relaxing article identity or minimum-body checks. Explicit HTTP OA metadata
+is tried using HTTPS only. Saved provenance removes transient session identifiers.
+
+The final ten writing sources receive bounded Crossref DOI metadata checks (four
+workers, four-second request timeouts, no retries). Matching DOI and title are
+required. Failed checks retain existing metadata and are visible in the audit.
+No year or article title is silently changed. Author honorifics are excluded from
+initials; malformed full-name-as-surname deposits do not override usable existing
+authors. Modern MDPI numeric article locators are not formatted as one-page ranges.
+
+Reporter checks detect selected classes of unsupported claims: expected benefits
+presented as demonstrated results, unqualified causal language over observational
+evidence, and specific conditions absent from cited passages. Failed sections use
+the existing three-attempt retry bound; persistent failure is visible rather than
+silently accepted. These are targeted heuristics, not a complete faithfulness test.
+The complete Summary is available for overlap checking against Findings; near
+restatements trigger rewriting. Findings are prompted for additional study-level
+detail only when supported. British-English normalisation preserves citations and
+source metadata. Saved historical reports are not regenerated or rewritten.
+
 The LangGraph nodes and Critic replanning route are unchanged. Processing first
 validates, deduplicates and ranks papers using the existing deterministic rules.
 It then resolves explicit open-access PDF metadata (Semantic Scholar openAccessPdf,
@@ -15,9 +40,47 @@ requests are never sent. There are at most eight requests and one transient-erro
 retry within a 30-second checked budget. HTTP 401/403/404/429 and Retry-After responses
 are not retried. Downloads are capped at 20 MiB and 200
 pages. Extraction uses PyMuPDF and preserves one-based PDF page positions. There
-is no OCR, HTML evidence extraction, CAPTCHA handling, login or paywall workaround.
+is no OCR, CAPTCHA handling, login or paywall workaround.
 Scanned, malformed, restricted, oversized or unavailable PDFs fall back to the
-abstract. Records without usable text stay in Ranked Sources, outside synthesis.
+HTML article body when a scholarly article URL is available, then to the abstract.
+Records without usable text stay in Ranked Sources, outside synthesis.
+
+## HTML article evidence (13 September 2026)
+
+When PDF extraction cannot supply text, Processing checks the paper's scholarly
+landing URL (or resolved OA URL) for publicly served HTML. No OA PDF is required
+for this branch. Unpaywall OA landing-page metadata is also accepted. It never
+executes JavaScript, logs in or bypasses access controls. HTML fetches allow at
+most six checked public-HTTPS requests, 2 MiB of response data and elapsed-time
+checks against 30 seconds. Synchronous network/DNS work can overrun that checked
+budget; it is not a hard process deadline.
+
+Beautiful Soup parses recognised article-body containers. The DOI, or a strong
+title match where DOI metadata is absent, must identify the requested paper.
+Navigation, forms, hidden content, tables, scripts, abstracts, reference lists,
+correction-notice metadata and other support sections are excluded. At least
+three retained paragraphs, 300 words and a non-abstract heading are required.
+These are conservative heuristics, not proof of completeness or study quality.
+Unusual layouts, brief papers and JavaScript-only views may still fall back.
+
+HTML paragraphs enter the same overlapping chunking, embedding, FAISS selection,
+deterministic relevance controls and two-passages-per-paper cap as PDFs. The
+existing 80-chunk limit applies and can omit later paragraphs. HTML remains
+evidence_type=full_text, distinguished by source_format=html; PDFs use pdf.
+HTML chunks have no PDF page number. Provenance retains the source URL, section
+heading, one-based extracted paragraph number and HTML anchor where available.
+Paragraph numbers refer to the filtered extraction, not publisher numbering.
+
+Critic and Reporter receive those locators. SQLite persists provenance and
+format/coverage metadata without full HTML or chunk text. Ranked Sources displays
+HTML versus PDF evidence and their appropriate locators. Audit events show HTML
+attempts, successful extraction and specific fallback reasons. Old reports load
+with optional-field defaults and are not rewritten.
+
+fulltext_papers_resolved includes PDF and HTML successes; pdf_papers_resolved and
+html_papers_resolved separate the formats. Writing coverage reports pdf_sources
+and html_sources. Failed PDF attempts stay counted even when HTML succeeds, so
+failure counts must not be interpreted as papers ultimately lacking evidence.
 
 Chunks remain within a page: 750 whitespace-delimited words with 110 words of
 overlap (approximately 1,000 and 150 tokens). Short pages remain shorter chunks.

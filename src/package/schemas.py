@@ -43,6 +43,10 @@ class EvidenceChunk(BaseModel):
     title: str
     doi: str | None = None
     page_number: int | None = None
+    source_format: Literal["pdf", "html"] | None = None
+    section_title: str | None = None
+    paragraph_number: int | None = None
+    html_anchor: str | None = None
     chunk_index: int
     text: str
     similarity_score: float = 0.0
@@ -59,6 +63,7 @@ class RankedSource(BaseModel):
     source_id: str | None = None
     evidence_type: Literal["full_text", "abstract", "metadata_only"] | None = None
     evidence_status: str | None = None
+    source_format: Literal["pdf", "html"] | None = None
 
 
 class ResearchReport(BaseModel):

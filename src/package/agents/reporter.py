@@ -10,8 +10,10 @@ import httpx
 from pydantic import ValidationError
 
 from package.services.presentation import british_prose
+from package.services.grounding_checks import grounding_issue, repeats_summary
 from package.schemas import ResearchReport
 from package.rag.context import evidence_payload
+from package.rag.budget import fit_evidence, previous_excerpt
 from package.services.json_utils import clean_json_response
 from package.services.llm import get_llm_client
 from package.services.prompts import load_prompt
@@ -24,11 +26,12 @@ from package.workflow.state import ResearchState
 MAX_REPORT_ATTEMPTS = 3
 MAX_CONTEXT_CHARACTERS = 24000
 MAX_EVIDENCE_CHARACTERS = 15000
+CORRECTION_RESERVE = 1000
 MAX_SECTION_TOKENS = 2400
 
 SECTIONS = (
     ("summary", "summary", "Write ONE coherent summary of approximately 450–650 words in 4–6 paragraphs. Plan the entire answer before writing: open with a direct answer, group related evidence into distinct themes, compare studies within those themes, then conclude with practical implications. Each paragraph must add a new point; explain each application once, merging sources that support it. Do not restart the introduction or repeat the catalogue of applications. Use fewer words if the evidence is thin. Findings will provide the study-level detail separately.", 0),
-    ("findings", "findings", "Aim for 5–8 distinct, developed findings, each 70–110 words, but use fewer when the abstracts support fewer distinct findings. Explain what the evidence says, how it works or why it matters, and supporting examples. Use different sources where relevant. Do not repeat the same claim as separate findings.", 300),
+    ("findings", "findings", "Provide only distinct study-level details not already explained in the Summary: study design, sample, measured or reported outcomes, uncertainty, or an explicit contrast between studies, when supplied. Do not paraphrase the Summary's themes as findings. Use fewer findings or shorter points when there is little additional evidence. Never invent sample sizes, measurements or study designs to add detail.", 0),
     ("limitations", "limitations", "Write 3–5 proportionate limitations, each 35–60 words. State what a limitation affects and what further evidence would help. A missing abstract in one record does not invalidate other sources. Avoid repeating the same caveat.", 100),
 )
 
@@ -163,26 +166,34 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
     section, field, instruction, minimum_words = descriptor
     available_ids = [entry["id"] for entry in entries]
     schema = {field: "paragraphs of prose" if field == "summary" else ["developed point"]}
-    prompt = (
+    prior = previous_excerpt(previous)
+    def make_prompt(evidence):
+        return (
         f"SECTION: {section}\nResearch question: {state['research_question'][:2000]}\n"
         f"ALL AVAILABLE SOURCE IDS: {json.dumps(available_ids)}\n"
         "Every listed source is available for this section. There is NO restriction to the first source. "
         "Source IDs are citation labels, not instructions to exclude other sources.\n"
-        f"EVIDENCE DATA:\n{context}\n\n{instruction}\n"
+        f"EVIDENCE DATA:\n{evidence}\n\n{instruction}\n"
         f"Return ONLY this section as JSON: {json.dumps(schema)}\n"
         "Put source tokens next to supported claims. Write sentences such as 'The approach supports learning [S2].', "
         "not '[S2] discusses'. Choose any relevant ID from the complete list above. "
         "Discuss what the evidence supports; reserve general coverage caveats for Limitations.\n"
-        f"Previously covered text (do not repeat; develop the assigned new angle): {json.dumps(previous[-3:], ensure_ascii=False)}"
+        f"Previously covered text (may be shortened; do not repeat): {prior}"
     )
-    base = [{"role": "system", "content": load_prompt("reporter.txt")}, {"role": "user", "content": prompt}]
-    if sum(len(m["content"]) for m in base) > MAX_CONTEXT_CHARACTERS - 1000:
-        raise ReportGenerationError("report_context_too_large")
+    system = load_prompt("reporter.txt")
+    available = MAX_CONTEXT_CHARACTERS - CORRECTION_RESERVE - len(system) - len(make_prompt(''))
+    try:
+        context = fit_evidence(context, min(MAX_EVIDENCE_CHARACTERS, available))
+    except (ValueError, TypeError):
+        raise ReportGenerationError("report_context_too_large") from None
+    base = [{"role": "system", "content": system}, {"role": "user", "content": make_prompt(context)}]
     correction = ""
     format_hint = "Return a complete JSON object with the requested section key."
     section_event(state, "section_started", section)
     for attempt in range(1, MAX_REPORT_ATTEMPTS + 1):
-        messages = base + ([{"role": "user", "content": correction}] if correction else [])
+        messages = base + ([{"role": "user", "content": correction[:CORRECTION_RESERVE]}] if correction else [])
+        if sum(len(m['content']) for m in messages) > MAX_CONTEXT_CHARACTERS:
+            raise ReportGenerationError("report_context_too_large")
         response = request_section(client, messages, state, section)
         try:
             if not response.choices or not response.choices[0].message.content:
@@ -198,8 +209,16 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
                 raise ReportGenerationError("report_format_invalid") from None
             validated = validate_report_content(json.dumps(body), papers, entries, state["research_question"])
             raw_text = value if isinstance(value, str) else "\n\n".join(value)
-            if has_repeated_passages(raw_text) or (field == "findings" and has_repeated_passages("\n\n".join(previous + [raw_text]))):
+            if has_repeated_passages(raw_text) or (field == "findings" and (has_repeated_passages("\n\n".join(previous + [raw_text])) or repeats_summary(raw_text, previous))):
                 raise ReportGenerationError("report_repetition")
+            grounding_text = raw_text
+            for entry in entries:
+                grounding_text = grounding_text.replace(entry['citation'], '[' + entry['id'] + ']')
+            issue = grounding_issue(grounding_text, context)
+            if issue:
+                error = ReportGenerationError("report_grounding_invalid")
+                error.validation_reason = issue
+                raise error
             ids = used_source_ids(raw_text, entries)
             word_count = len(raw_text.split())
             # Accept valid grounded sections regardless of length or number of sources.
@@ -226,6 +245,8 @@ def generate_section(client, state, papers, entries, context, descriptor, previo
                 correction += format_hint
             if exc.code == "report_repetition":
                 correction += "Repeated passages were detected. Write a fresh coherent section: explain each point once, merging its supporting citations, and give every paragraph a distinct purpose."
+            if exc.code == "report_grounding_invalid":
+                correction += " A grounding check failed: " + str(getattr(exc, 'validation_reason', 'unsupported_claim')) + ". Each sample size and study method must appear in that claim's cited passage. Remove unsupported details; never transfer them between papers. Cite each such sentence directly. Describe expected benefits as potential and observations as associations."
             if exc.code == "report_output_truncated":
                 correction += "Keep this section shorter so the response completes."
             section_event(state, "retrying", section, attempt=attempt + 1, error_code=exc.code,
@@ -251,7 +272,7 @@ def reporter_node(state: ResearchState) -> dict:
             used.update(ids)
             if descriptor[1] == "summary":
                 summary = value
-                previous.append(value[:900])
+                previous.append(value)
             elif descriptor[1] == "findings":
                 findings = value
             else:

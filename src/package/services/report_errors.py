@@ -6,6 +6,7 @@ import httpx
 from pydantic import ValidationError
 
 REPORT_ERRORS = {
+    "report_grounding_invalid": "The report repeatedly overstated its supplied evidence. Review the evidence or retry the investigation.",
     "model_credits_required": "The model provider rejected the request because payment or inference credits are required (HTTP 402). Check the Hugging Face account billing and inference credits before retrying.",
     "model_timeout": "The model request timed out. Please try again shortly.",
     "model_connection": "The connection to the model service was interrupted. This may be a temporary service or network problem. Please try again shortly.",
@@ -20,7 +21,7 @@ REPORT_ERRORS = {
     "workflow_stage_failed": "An unexpected application error stopped this stage. Use the run identifier to investigate.",
     "report_repetition": "The reporting model repeatedly returned duplicated passages. Please try again.",
     "report_invented_restriction": "The reporting model repeatedly invented a source restriction. Please try again.",
-    "report_context_too_large": "The evidence is too large for this reporting request. Please use a shorter research question.",
+    "report_context_too_large": "The Reporter could not fit the minimum evidence and instructions within its request budget. Check the reporting configuration; shortening the research question may not resolve this error.",
     "report_model_unavailable": "The reporting model could not be reached. Please try again shortly.",
     "report_citations_invalid": "The report's citations could not be verified after retrying. Please try the investigation again.",
     "report_format_invalid": "The reporting model could not produce a complete report after retrying. Please try again.",

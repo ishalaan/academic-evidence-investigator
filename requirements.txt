@@ -13,3 +13,4 @@ pytest-cov
 PyMuPDF
 sentence-transformers
 faiss-cpu
+beautifulsoup4>=4.12,<5

@@ -21,10 +21,19 @@ def activity_events(events):
             "fulltext_unavailable": "Accessible full text unavailable.", "pdf_extracted": "PDF text extracted with page references.",
             "pdf_failed": "PDF access or extraction failed; checking abstract fallback.",
             "pdf_downloaded": "PDF downloaded; extracting page-aware text.",
+            "html_started": "Checking openly accessible HTML article text.",
+            "metadata_checked": "Checked bibliographic metadata for a writing source.",
+            "html_extracted": "HTML article text extracted with section and paragraph provenance.",
+            "html_failed": "No usable HTML article body; checking abstract fallback.",
             "abstract_fallback": "Using abstract-only evidence.", "chunks_created": "Evidence chunks created.",
             "chunks_selected": "Relevant passages selected.", "semantic_completed": "Hybrid evidence retrieval completed."}
         if component == "Processing" and action in rag_messages:
             message = rag_messages[action]
+            if action == "metadata_checked":
+                message = {"verified":"Bibliographic metadata verified against its DOI record.",
+                    "identity_mismatch":"DOI metadata did not match; retained the original reference metadata.",
+                    "unavailable":"DOI metadata verification unavailable; retained the original reference metadata.",
+                    "not_applicable":"No valid DOI for metadata verification; retained the original reference metadata."}.get(details.get('status'), message)
             failure_reasons = {
                 "access_denied": "The host denied access", "not_found": "The document was not found",
                 "rate_limited": "The host rate limit was reached", "http_error": "The host returned an HTTP error",
@@ -37,7 +46,12 @@ def activity_events(events):
                 "password_required": "The PDF requires a password", "invalid_pdf": "The PDF could not be parsed",
                 "page_limit": "The PDF page limit was reached", "no_usable_text": "The PDF contained no usable text"
             }
-            if action in ("pdf_failed", "fulltext_unavailable") and details.get("reason") in failure_reasons:
+            failure_reasons.update({"html_access_blocked": "The HTML host requires access verification",
+                "html_identity_mismatch": "The HTML page could not be matched to this paper",
+                "html_no_article_body": "No recognised HTML article body was found",
+                "html_insufficient_body": "The HTML page did not provide sufficient article-body text",
+                "html_wrong_content_type": "The article URL did not return HTML"})
+            if action in ("pdf_failed", "fulltext_unavailable", "html_failed") and details.get("reason") in failure_reasons:
                 message = failure_reasons[details["reason"]] + "; checking abstract fallback."
             if action == "semantic_completed" and details.get("mode") == "lexical_fallback":
                 message = "Local embeddings unavailable; used deterministic passage selection."

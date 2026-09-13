@@ -8,12 +8,16 @@ MONTHS = ("January", "February", "March", "April", "May", "June", "July",
           "August", "September", "October", "November", "December")
 
 
+def without_title(name):
+    return re.sub(r'^(?:(?:dr|prof|professor|doctor)\.?\s+)+', '', name.strip(), flags=re.I)
+
+
 def author_parts(paper):
     if paper.author_details and len(paper.author_details) == len(paper.authors):
-        return [(a.family or a.given, a.given if a.family else "") for a in paper.author_details]
+        return [(without_title(a.family or a.given), without_title(a.given) if a.family else "") for a in paper.author_details]
     parts = []
     for name in paper.authors:
-        name = name.strip()
+        name = without_title(name)
         if not name:
             continue
         if "," in name:
@@ -37,7 +41,7 @@ def author_label(paper, *, initials=False):
         return paper.title
     names = []
     for family, given in parts:
-        letters = "".join(word[0].upper() + "." for word in re.split(r"[\s.\-]+", given) if word)
+        letters = "".join(word[0].upper() + "." for word in re.findall(r"[^\W\d_]+", given, re.UNICODE))
         names.append(f"{family}, {letters}" if initials and letters else family)
     return join_authors(names)
 
@@ -79,11 +83,11 @@ def reference_entries(papers):
         publication = paper.volume or ""
         if paper.issue:
             publication += f"({paper.issue})"
-        if paper.pages:
+        if paper.article_number:
+            publication += (", " if publication else "") + f"article {paper.article_number}"
+        elif paper.pages:
             page_label = "pp." if re.search(r"[-–]", paper.pages) else "p."
             publication += (", " if publication else "") + f"{page_label} {paper.pages}"
-        elif paper.article_number:
-            publication += (", " if publication else "") + f"article {paper.article_number}"
         entry["publication"] = publication
         entry["url"] = source_url(paper)
         entry["access_date"] = (f"{paper.accessed_on.day} {MONTHS[paper.accessed_on.month - 1]} {paper.accessed_on.year}"
@@ -92,6 +96,9 @@ def reference_entries(papers):
 
 
 def normalise_source_tokens(text):
+    text = re.sub(r"\(\s*s\d+(?:\s*[,;]\s*s\d+)*\s*\)",
+                  lambda m: " ".join(f"[{token.upper()}]" for token in re.findall(r"s\d+", m.group(0), re.I)),
+                  text, flags=re.I)
     return re.sub(r"\[\s*s\d+(?:\s*[,;]\s*s\d+)*\s*\]",
                   lambda m: " ".join(f"[{token.upper()}]" for token in re.findall(r"s\d+", m.group(0), re.I)),
                   text, flags=re.I)
@@ -119,6 +126,8 @@ def cited_text(text, entries, *, require_citation=False):
     """Resolve validated source tokens. Never fabricate a citation for uncited prose."""
     text = normalise_source_tokens(text)
     lookup = {entry["id"]: entry["citation"] for entry in entries}
+    if re.search(r"(?<!\[)\bS\d+\b(?!\])", text):
+        raise ValueError("Reporter returned an invalid source citation.")
     # Accept ordinary model variations without guessing which source was intended.
     text = re.sub(r"\[\s*S\d+(?:\s*[,;]\s*S\d+)*\s*\]",
                   lambda match: " ".join(f"[{source_id}]" for source_id in re.findall(r"S\d+", match.group(0))), text)

@@ -23,3 +23,5 @@ could fill a specific gap; request replanning only with a concrete evidence need
 Do not repeatedly request an unavailable provider. A small, relevant evidence set
 can support a preliminary overview: describe it proportionately. Do not impose a
 minimum source count or declare evidence insufficient solely because it is abstract-only.
+
+HTML full-text passages carry section titles and extracted paragraph positions, not PDF page numbers. Treat these as provenance locators, never invent printed page numbers. HTML extraction may omit tables, figures or unsupported sections; full-text availability does not prove completeness or scientific quality.

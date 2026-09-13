@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit, urlunsplit
 from time import monotonic
 import httpx
+from package.services.source_locations import stable_url
 from package.services.fulltext_resolver import http_client, public_https
 
 MAX_BYTES = 20 * 1024 * 1024
@@ -106,7 +107,7 @@ def download_pdf(url, directory, name, metadata=None):
                                     body.extend(part)
                         if is_pdf:
                             if metadata is not None:
-                                metadata.update(source_url=url, metadata_resolution=html_used)
+                                metadata.update(source_url=stable_url(url), metadata_resolution=html_used)
                             return target
                         target.unlink(missing_ok=True)
                         if html_used:
