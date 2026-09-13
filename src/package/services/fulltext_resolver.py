@@ -1,4 +1,4 @@
-"""Use explicit OA metadata; never scrape landing pages or bypass restrictions."""
+"""Use explicit OA metadata; the PDF loader may resolve declared citation PDF metadata."""
 import ipaddress
 import os
 import socket

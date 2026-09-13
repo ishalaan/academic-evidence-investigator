@@ -75,7 +75,7 @@ def test_embedding_failure_is_explicit():
 
 
 def test_hybrid_types_audit_cleanup_and_metadata_persistence(rag_runtime, monkeypatch):
-    def pdf(url,directory,name): return make_pdf(directory/(name+'.pdf'))
+    def pdf(url,directory,name,metadata=None): return make_pdf(directory/(name+'.pdf'))
     monkeypatch.setattr('package.rag.pipeline.download_pdf',pdf)
     papers=[Paper(title='Full', open_access_url='https://example.com/full.pdf'), Paper(title='Abstract',abstract='Flight evidence.'), Paper(title='Metadata')]
     run_id=create_run(); rows=ranked(papers)
@@ -101,7 +101,8 @@ def test_inaccessible_fulltext_falls_back_without_terminating(rag_runtime,monkey
     rows=ranked([Paper(title='Flight',abstract='Flight delays evidence.',open_access_url='https://example.com/a.pdf')])
     result=build_evidence({'research_question':'flight'},rows)
     assert result['evidence_chunks'][0].evidence_type=='abstract'
-    assert result['rag_metrics']['pdf_extraction_failures']==1
+    assert result['rag_metrics']['fulltext_access_failures']==1
+    assert result['rag_metrics']['pdf_extraction_failures']==0
 
 
 def test_replan_reuses_extraction(rag_runtime,monkeypatch):
@@ -111,6 +112,44 @@ def test_replan_reuses_extraction(rag_runtime,monkeypatch):
     first=build_evidence({'research_question':'flight'},rows)
     build_evidence({'research_question':'flight','rag_cache':first['rag_cache']},rows)
     assert len(calls)==1
+
+
+def test_extraction_failure_separate_from_download_and_audited(rag_runtime, monkeypatch):
+    def broken(url, directory, name, metadata):
+        path = directory / (name + '.pdf')
+        path.write_bytes(b'%PDF- broken')
+        return path
+    monkeypatch.setattr('package.rag.pipeline.download_pdf', broken)
+    rows = ranked([Paper(title='Flight', abstract='Flight evidence.', open_access_url='https://example.com/a.pdf')])
+    run_id = create_run()
+    result = build_evidence({'run_id':run_id, 'research_question':'flight'}, rows)
+    assert result['rag_metrics']['pdf_extraction_failures'] == 1
+    assert result['rag_metrics']['fulltext_access_failures'] == 0
+    failure = next(e for e in get_run(run_id)['events'] if e['action'] == 'pdf_failed')
+    assert failure['details']['reason'] == 'invalid_pdf'
+    assert failure['details']['failure_stage'] == 'extraction'
+    assert rows[0].evidence_type == 'abstract'
+    assert not list(rag_runtime.rglob('*.pdf'))
+
+
+def test_download_provenance_uses_final_pdf_url(rag_runtime, monkeypatch):
+    def downloaded(url, directory, name, metadata):
+        metadata['source_url'] = 'https://example.com/actual.pdf'
+        metadata['metadata_resolution'] = True
+        return make_pdf(directory / (name + '.pdf'))
+    monkeypatch.setattr('package.rag.pipeline.download_pdf', downloaded)
+    rows = ranked([Paper(title='Flight', open_access_url='https://example.com/article')])
+    result = build_evidence({'research_question':'flight'}, rows)
+    assert all(c.source_url == 'https://example.com/actual.pdf' for c in result['evidence_chunks'])
+
+
+def test_failure_activity_is_specific_but_legacy_events_still_render():
+    from package.workflow.activity import activity_events
+    base = {'id':1, 'timestamp':'2026-09-13T00:00:00+00:00', 'component':'Processing', 'action':'pdf_failed'}
+    events = activity_events([{**base, 'details':{'reason':'access_denied', 'http_status':403}},
+                              {**base, 'details':{}}])
+    assert 'denied access' in events[0]['message']
+    assert 'access or extraction failed' in events[1]['message']
 
 
 def test_processing_deduplicates_before_chunks(rag_runtime):
@@ -195,7 +234,7 @@ def test_replan_preserves_failure_counts(rag_runtime,monkeypatch):
     rows=ranked([Paper(title='Flight',abstract='Flight evidence.',open_access_url='https://example.com/a.pdf')])
     first=build_evidence({'research_question':'flight'},rows)
     second=build_evidence({'research_question':'flight','rag_cache':first['rag_cache'],'rag_failures':first['rag_failures']},rows)
-    assert second['rag_metrics']['pdf_extraction_failures']==1
+    assert second['rag_metrics']['fulltext_access_failures']==1
 
 
 def test_public_https_rejects_local_addresses(monkeypatch):

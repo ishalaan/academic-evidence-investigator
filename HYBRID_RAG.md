@@ -4,13 +4,18 @@ The LangGraph nodes and Critic replanning route are unchanged. Processing first
 validates, deduplicates and ranks papers using the existing deterministic rules.
 It then resolves explicit open-access PDF metadata (Semantic Scholar openAccessPdf,
 or Crossref PDF links accompanied by a Creative Commons licence). Optional
-Unpaywall resolution is enabled only when UNPAYWALL_EMAIL is configured. Ordinary
-publisher landing pages and unverified Crossref full-text links are not scraped.
+Unpaywall resolution is enabled only when UNPAYWALL_EMAIL is configured. When an
+OA URL leads to HTML, the downloader can follow one unambiguous citation_pdf_url
+meta tag on the same host. It does not guess PDF links or crawl ordinary anchors.
+The landing-page response is limited to 512 KiB and is never used as evidence text.
 
 PDF downloads use verified public HTTPS, inspect redirect destinations, and stop
-on access errors. They are capped at 20 MiB, a 30-second streaming budget and 200
+on access errors. HTTP redirect targets are tried using HTTPS only; insecure HTTP
+requests are never sent. There are at most eight requests and one transient-error
+retry within a 30-second checked budget. HTTP 401/403/404/429 and Retry-After responses
+are not retried. Downloads are capped at 20 MiB and 200
 pages. Extraction uses PyMuPDF and preserves one-based PDF page positions. There
-is no OCR, HTML extraction, CAPTCHA handling, login or paywall workaround.
+is no OCR, HTML evidence extraction, CAPTCHA handling, login or paywall workaround.
 Scanned, malformed, restricted, oversized or unavailable PDFs fall back to the
 abstract. Records without usable text stay in Ranked Sources, outside synthesis.
 
@@ -59,8 +64,12 @@ for the new optional fields; the existing report_payload migration is unchanged.
 
 Metrics count the current deduplicated corpus, not repeated work across replans.
 Failure metadata and extracted chunks are reused within a run. fulltext_papers_resolved
-counts successfully extracted papers; pdf_extraction_failures includes PDF download
-failures after a URL was resolved. Provider/access failures are explicitly visible.
+counts successfully extracted papers. From the 13 September 2026 PDF fix,
+pdf_extraction_failures counts failures after download, while fulltext_access_failures
+counts URL resolution/download failures. Audit events include a safe reason,
+failure stage and HTTP status where applicable. The actual downloaded PDF URL is
+retained in passage provenance. Earlier saved reports, including Report 54, retain
+their original broader extraction-failure counter; these records are not rewritten.
 Runtime text is lost on process restart; there is no persistent vector database.
 
 Verification includes generated PDFs, real FAISS with deterministic test embeddings,

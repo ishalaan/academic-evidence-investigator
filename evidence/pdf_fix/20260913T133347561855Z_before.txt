@@ -1,0 +1,26 @@
+ACADEMIC EVIDENCE INVESTIGATOR: PDF RETRIEVAL CHECK
+UTC: 2026-09-13T13:33:47+00:00
+Mode: BEFORE - preserved original downloader
+Controlled live replay; this is not the original Report 54 execution.
+Downloader SHA256: dbb621d9b6dae0efd58756dba93c3a19277fadc7c17d719f0a5869bd57f6a3ad
+Shared HTTPS helper: C:\Scripts\academic-evidence-investigator\src\package\services\fulltext_resolver.py
+No LLM calls, database updates or permanent PDF storage.
+
+A - article landing page
+DOI: 10.59075/m1cm0j76
+RESULT: FAILED during download
+Error type: ValueError
+Reason: Resource is not a PDF
+Elapsed: 1.95 seconds
+Temporary files cleaned up.
+
+B - DOI advertises HTTP redirect
+DOI: 10.29333/iji.2026.19137a
+RESULT: FAILED during download
+Error type: ValueError
+Reason: Only public HTTPS resources are allowed
+Elapsed: 0.35 seconds
+Temporary files cleaned up.
+
+Observed result: 0/2 documents successfully extracted.
+Live websites can change; report these actual results, not expected ones.

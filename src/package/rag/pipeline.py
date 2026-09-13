@@ -6,7 +6,7 @@ import re
 from package.processing.chunking import chunk_pages, paper_key
 from package.processing.semantic_retrieval import select_chunks
 from package.services.fulltext_resolver import resolve_fulltext
-from package.services.pdf_loader import download_pdf, extract_pages
+from package.services.pdf_loader import download_pdf, extract_pages, failure_details
 from package.rag.runtime import run_directory
 from package.storage.audit import record_event
 
@@ -35,12 +35,19 @@ def build_evidence(state, ranked):
                 paper_chunks, kind = cache[key]
             else:
                 paper_chunks, kind, url = [], "metadata_only", None
+                phase = "resolution"
                 try:
                     url = resolve_fulltext(paper)
                     if url:
                         event("fulltext_located", paper_id=key, doi=paper.doi, source_url=url)
-                        path = download_pdf(url, directory, key)
+                        phase = "download"
+                        download_details = {}
+                        path = download_pdf(url, directory, key, download_details)
+                        url = download_details.get("source_url", url)
                         try:
+                            event("pdf_downloaded", paper_id=key, source_url=url,
+                                  metadata_resolution=download_details.get("metadata_resolution", False))
+                            phase = "extraction"
                             pages = extract_pages(path)
                         finally:
                             path.unlink(missing_ok=True)
@@ -51,8 +58,9 @@ def build_evidence(state, ranked):
                         event("fulltext_unavailable", paper_id=key)
                 except Exception as exc:
                     # Access/extraction is optional. Never persist provider bodies.
-                    failures[key] = "pdf_extraction_failures" if url else "fulltext_access_failures"
-                    event("pdf_failed" if url else "fulltext_unavailable", paper_id=key)
+                    failures[key] = "pdf_extraction_failures" if phase == "extraction" else "fulltext_access_failures"
+                    event("pdf_failed" if url else "fulltext_unavailable", paper_id=key,
+                          **failure_details(exc, phase))
                 if not paper_chunks:
                     abstract = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", paper.abstract or "")).split())
                     if abstract:

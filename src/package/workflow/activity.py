@@ -20,10 +20,25 @@ def activity_events(events):
         rag_messages = {"fulltext_located": "Open-access full text located.",
             "fulltext_unavailable": "Accessible full text unavailable.", "pdf_extracted": "PDF text extracted with page references.",
             "pdf_failed": "PDF access or extraction failed; checking abstract fallback.",
+            "pdf_downloaded": "PDF downloaded; extracting page-aware text.",
             "abstract_fallback": "Using abstract-only evidence.", "chunks_created": "Evidence chunks created.",
             "chunks_selected": "Relevant passages selected.", "semantic_completed": "Hybrid evidence retrieval completed."}
         if component == "Processing" and action in rag_messages:
             message = rag_messages[action]
+            failure_reasons = {
+                "access_denied": "The host denied access", "not_found": "The document was not found",
+                "rate_limited": "The host rate limit was reached", "http_error": "The host returned an HTTP error",
+                "timeout": "The request timed out", "network_error": "The network request failed",
+                "unsafe_url": "The URL failed public HTTPS validation", "access_error": "Full-text access failed",
+                "download_time_limit": "The download time limit was reached", "pdf_size_limit": "The PDF size limit was reached",
+                "html_size_limit": "The article metadata size limit was reached", "invalid_redirect": "The redirect was invalid",
+                "redirect_limit": "The request/redirect limit was reached", "no_pdf_metadata": "The response was not a PDF and supplied no unambiguous PDF metadata",
+                "not_pdf": "The PDF link returned a non-PDF response", "cross_host_pdf_metadata": "The PDF metadata pointed to another host",
+                "password_required": "The PDF requires a password", "invalid_pdf": "The PDF could not be parsed",
+                "page_limit": "The PDF page limit was reached", "no_usable_text": "The PDF contained no usable text"
+            }
+            if action in ("pdf_failed", "fulltext_unavailable") and details.get("reason") in failure_reasons:
+                message = failure_reasons[details["reason"]] + "; checking abstract fallback."
             if action == "semantic_completed" and details.get("mode") == "lexical_fallback":
                 message = "Local embeddings unavailable; used deterministic passage selection."
         elif action in ("section_started", "section_completed") and component == "Reporter":
