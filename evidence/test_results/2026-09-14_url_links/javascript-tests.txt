@@ -1,0 +1,18 @@
+✔ paper URL recognition preserves prose and DOI parentheses (2.2193ms)
+✔ only HTTP URLs become links and query strings are preserved (0.2516ms)
+✔ submit, real status, repeated replanning and completion redirect (7.945ms)
+✔ failed run removes overlay, restores form and stops polling (1.9295ms)
+✔ polling reconnects to the same run and survives page refresh (3.1968ms)
+✔ missing run stops polling and allows a fresh investigation (1.2295ms)
+✔ start rejection shows server error and allows retry (0.9547ms)
+✔ activity preserves history, avoids duplicates and highlights current action (2.4091ms)
+✔ tabs support click and keyboard selection with matching panel visibility (1.2475ms)
+✔ paper IDs in the live feed open the source in a new tab (1.3383ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 194.5986
