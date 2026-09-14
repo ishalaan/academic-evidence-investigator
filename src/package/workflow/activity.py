@@ -1,3 +1,6 @@
+from urllib.parse import urlsplit
+from package.services.references import source_url
+from package.processing.chunking import paper_key
 """Public activity messages derived only from known workflow event fields."""
 
 from package.workflow.audit import STAGE_MESSAGES
@@ -5,7 +8,8 @@ from package.services.presentation import display_timestamp
 import re
 
 
-def activity_events(events):
+def activity_events(events, papers=None):
+    urls = {paper_key(p): source_url(p) for p in (papers or [])}
     activity = []
     for event in events:
         component, action = event["component"], event["action"]
@@ -100,8 +104,16 @@ def activity_events(events):
         if isinstance(paper_id, str) and re.fullmatch(r"[a-f0-9]{20}", paper_id):
             title = details.get("paper_title")
             title = " ".join(title.split())[:120] if isinstance(title, str) else ""
+            title = re.sub(r"^(\d+)(?=[A-Za-z])", r"\1 ", title)
             message += f" Paper {paper_id}" + (f" — {title}." if title else ".")
+        paper_url = details.get('paper_url') or urls.get(paper_id)
+        try:
+            parsed = urlsplit(paper_url or '')
+            if parsed.scheme not in ('http', 'https') or not parsed.netloc:
+                paper_url = None
+        except ValueError:
+            paper_url = None
         activity.append({"id": event["id"], "timestamp": event["timestamp"], "display_timestamp": display_timestamp(event["timestamp"]),
                          "component": component, "action": action, "cycle": cycle,
-                         "message": message})
+                         "message": message, "paper_id": paper_id, "paper_url": paper_url})
     return activity

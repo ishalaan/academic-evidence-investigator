@@ -16,7 +16,8 @@
     <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
         <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
         <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
-        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Agent Activity</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
     </div>
     <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
         <h2>Summary</h2>
@@ -34,7 +35,7 @@
         {% if references %}<ul class="reference-list">
         {% for entry in references | sort(attribute='sort_key') %}
             <li id="source-{{ entry.id }}">
-                {{ entry.opening }}{% if entry.paper.journal %}, <em>{{ entry.paper.journal }}</em>{% endif %}{% if entry.publication %}, {{ entry.publication }}{% endif %}.
+                {{ entry.opening }}{% if entry.paper.journal %}, <em>{{ plain_abstract(entry.paper.journal) }}</em>{% endif %}{% if entry.publication %}, {{ entry.publication }}{% endif %}.
                 {% if entry.url %}Available at: <a href="{{ entry.url }}" target="_blank" rel="noopener noreferrer">{{ entry.url }}</a>
                 {% if entry.access_date %}(Accessed: {{ entry.access_date }}).{% else %}(Access date not recorded).{% endif %}
                 {% else %}<span class="reference-note">No DOI or web link was supplied.</span>{% endif %}
@@ -68,7 +69,7 @@
     </section>
 
     <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
-        <h2>Agent Activity</h2>
+        <h2>Audit</h2>
         {% if audit %}
         <p>Run ID: {{ audit.id }} · Report ID: {{ report_id or 'Not saved' }}</p>
         <p>Started: {{ display_timestamp(audit.created_at) }} · Updated: {{ display_timestamp(audit.updated_at) }} (UTC)</p>
@@ -85,11 +86,15 @@
         {% else %}<p>No Critic decision was recorded.</p>{% endfor %}
         <h3>Hybrid evidence coverage</h3>
         {% if report.evidence_coverage %}<dl class="metrics">{% for key, value in report.evidence_coverage.items() %}<dt>{{ key|replace('_', ' ')|capitalize }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>{% endif %}
-        <h3>Activity log</h3>
+        {% else %}<p>No audit was recorded for this report.</p>{% endif %}
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        {% if audit %}
         <div class="audit-table"><table>
             <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
-            <tbody>{% for event in activity_events(audit.events) %}
-            <tr><td>{{ event.display_timestamp }}</td><td>{{ event.component }}{% if event.cycle %}<br>Cycle {{ event.cycle }}{% endif %}</td><td>{{ event.action | replace('_', ' ') }}</td><td>{{ event.message }}</td></tr>
+            <tbody>{% for event in activity_events(audit.events, report.ranked_sources|map(attribute='paper')|list if report.ranked_sources else report.sources) %}
+            <tr><td>{{ event.display_timestamp }}</td><td>{{ event.component }}{% if event.cycle %}<br>Cycle {{ event.cycle }}{% endif %}</td><td>{{ event.action | replace('_', ' ') }}</td><td>{% if event.paper_id and event.paper_url %}{% set parts = event.message.split(event.paper_id, 1) %}{{ parts[0] }}<a href="{{ event.paper_url }}" target="_blank" rel="noopener noreferrer">{{ event.paper_id }}</a>{{ parts[1] if parts|length > 1 else '' }}{% else %}{{ event.message }}{% endif %}</td></tr>
             {% endfor %}</tbody>
         </table></div>
         {% else %}<p>No agent activity was recorded for this report.</p>{% endif %}

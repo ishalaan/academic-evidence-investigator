@@ -41,6 +41,20 @@ def grounding_issue(text, context):
             if not ids and re.search(r'\b\d[\d,]*\s+(?:students|participants|respondents)|\b(?:systematic review|mixed.methods|regression analysis)\b', sentence, re.I):
                 return 'missing_claim_citation'
             evidence = ' '.join(t for sid in ids for t in sources.get(sid, [])).lower()
+            claim = sentence.lower()
+            statistics = re.findall(r'\b(r|p|beta|β)\s*([=<>≤≥])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))', claim)
+            if statistics:
+                def stats(value):
+                    return {(label, op, float(number)) for label, op, number in re.findall(r'\b(r|p|beta|β)\s*([=<>≤≥])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))', value.lower())}
+                if not ids or any(not stats(sentence).issubset(stats(' '.join(sources.get(sid, [])))) for sid in ids):
+                    return 'unsupported_statistic'
+            for pattern, reason in [
+                (r'\b(?:analysis|study|research) (?:was |is |has been )?truncated\b', 'truncation_as_study_limitation'),
+                (r'\bsmall samples?\b', 'unsupported_sample_limitation'),
+                (r'\b(?:negative effects?|minimal gains?)\b', 'unsupported_outcome'),
+            ]:
+                if re.search(pattern, claim) and not re.search(pattern, evidence):
+                    return reason
             if not evidence:
                 continue
             claim = sentence.lower()
@@ -48,8 +62,10 @@ def grounding_issue(text, context):
                 number = count.replace(',', '')
                 if not all(re.search(r'(?<!\d)' + re.escape(number) + r'(?!\d)', ' '.join(sources.get(sid, [])).replace(',', '')) for sid in ids):
                     return 'unsupported_sample_size'
-            for design, pattern in [('systematic review', r'systematic (?:literature )?review'), ('mixed-methods', r'mixed[ -]methods?'), ('regression analysis', r'regression')]:
-                if re.search(pattern, claim) and not all(re.search(pattern, ' '.join(sources.get(sid, [])).lower()) for sid in ids):
+            for design, pattern in [('systematic review', r'systematic (?:literature )?review'), ('mixed-methods', r'mixed[\s\-‐-—]+methods?'), ('regression analysis', r'regression')]:
+                supports = [bool(re.search(pattern, ' '.join(sources.get(sid, [])).lower())) for sid in ids]
+                universal = bool(re.search(r'\b(?:both|all|each|every)\b', claim))
+                if re.search(pattern, claim) and not (all(supports) if universal else any(supports)):
                     return 'unsupported_study_design'
             qualified = bool(re.search(r'\b(may|might|could|can|potential|expected|proposed|suggests?|reported|reports?|associated|correlat\w*|recommend\w*|should)\b', claim))
             empirical = bool(re.search(r'results (?:revealed|showed)|randomi[sz]ed|p\s*[<=]\s*0\.|β\s*=', evidence))

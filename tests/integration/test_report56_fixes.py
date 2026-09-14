@@ -49,3 +49,10 @@ def test_wrong_sample_triggers_targeted_regeneration():
  value, ids=generate_section(Client(),{'research_question':'Q'},papers,reference_entries(papers),CONTEXT,('summary','summary','Summarise',0),[])
  assert len(calls)==2 and '300' not in value and ids=={'S1'}
  assert 'unsupported_sample_size' in calls[1]['messages'][-1]['content']
+
+
+# These cases exercise the optional strict evaluation policy.
+import pytest
+@pytest.fixture(autouse=True)
+def strict_quality_policy(monkeypatch):
+    monkeypatch.setattr('package.agents.reporter.STRICT_REPORT_QUALITY', True)

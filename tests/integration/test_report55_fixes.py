@@ -113,3 +113,10 @@ def test_grounding_failure_regenerates_current_section(monkeypatch):
     p=Paper(title='Study',authors=['Author'],year=2026,abstract='Expected Learning Benefit: improved learning.')
     value,ids=generate_section(Client(),{'research_question':'Q'},[p],reference_entries([p]),json.dumps([{'source_id':'S1','text':p.abstract}]),('summary','summary','Summarise',0),[])
     assert len(calls)==2 and 'may support' in value and 'grounding check failed' in str(calls[1])
+
+
+# These cases exercise the optional strict evaluation policy.
+import pytest
+@pytest.fixture(autouse=True)
+def strict_quality_policy(monkeypatch):
+    monkeypatch.setattr('package.agents.reporter.STRICT_REPORT_QUALITY', True)

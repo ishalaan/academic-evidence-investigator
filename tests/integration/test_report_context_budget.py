@@ -55,3 +55,10 @@ def test_unfit_minimum_evidence_is_not_silently_dropped():
 def test_already_short_evidence_is_preserved():
     rows=[{'source_id':'S1','text':'Short evidence.','excerpt_truncated':False}]
     assert json.loads(fit_evidence(json.dumps(rows),1000))==rows
+
+
+# These cases exercise the optional strict evaluation policy.
+import pytest
+@pytest.fixture(autouse=True)
+def strict_quality_policy(monkeypatch):
+    monkeypatch.setattr('package.agents.reporter.STRICT_REPORT_QUALITY', True)

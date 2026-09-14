@@ -21,9 +21,9 @@ def test_three_tabs_combine_overview_and_preserve_cited_references():
     assert response.status_code == 200
     html = response.text
     labels = re.findall(r'role="tab"[^>]*>([^<]+)</button>', html)
-    assert labels == ["Overview", "Ranked Sources", "Agent Activity"]
+    assert labels == ["Overview", "Ranked Sources", "Audit", "Activity Log"]
     panels = dict(re.findall(r'<section id="([^"]+)"[^>]*>(.*?)</section>', html, re.S))
-    assert len(panels) == 3
+    assert len(panels) == 4
     overview = panels["overview-panel"]
     assert "Distinct finding" in overview
     assert "Distinct limitation" in overview
@@ -34,7 +34,7 @@ def test_three_tabs_combine_overview_and_preserve_cited_references():
     assert "Available at:" in overview
     assert "(Accessed: 10 September 2026)" in overview
     assert "<script>alert(1)</script>" not in html
-    assert "Planning search" in panels["activity-panel"]
+    assert "Planning search" in panels["log-panel"]
     assert "Investigation metrics" in panels["activity-panel"]
 
 

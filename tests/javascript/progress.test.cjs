@@ -121,8 +121,8 @@ test('activity preserves history, avoids duplicates and highlights current actio
 });
 
 test('tabs support click and keyboard selection with matching panel visibility', () => {
-    const tabs = Array.from({length: 3}, element);
-    const panels = Array.from({length: 3}, element);
+    const tabs = Array.from({length: 4}, element);
+    const panels = Array.from({length: 4}, element);
     tabs.forEach((tab, index) => {
         tab.attributes = {'aria-controls': `panel-${index}`};
         tab.setAttribute = (key, value) => tab.attributes[key] = value;
@@ -141,12 +141,25 @@ test('tabs support click and keyboard selection with matching panel visibility',
     assert.equal(panels[1].hidden, false);
     assert.equal(tabs[1].attributes['aria-selected'], 'true');
     tabs[1].listeners.keydown({key: 'End', preventDefault() {}});
-    assert.equal(tabs[2].focused, true);
-    assert.equal(panels[2].hidden, false);
-    assert.ok(panels.slice(0, 2).every(panel => panel.hidden));
-    tabs[2].listeners.keydown({key: 'ArrowRight', preventDefault() {}});
+    assert.equal(tabs[3].focused, true);
+    assert.equal(panels[3].hidden, false);
+    assert.ok(panels.slice(0, 3).every(panel => panel.hidden));
+    tabs[3].listeners.keydown({key: 'ArrowRight', preventDefault() {}});
     assert.equal(tabs[0].focused, true);
     assert.equal(tabs[0].tabIndex, 0);
     assert.equal(tabs[1].tabIndex, -1);
     assert.equal(panels[0].hidden, false);
+});
+
+
+test('paper IDs in the live feed open the source in a new tab', async () => {
+    const id = 'a'.repeat(20);
+    const page = setup([{status_url:'/runs/a/status'}, {status:'running', message:'Processing', events:[{id:1, component:'Processing', action:'chunks_created', message:'Paper '+id+' ready', paper_id:id, paper_url:'https://doi.org/10.1234/test', display_timestamp:'Now'}]}]);
+    await page.submit(); await flush();
+    const message = page.elements['activity-list'].children[0].children[1];
+    const link = message.children[1];
+    assert.equal(link.textContent, id);
+    assert.equal(link.href, 'https://doi.org/10.1234/test');
+    assert.equal(link.target, '_blank');
+    assert.equal(link.rel, 'noopener noreferrer');
 });

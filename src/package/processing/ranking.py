@@ -175,6 +175,8 @@ def filter_relevant_papers(
     relevant: list[Paper] = []
 
     for paper in papers:
+        if population_mismatch(research_question, paper) or education_scope_mismatch(research_question, paper):
+            continue
         score = _relevance_score(
             paper,
             research_question,
@@ -199,3 +201,20 @@ def filter_relevant_papers(
         relevant.append(paper)
 
     return relevant
+
+def population_mismatch(question, paper):
+    """Exclude explicitly school-only populations for higher-education questions."""
+    higher = r'\bhigher education\b|\buniversit(?:y|ies)\b|\bundergraduates?\b|\bpostgraduates?\b'
+    school = r'\bgrade\s+(?:[1-9]|1[0-2])\b|\b(?:primary|secondary|high) school\b|\bk[\u2013-]12\b'
+    if not re.search(higher, question, re.I) or re.search(school, question, re.I):
+        return False
+    title = paper.title
+    text = title + ' ' + (paper.abstract or '')
+    return bool(re.search(school, text, re.I) and not re.search(higher, text, re.I))
+
+
+def education_scope_mismatch(question, paper):
+    if not re.search(r'\bhigher education\b|\buniversit(?:y|ies)\b', question, re.I):
+        return False
+    text = paper.title + ' ' + (paper.abstract or '')
+    return not bool(re.search(r'\beducat\w*|\bstudents?\b|\blearning\b|\bteach\w*|\bpedagog\w*|\buniversit\w*|\bacademic\b', text, re.I))

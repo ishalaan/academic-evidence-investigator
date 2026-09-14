@@ -15,7 +15,7 @@ def display_timestamp(value):
 
 
 def plain_abstract(value):
-    return " ".join(re.sub(r"<[^>]*>", " ", html.unescape(value or "")).split())
+    return " ".join(re.sub(r"</?[A-Za-z][A-Za-z0-9:._-]*(?:\s+[^<>]*?)?\s*/?>", " ", html.unescape(value or "")).split())
 
 
 def british_prose(text):

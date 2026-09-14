@@ -1,3 +1,5 @@
+from package.services.references import source_url
+from package.services.presentation import plain_abstract
 """Hybrid evidence assembly; transient text stays in state, not SQLite."""
 from time import perf_counter
 from uuid import uuid4
@@ -25,8 +27,10 @@ def build_evidence(state, ranked):
     cache = dict(state.get("rag_cache", {}))
     failures = dict(state.get("rag_failures", {}))
     paper_titles = {paper_key(item.paper): item.paper.title for item in ranked}
+    paper_urls = {paper_key(item.paper): source_url(item.paper) for item in ranked}
     def event(action, **details):
         if details.get("paper_id") in paper_titles:
+            details["paper_url"] = paper_urls.get(details["paper_id"])
             details["paper_title"] = paper_titles[details["paper_id"]][:160]
         if run_id:
             record_event(run_id, "Processing", action, details, stage="processing")
@@ -79,7 +83,7 @@ def build_evidence(state, ranked):
                         # Count a terminal HTML-only failure once; preserve an earlier PDF failure category.
                         failures.setdefault(key, "fulltext_access_failures")
                 if not paper_chunks:
-                    abstract = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", paper.abstract or "")).split())
+                    abstract = plain_abstract(paper.abstract)
                     if abstract:
                         paper_chunks = chunk_pages(paper, [(None, abstract)], "abstract", stable_url(paper.url))
                         kind = "abstract"

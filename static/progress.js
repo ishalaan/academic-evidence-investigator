@@ -33,6 +33,20 @@ function renderActivity(events) {
         heading.append(component, badge);
         const message = document.createElement("p");
         message.textContent = event.message;
+        if (event.paper_id && /^https?:\/\//i.test(event.paper_url || "") && event.message.includes(event.paper_id)) {
+            const offset = event.message.indexOf(event.paper_id);
+            message.textContent = "";
+            const before = document.createElement("span");
+            before.textContent = event.message.slice(0, offset);
+            const link = document.createElement("a");
+            link.textContent = event.paper_id;
+            link.href = event.paper_url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            const after = document.createElement("span");
+            after.textContent = event.message.slice(offset + event.paper_id.length);
+            message.append(before, link, after);
+        }
         const timestamp = document.createElement("time");
         timestamp.dateTime = event.timestamp;
         timestamp.textContent = event.display_timestamp || new Date(event.timestamp).toISOString().slice(0, 19).replace("T", " ");

@@ -14,7 +14,9 @@ def _normalise_doi(doi: str | None) -> str | None:
     if not doi:
         return None
 
-    normalised = doi.strip().lower()
+    normalised = re.sub(r"^https?://(?:dx\.)?doi\.org/", "", doi.strip().lower())
+    if normalised.startswith("10.31235/osf.io/"):
+        normalised = re.sub(r"_v\d+$", "", normalised)
 
     # Versioned preprints such as ".../v1" and ".../v2" represent revisions of
     # the same underlying work. Removing the version suffix prevents multiple

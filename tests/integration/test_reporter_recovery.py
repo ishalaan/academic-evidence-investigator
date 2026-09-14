@@ -143,3 +143,10 @@ def test_valid_short_section_is_not_rewritten_for_cosmetic_depth(monkeypatch):
     report = reporter_node({'research_question': 'Q', 'processed_papers': papers})['final_report']
     assert report.summary
     assert len(client.calls) == 3
+
+
+# These cases exercise the optional strict evaluation policy.
+import pytest
+@pytest.fixture(autouse=True)
+def strict_quality_policy(monkeypatch):
+    monkeypatch.setattr('package.agents.reporter.STRICT_REPORT_QUALITY', True)

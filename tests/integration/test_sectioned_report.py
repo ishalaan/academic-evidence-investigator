@@ -154,3 +154,10 @@ def test_findings_cannot_copy_summary_passages(monkeypatch):
     report = reporter_node({'research_question': 'Education', 'processed_papers': [Paper(title='First'), Paper(title='Second', abstract='Knowledge graphs support educational answers.')]})['final_report']
     assert client.finding_attempts == 2
     assert report.findings[0] != report.summary
+
+
+# These cases exercise the optional strict evaluation policy.
+import pytest
+@pytest.fixture(autouse=True)
+def strict_quality_policy(monkeypatch):
+    monkeypatch.setattr('package.agents.reporter.STRICT_REPORT_QUALITY', True)

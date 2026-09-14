@@ -59,7 +59,7 @@ def test_start_returns_before_workflow_finishes_and_can_be_polled(monkeypatch):
     assert status["status"] == "completed"
     report = client.get(status["report_url"])
     assert b"Persisted briefing" in report.data
-    assert b"Agent Activity" in report.data
+    assert b"Audit" in report.data
 
 
 def test_report_tab_shows_persisted_critic_metrics_and_escapes_reason():
@@ -168,7 +168,7 @@ def test_activity_retains_short_stages_and_replanning_without_private_details():
     assert "Crossref was unavailable" in events[3]["message"]
     assert "PRIVATE" not in first.text
     assert events == client.get(f"/runs/{run_id}/status").json["events"]
-    assert all(set(e) == {"id", "timestamp", "display_timestamp", "component", "action", "cycle", "message"} for e in events)
+    assert all(set(e) == {"id", "timestamp", "display_timestamp", "component", "action", "cycle", "message", "paper_id", "paper_url"} for e in events)
 
 
 def test_report_failure_shows_safe_actionable_reason():

@@ -72,7 +72,7 @@ def reference_entries(papers):
     for group in groups.values():
         if len(group) > 1:
             for index, entry in enumerate(sorted(group, key=lambda e: (e["paper"].title.casefold(), e["id"]))):
-                entry["year"] += chr(ord("a") + index)
+                entry["year"] += (" " if entry["year"] == "no date" else "") + chr(ord("a") + index)
     for entry in entries:
         paper = entry["paper"]
         entry["citation"] = f"({entry['author']}, {entry['year']})"
@@ -104,8 +104,25 @@ def normalise_source_tokens(text):
                   text, flags=re.I)
 
 
+
+def resolve_known_citations(text, entries):
+    """Resolve only unique metadata matches, never infer an author or year."""
+    def key(value):
+        value = value.casefold().replace('&', ' and ')
+        return re.sub(r'[\s,.]+', '', value)
+    lookup = defaultdict(list)
+    for entry in entries:
+        lookup[key(entry['citation'][1:-1])].append(entry['id'])
+    def replace(match):
+        parts = match.group(1).split(';')
+        ids = [lookup.get(key(part), []) for part in parts]
+        if ids and all(len(found) == 1 for found in ids):
+            return ' '.join('[' + found[0] + ']' for found in ids)
+        return match.group(0)
+    return re.sub(r'\(([^()]*)\)', replace, normalise_source_tokens(text))
+
 def used_source_ids(text, entries):
-    text = normalise_source_tokens(text)
+    text = resolve_known_citations(text, entries)
     valid = {entry["id"] for entry in entries}
     bracket_text = " ".join(re.findall(r"\[([^\]]+)\]", text))
     used = set(re.findall(r"\bS\d+\b", bracket_text)) & valid
@@ -124,17 +141,15 @@ def report_references(report):
 
 def cited_text(text, entries, *, require_citation=False):
     """Resolve validated source tokens. Never fabricate a citation for uncited prose."""
-    text = normalise_source_tokens(text)
+    text = resolve_known_citations(text, entries)
     lookup = {entry["id"]: entry["citation"] for entry in entries}
     if re.search(r"(?<!\[)\bS\d+\b(?!\])", text):
         raise ValueError("Reporter returned an invalid source citation.")
     # Accept ordinary model variations without guessing which source was intended.
     text = re.sub(r"\[\s*S\d+(?:\s*[,;]\s*S\d+)*\s*\]",
                   lambda match: " ".join(f"[{source_id}]" for source_id in re.findall(r"S\d+", match.group(0))), text)
-    # Exact known author-year citations can also be mapped back unambiguously.
-    for source_id, citation in lookup.items():
-        text = text.replace(citation, f"[{source_id}]")
-    if re.search(r"\([^)]*(?:\b(?:19|20)\d{2}[a-z]?\b|no date)[^)]*\)", text, flags=re.I):
+    # A numeric date/range alone is not an author-year citation.
+    if re.search(r"\([^)]*[^\W\d_][^)]*(?:\b(?:19|20)\d{2}[a-z]?\b|no date)[^)]*\)", text, flags=re.I):
         raise ValueError("Reporter must use source IDs instead of author-year citations.")
     tokens = re.findall(r"\[(S\d+)\]", text)
     if any(token not in lookup for token in tokens):
