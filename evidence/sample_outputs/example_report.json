@@ -1,7 +1,1532 @@
 {
-  "research_question": "Example research question",
-  "summary": "Sample output will be replaced after live end-to-end testing.",
-  "findings": [],
-  "limitations": [],
-  "sources": []
+  "research_question": "How does generative AI affect student learning outcomes in higher education?",
+  "summary": "Generative AI (GenAI) in higher education shows mixed but promising effects on student learning outcomes, with its impact mediated by factors like student engagement, AI literacy, and institutional integration. Studies highlight its potential to enhance academic tasks such as writing, research, and problem-solving, supported by tools that provide instant feedback and personalised learning support (Alkhatib et al., 2026). For instance, GenAI-based assessment systems offer adaptive, real-time evaluation, addressing limitations of traditional methods like delayed feedback and high faculty workload (D, 2026). However, effectiveness varies: while some studies report improved engagement and performance, others note risks such as over-reliance on AI and discipline-specific variability (Hon, 2025). This suggests that GenAI’s benefits depend on how it is implemented and contextual factors.\n\nA key mediating factor is student engagement, which is influenced by their AI literacy and willingness to adopt the technology. Research indicates that students who actively engage with GenAI tools—such as using them for brainstorming or refining arguments—tend to achieve better outcomes, but this requires prior training and familiarity (Alkhatib et al., 2026). Conversely, concerns about accuracy, ethical use, and the erosion of critical thinking skills persist, with students expressing worries about privacy and the impact on personal development (Chan and Hu, 2023). These findings underscore the need for balanced integration, combining GenAI’s capabilities with pedagogical strategies that foster independent learning and digital responsibility.\n\nThe role of institutional frameworks is also critical. Studies emphasise that successful GenAI adoption depends on alignment with pedagogical goals, technological infrastructure, and student characteristics. For example, a framework developed to optimise GenAI integration highlights the importance of aligning AI tools with teaching methods and ensuring institutional readiness to support both faculty and students (Riaz and Mushtaq, 2024). This includes addressing challenges like academic integrity, where GenAI’s potential for misuse—such as plagiarism or shortcut-taking—requires clear policies and monitoring (Elenode, 2026). Such systemic approaches are essential to maximise benefits while mitigating risks.\n\nBeyond traditional academic tasks, GenAI is being applied in creative and interdisciplinary contexts, such as AI art and multimodal projects, which support ideation and expression (Rong et al., 2025). These applications demonstrate the technology’s versatility but also highlight structural barriers, including access disparities and the need for training to harness its full potential. Student perceptions remain cautiously optimistic, with many recognising its value for personalised learning and research assistance, though they advocate for transparent guidelines to address ethical concerns (Chan and Hu, 2023). Overall, the evidence suggests that GenAI can augment learning outcomes when integrated thoughtfully, but its success hinges on addressing both technical and pedagogical challenges.",
+  "findings": [
+    "Generative AI-based assessment systems provide adaptive, real-time feedback, addressing limitations of traditional methods such as delayed feedback and high faculty workload (D, 2026).",
+    "A quantitative study examines the mediating roles of student engagement and AI literacy, using data from undergraduate and postgraduate students who use GenAI tools (Alkhatib et al., 2026).",
+    "A validated theoretical framework links technological acceptance, constructivist engagement, and ethical governance, offering a model for integrating GenAI responsibly (Shuvo et al., 2025).",
+    "A qualitative study analyses the complex relationships between GenAI, pedagogical approaches, and institutional technological preparedness, highlighting alignment with teaching methods as critical for success (Riaz and Mushtaq, 2024).",
+    "A systematic review identifies mixed evidence, with some studies reporting increased engagement and performance while others note risks like over-reliance on AI and discipline-specific variability (Hon, 2025).",
+    "A survey of 399 students reveals positive attitudes toward GenAI for personalised learning support, writing assistance, and research capabilities, though concerns about accuracy and ethical use persist (Chan and Hu, 2023)."
+  ],
+  "limitations": [
+    "The reliance on self-reported data from students limits the objectivity of perceptions regarding GenAI benefits and challenges (Chan and Hu, 2023). Further evidence from mixed-methods studies could clarify the extent of these subjective experiences.",
+    "Most studies focus on short-term outcomes, lacking long-term data on sustained learning gains or skill development (Elenode, 2026). Longitudinal research would better assess GenAI's enduring impact on academic performance.",
+    "Conflicting findings on engagement and academic integrity highlight inconsistent implementation contexts (Hon, 2025). Comparative studies across diverse institutional settings could identify optimal integration strategies.",
+    "Few studies address non-English speaking students' unique challenges with GenAI tools (Chan and Hu, 2023). Evidence from multilingual contexts is needed to evaluate equitable access and effectiveness.",
+    "Theoretical frameworks often prioritize technical integration over pedagogical alignment (Riaz and Mushtaq, 2024). Research linking GenAI use to specific teaching methodologies could strengthen its educational value proposition.",
+    "Reporter review note: Findings contains model-generated wording requiring human review (unsupported study design). Unresolved author-year citations are not verified references; check claims against Ranked Sources.",
+    "Reporter review note: Limitations contains model-generated wording requiring human review (missing claim citation). Unresolved author-year citations are not verified references; check claims against Ranked Sources."
+  ],
+  "sources": [
+    {
+      "title": "Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education",
+      "authors": [
+        "Rajasekaran D"
+      ],
+      "abstract": "<jats:p>The rapid advancement of Generative Artificial Intelligence (GAI) has significantly transformed assessment and feedback mechanisms in higher education. Traditional assessment practices often suffer from delayed feedback, limited personalization, and high faculty workload, which may negatively affect student engagement and learning outcomes. Generative AI–based assessment and feedback systems offer adaptive, real-time, and personalized evaluation models that promise enhanced learning effectiveness. This study evaluates the impact of Generative AI–driven assessment and feedback systems on student learning outcomes in higher education institutions. Using a mixed-method research design, data were collected from undergraduate and postgraduate students exposed to AI-supported assessments across multiple disciplines. Statistical tools such as simple percentage analysis, paired t-tests, and regression analysis were employed to assess improvements in academic performance, learner engagement, and self-regulated learning. The findings reveal that Generative AI–based feedback significantly improves conceptual understanding, timely error correction, and student satisfaction. However, concerns regarding academic integrity, algorithmic bias, and ethical data use remain critical challenges. The study concludes that while Generative AI can substantially enhance assessment effectiveness, its successful adoption requires ethical governance, faculty training, and transparent AI models. The paper offers practical implications for educators, policymakers, and institutional leaders aiming to integrate AI responsibly into higher education assessment frameworks.</jats:p>",
+      "doi": "10.36948/ijfmr.2026.v08i03.81825",
+      "url": "https://doi.org/10.36948/ijfmr.2026.v08i03.81825",
+      "year": 2026,
+      "source": "Crossref",
+      "author_details": [
+        {
+          "given": "Rajasekaran",
+          "family": "D"
+        }
+      ],
+      "journal": "International Journal For Multidisciplinary Research",
+      "volume": "8",
+      "issue": "3",
+      "pages": null,
+      "article_number": "81825",
+      "accessed_on": "2026-09-14",
+      "open_access_url": null
+    },
+    {
+      "title": "Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and AI Literacy in Higher Education",
+      "authors": [
+        "Omar J. Alkhatib",
+        "Faisal Rahman",
+        "Azzah Khadim Hussain",
+        "Muhammad Siddique",
+        "Humera Omer Farooq"
+      ],
+      "abstract": "Generative Artificial Intelligence (GenAI) is rapidly transforming higher education by providing personalized academic support, automated feedback, content generation, problem-solving assistance, and interactive learning opportunities. This research investigates the impact of GenAI on student learning outcomes, with particular emphasis on the mediating roles of student engagement and AI literacy. The study addresses the growing need to examine whether GenAI directly improves academic performance or whether its influence becomes stronger when students are actively engaged and possess sufficient knowledge of how to use AI tools responsibly and effectively. A quantitative research design was adopted, and data were collected through a structured questionnaire from 350 undergraduate and postgraduate students enrolled in higher education institutions. The questionnaire measured four major constructs: GenAI usage, student engagement, AI literacy, and student learning outcomes. Data were analyzed using descriptive statistics, reliability analysis, correlation analysis, and structural equation modeling. The results revealed that GenAI usage had a significant positive effect on student learning outcomes (β = 0.41, p < 0.001). Student engagement significantly mediated the relationship between GenAI usage and learning outcomes (indirect effect = 0.23, p < 0.01), showing that GenAI-supported learning improved student motivation, participation, classroom interaction, and self-directed learning behavior. Similarly, AI literacy also showed a strong mediating effect (indirect effect = 0.27, p < 0.001), indicating that students with higher AI literacy were better able to evaluate AI-generated content, apply ethical judgment, avoid overdependence, and use AI tools for meaningful academic improvement. The model explained 62.4% of the variance in student learning outcomes, while GenAI usage improved perceived academic performance by 31.6%, student engagement by 28.4%, and AI literacy-based learning confidence by 34.2%. Overall, the findings suggest that GenAI alone is not sufficient to ensure improved learning outcomes; its effectiveness depends largely on student engagement and AI literacy competencies. The study provides practical implications for universities, teachers, and policymakers to develop AI literacy programs and student-centered GenAI learning strategies in higher education.",
+      "doi": "10.59075/m1cm0j76",
+      "url": "https://www.semanticscholar.org/paper/f6939ae2955511c362b4b008ffc029555ed5d6f2",
+      "year": 2026,
+      "source": "Semantic Scholar",
+      "author_details": [],
+      "journal": "The Critical Review of Social Sciences Studies",
+      "volume": "4",
+      "issue": "1",
+      "pages": "6400-6424",
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": "https://doi.org/10.59075/m1cm0j76"
+    },
+    {
+      "title": "Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awareness",
+      "authors": [
+        "Tamim Forhad Shuvo",
+        "Md Taushik Hossain",
+        "Jannatul Ferdoush Oishy",
+        "Nawreen Islam Nazat",
+        "Md Kabir Hosen"
+      ],
+      "abstract": "The accelerated integration of Artificial Intelligence (AI) into higher education has introduced both transformative opportunities and complex ethical challenges across teaching, learning, and academic governance. This study explores university students’ awareness, perceptions, and usage patterns of AI technologies, particularly generative AI, and assesses their influence on academic engagement and perceived performance. Employing a structured quantitative methodology, survey data were collected from 300 students across diverse disciplines. Descriptive and inferential analyses, including multiple linear regression, were conducted to identify key predictors of AI-driven academic outcomes. Findings reveal that perceived benefits of AI and student engagement are strong positive predictors of improved academic performance, while access-related disparities emerge as significant barriers. Additionally, ethical concerns, policy awareness, and trust in AI-generated content shape students’ attitudes and behaviors, indicating that cognitive and contextual factors influence the educational impact of AI. Grounded in a theoretical framework integrating the Technology Acceptance Model (TAM) and Constructivist Learning Theory, this research highlights AI’s dual role as both an enabler and disruptor of equitable education. It calls for the implementation of transparent governance structures, equitable digital infrastructure, and ethical AI literacy within academic institutions. This study contributes to the evolving discourse on responsible AI adoption in education and offers practical guidance for policymakers, educators, and technology developers aiming to enhance academic integrity and digital inclusion in the AI age.",
+      "doi": "10.67508/iub.icebtm.2025.023",
+      "url": "https://www.semanticscholar.org/paper/18c39717d8fd86fc91a87db1f8758fa27578ab51",
+      "year": 2025,
+      "source": "Semantic Scholar",
+      "author_details": [],
+      "journal": "The Proceedings of the International Conference on Economics, Business and Technology Management (ICEBTM 2025)",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": "https://ar.iub.edu.bd/bitstream/11348/1428/1/ICEBTM-25-1075.pdf"
+    },
+    {
+      "title": "Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outcomes",
+      "authors": [
+        "Sadia Riaz",
+        "Arif Mushtaq"
+      ],
+      "abstract": "As higher education institutions adapt to changing teaching and learning, Generative Artificial Intelligence (AI) technologies may boost student engagement and learning outcomes. This study aims to help higher education institutions determine the best ways to integrate Generative AI, an urgent issue. A thorough analysis of Generative AI integration and its different effects on education underpins the research framework. This qualitative study analyses the complex relationships between Generative AI, pedagogical approaches, institutional technological preparedness, student characteristics, and educational environment mediators. This study examines Generative AI integration, pedagogical alignment, technology acceptability, and material customization. This study examines how Generative AI might boost student engagement and learning. It evaluates Generative AI's performance through pedagogical methods and relevant feedback. The study underlines the importance of technical adoption and topic matter in AI integration efficacy. This paper closes with a complete framework that gives educators, institutions, and policymakers practical advice for optimising Generative AI integration in higher education. This approach equips stakeholders with the skills and knowledge to navigate AI-enhanced education's complex landscape. It strives to establish a dynamic, student-centred learning environment. To achieve these goals, the framework uses Generative AI technology's revolutionary power.",
+      "doi": "10.1109/ASET60340.2024.10708721",
+      "url": "https://www.semanticscholar.org/paper/0da4e2bc9fa2dd92d390a9eae6d82a896e9e2ed7",
+      "year": 2024,
+      "source": "Semantic Scholar",
+      "author_details": [
+        {
+          "given": "Sadia",
+          "family": "Riaz"
+        },
+        {
+          "given": "Arif",
+          "family": "Mushtaq"
+        }
+      ],
+      "journal": "2024 Advances in Science and Engineering Technology International Conferences (ASET)",
+      "volume": null,
+      "issue": null,
+      "pages": "1-6",
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": ""
+    },
+    {
+      "title": "Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes in Higher Education",
+      "authors": [
+        "Dr. Abhijit Das",
+        "Dr. Urvesh Chaudhery",
+        "Dr Namrata Yadav Das"
+      ],
+      "abstract": "The integration of Artificial Intelligence (AI) in higher education is reshaping traditional pedagogical models by enhancing personalization, engagement, and administrative efficiency. This study investigates the role of AI in teaching-learning processes in higher education institutions (HEIs) through a quantitative lens, focusing on faculty and student experiences with AI tools. Drawing data from a sample of 250 respondents across Indian universities, the study explores AI’s influence on academic performance, pedagogical innovation, and learner satisfaction. The findings indicate a positive correlation between AI adoption and improved teaching effectiveness, learning outcomes, and administrative convenience. This paper offers policy and practical recommendations for AI integration to support blended learning environments and faculty development. The results contribute to ongoing discussions about digital transformation in higher education.",
+      "doi": "10.51244/ijrsi.2025.120700041",
+      "url": "https://www.semanticscholar.org/paper/e5fccca392392c58390fbb15057f882142af96f2",
+      "year": 2025,
+      "source": "Semantic Scholar",
+      "author_details": [
+        {
+          "given": "Dr. Abhijit",
+          "family": "Das"
+        },
+        {
+          "given": "Dr. Urvesh",
+          "family": "Chaudhery"
+        },
+        {
+          "given": "Dr Namrata",
+          "family": "Yadav Das"
+        }
+      ],
+      "journal": "International Journal of Research and Scientific Innovation",
+      "volume": "XII",
+      "issue": "VII",
+      "pages": "401-407",
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": ""
+    },
+    {
+      "title": "Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Student Engagement, Learning Outcomes, and Academic Integrity",
+      "authors": [
+        "Ayonote Elenode"
+      ],
+      "abstract": "This study examines the integration of generative artificial intelligence (GenAI) and learning analytics (LA) in fostering personalized learning within Nigerian higher education institutions. Specifically, it explores how these emerging technologies influence student engagement, academic performance, and perceptions of academic integrity in digitally mediated learning environments. A mixed-method research design was adopted, involving 420 undergraduate students and 60 academic staff drawn from three Nigerian universities. Quantitative data were collected through structured questionnaires assessing GenAI usage patterns, learning analytics engagement, levels of digital literacy, and integrity perceptions, while qualitative insights were obtained from semi-structured interviews with academic staff and information and communication technology (ICT) administrators. The findings reveal that 64% of respondents actively use GenAI tools such as ChatGPT and Gemini to support learning activities, while 58% regularly access learning analytics dashboards for performance monitoring and feedback. Regression analysis indicates that GenAI-assisted learning and engagement with learning analytics jointly predict improved academic performance (β = 0.36, p < 0.01) and higher levels of student engagement (β = 0.42, p < 0.001). However, the study also finds that unregulated use of GenAI tools is positively associated with increased concerns about plagiarism and academic misconduct (r = 0.31, p < 0.05). The study concludes that the pedagogically guided integration of GenAI and learning analytics can significantly enhance personalized learning experiences in Nigerian higher education. Nevertheless, this potential can only be realized through the development of robust governance frameworks that emphasize ethical use, digital literacy, academic integrity, and data privacy. The study therefore recommends targeted capacity-building for educators, the establishment of transparent institutional AI policies, and continuous evaluation of the pedagogical impact of GenAI technologies.",
+      "doi": "10.11648/j.eas.20261101.11",
+      "url": "https://www.semanticscholar.org/paper/dfe761ff3c30a584b071dd265b3599f40f71176a",
+      "year": 2026,
+      "source": "Semantic Scholar",
+      "author_details": [],
+      "journal": "Engineering and Applied Sciences",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": "http://article.sciencepg.com/pdf/j.eas.20261101.11"
+    },
+    {
+      "title": "Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes",
+      "authors": [
+        "S. Mckenzie",
+        "Jennifer Day"
+      ],
+      "abstract": "The symposium will explore ways of better understanding, challenging and expanding the ways that its diverse users think about and use generative AI in higher education, to best respond to our emerging opportunities to achieve AI ethical and pedagogical best practice. The symposium features a discussion between a range of AI in education experts, and session attendees, guided by key questions on how to achieve the best possible use of AI in education. These questions include how to best bring together technological and human interfaces, and how to best use generative AI in education practice. This could include by strategically expanding its current uses to help it improve whole student education, as well as academic education. Student engagement, wellbeing and motivation could be strategically improved via identifying current levels of, and potential improvements in, student and staff knowledge of and attitudes towards educational uses of AI.     \n \n ",
+      "doi": "10.65106/apubs.2025.2750",
+      "url": "https://www.semanticscholar.org/paper/c6baacf1be692b1bca75b151d26e370f4d97ea79",
+      "year": 2025,
+      "source": "Semantic Scholar",
+      "author_details": [],
+      "journal": "ASCILITE Publications",
+      "volume": null,
+      "issue": null,
+      "pages": "123-125",
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": "https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537"
+    },
+    {
+      "title": "Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance",
+      "authors": [
+        "K. Hon"
+      ],
+      "abstract": "The integration of Generative AI tools in higher education has sparked significant interest, yet their impact on student learning engagement and academic performance remains unclear. This SLR examines empirical studies to determine whether Generative AI enhances engagement and improves learning outcomes in higher education. Following the PRISMA framework, we analyzed peer-reviewed articles from 2018 to 2024, identifying key trends, methodologies, and conflicting findings. Results reveal mixed evidence: while some studies report increased engagement and performance, others highlight limitations, including over-reliance on AI and variable effectiveness across disciplines. The review also identifies gaps in longitudinal and large-scale studies, calling for more rigorous research to assess Generative AI's pedagogical impact. Findings provide insights for educators and policymakers on optimizing Generative AI integration while addressing potential challenges.",
+      "doi": "10.1177/00472395251400089",
+      "url": "https://www.semanticscholar.org/paper/a57539a5937dfd3487d761ec0b3e7edad2a34208",
+      "year": 2025,
+      "source": "Semantic Scholar",
+      "author_details": [],
+      "journal": "Journal of Educational Technology Systems",
+      "volume": "54",
+      "issue": null,
+      "pages": "537 - 560",
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": ""
+    },
+    {
+      "title": "Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review",
+      "authors": [
+        "Wei-Han Rong",
+        "Mengyun Xiao",
+        "Long Zhao",
+        "Xiaolong Zhou"
+      ],
+      "abstract": "Generative Artificial intelligence (AI) art is increasingly integrated into higher education (HE). While its creative potential has been discussed, its actual pedagogical impact and implications for educational equity remain underexplored. This study conducts a systematic review to evaluate how AI art has been applied in HE settings, what teaching and learning outcomes it supports, and what structural barriers exist in its integration. Using the PRISMA framework, 65 peer-reviewed articles published Scopus and Web of Science. The included studies were synthesized thematically and find that generative AI tools are being used to support ideation, multimodal expression, and interdisciplinary projects. However, barriers such as limited faculty training and unclear evaluation standards may hinder equitable access and long-term integration. This review contributes a conceptual framework for understanding the integration of generative AI art, highlighting opportunities and structural limitations. It offers insights for curriculum designers, educators aiming to support responsible, creative, and inclusive uses of AI in arts education.",
+      "doi": "10.3390/info16121070",
+      "url": "https://www.semanticscholar.org/paper/fb11e772aeec8bda112beefcb96c9d43458ec050",
+      "year": 2025,
+      "source": "Semantic Scholar",
+      "author_details": [],
+      "journal": "Inf.",
+      "volume": "16",
+      "issue": null,
+      "pages": "1070",
+      "article_number": null,
+      "accessed_on": "2026-09-14",
+      "open_access_url": "https://www.mdpi.com/2078-2489/16/12/1070/pdf"
+    },
+    {
+      "title": "Students’ voices on generative AI: perceptions, benefits, and challenges in higher education",
+      "authors": [
+        "Cecilia Ka Yuk Chan",
+        "Wenjie Hu"
+      ],
+      "abstract": "This study explores university students’ perceptions of generative AI (GenAI) technologies, such as ChatGPT, in higher education, focusing on familiarity, their willingness to engage, potential benefits and challenges, and effective integration. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Students recognized the potential for personalized learning support, writing and brainstorming assistance, and research and analysis capabilities. However, concerns about accuracy, privacy, ethical issues, and the impact on personal development, career prospects, and societal values were also expressed. According to John Biggs’ 3P model, student perceptions significantly influence learning approaches and outcomes. By understanding students’ perceptions, educators and policymakers can tailor GenAI technologies to address needs and concerns while promoting effective learning outcomes. Insights from this study can inform policy development around the integration of GenAI technologies into higher education. By understanding students’ perceptions and addressing their concerns, policymakers can create well-informed guidelines and strategies for the responsible and effective implementation of GenAI tools, ultimately enhancing teaching and learning experiences in higher education. This study focuses on the integration of generative AI (GenAI) technologies, like ChatGPT, into higher education settings. University students’ perceptions of generative AI technologies in higher education were explored, including familiarity, potential benefits, and challenges. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Insights from this study can inform policy development around the integration of GenAI technologies into higher education, helping to create well-informed guidelines and strategies for responsible and effective implementation. This study focuses on the integration of generative AI (GenAI) technologies, like ChatGPT, into higher education settings. University students’ perceptions of generative AI technologies in higher education were explored, including familiarity, potential benefits, and challenges. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Insights from this study can inform policy development around the integration of GenAI technologies into higher education, helping to create well-informed guidelines and strategies for responsible and effective implementation.",
+      "doi": "10.1186/s41239-023-00411-8",
+      "url": "https://www.semanticscholar.org/paper/49b66b980c91f989637b089c2e8284af443aaa25",
+      "year": 2023,
+      "source": "Semantic Scholar",
+      "author_details": [
+        {
+          "given": "Cecilia Ka Yuk",
+          "family": "Chan"
+        },
+        {
+          "given": "Wenjie",
+          "family": "Hu"
+        }
+      ],
+      "journal": "International Journal of Educational Technology in Higher Education",
+      "volume": "20",
+      "issue": "1",
+      "pages": null,
+      "article_number": "43",
+      "accessed_on": "2026-09-14",
+      "open_access_url": "https://educationaltechnologyjournal.springeropen.com/counter/pdf/10.1186/s41239-023-00411-8"
+    }
+  ],
+  "cited_source_ids": [
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S6",
+    "S8",
+    "S9",
+    "S10"
+  ],
+  "ranked_sources": [
+    {
+      "paper": {
+        "title": "Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education",
+        "authors": [
+          "Rajasekaran D"
+        ],
+        "abstract": "<jats:p>The rapid advancement of Generative Artificial Intelligence (GAI) has significantly transformed assessment and feedback mechanisms in higher education. Traditional assessment practices often suffer from delayed feedback, limited personalization, and high faculty workload, which may negatively affect student engagement and learning outcomes. Generative AI–based assessment and feedback systems offer adaptive, real-time, and personalized evaluation models that promise enhanced learning effectiveness. This study evaluates the impact of Generative AI–driven assessment and feedback systems on student learning outcomes in higher education institutions. Using a mixed-method research design, data were collected from undergraduate and postgraduate students exposed to AI-supported assessments across multiple disciplines. Statistical tools such as simple percentage analysis, paired t-tests, and regression analysis were employed to assess improvements in academic performance, learner engagement, and self-regulated learning. The findings reveal that Generative AI–based feedback significantly improves conceptual understanding, timely error correction, and student satisfaction. However, concerns regarding academic integrity, algorithmic bias, and ethical data use remain critical challenges. The study concludes that while Generative AI can substantially enhance assessment effectiveness, its successful adoption requires ethical governance, faculty training, and transparent AI models. The paper offers practical implications for educators, policymakers, and institutional leaders aiming to integrate AI responsibly into higher education assessment frameworks.</jats:p>",
+        "doi": "10.36948/ijfmr.2026.v08i03.81825",
+        "url": "https://doi.org/10.36948/ijfmr.2026.v08i03.81825",
+        "year": 2026,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Rajasekaran",
+            "family": "D"
+          }
+        ],
+        "journal": "International Journal For Multidisciplinary Research",
+        "volume": "8",
+        "issue": "3",
+        "pages": null,
+        "article_number": "81825",
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 1,
+      "relevance_score": 62,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S1",
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and AI Literacy in Higher Education",
+        "authors": [
+          "Omar J. Alkhatib",
+          "Faisal Rahman",
+          "Azzah Khadim Hussain",
+          "Muhammad Siddique",
+          "Humera Omer Farooq"
+        ],
+        "abstract": "Generative Artificial Intelligence (GenAI) is rapidly transforming higher education by providing personalized academic support, automated feedback, content generation, problem-solving assistance, and interactive learning opportunities. This research investigates the impact of GenAI on student learning outcomes, with particular emphasis on the mediating roles of student engagement and AI literacy. The study addresses the growing need to examine whether GenAI directly improves academic performance or whether its influence becomes stronger when students are actively engaged and possess sufficient knowledge of how to use AI tools responsibly and effectively. A quantitative research design was adopted, and data were collected through a structured questionnaire from 350 undergraduate and postgraduate students enrolled in higher education institutions. The questionnaire measured four major constructs: GenAI usage, student engagement, AI literacy, and student learning outcomes. Data were analyzed using descriptive statistics, reliability analysis, correlation analysis, and structural equation modeling. The results revealed that GenAI usage had a significant positive effect on student learning outcomes (β = 0.41, p < 0.001). Student engagement significantly mediated the relationship between GenAI usage and learning outcomes (indirect effect = 0.23, p < 0.01), showing that GenAI-supported learning improved student motivation, participation, classroom interaction, and self-directed learning behavior. Similarly, AI literacy also showed a strong mediating effect (indirect effect = 0.27, p < 0.001), indicating that students with higher AI literacy were better able to evaluate AI-generated content, apply ethical judgment, avoid overdependence, and use AI tools for meaningful academic improvement. The model explained 62.4% of the variance in student learning outcomes, while GenAI usage improved perceived academic performance by 31.6%, student engagement by 28.4%, and AI literacy-based learning confidence by 34.2%. Overall, the findings suggest that GenAI alone is not sufficient to ensure improved learning outcomes; its effectiveness depends largely on student engagement and AI literacy competencies. The study provides practical implications for universities, teachers, and policymakers to develop AI literacy programs and student-centered GenAI learning strategies in higher education.",
+        "doi": "10.59075/m1cm0j76",
+        "url": "https://www.semanticscholar.org/paper/f6939ae2955511c362b4b008ffc029555ed5d6f2",
+        "year": 2026,
+        "source": "Semantic Scholar",
+        "author_details": [],
+        "journal": "The Critical Review of Social Sciences Studies",
+        "volume": "4",
+        "issue": "1",
+        "pages": "6400-6424",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://doi.org/10.59075/m1cm0j76"
+      },
+      "rank": 2,
+      "relevance_score": 59,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S2",
+      "evidence_type": "full_text",
+      "evidence_status": "Text available",
+      "source_format": "pdf"
+    },
+    {
+      "paper": {
+        "title": "Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awareness",
+        "authors": [
+          "Tamim Forhad Shuvo",
+          "Md Taushik Hossain",
+          "Jannatul Ferdoush Oishy",
+          "Nawreen Islam Nazat",
+          "Md Kabir Hosen"
+        ],
+        "abstract": "The accelerated integration of Artificial Intelligence (AI) into higher education has introduced both transformative opportunities and complex ethical challenges across teaching, learning, and academic governance. This study explores university students’ awareness, perceptions, and usage patterns of AI technologies, particularly generative AI, and assesses their influence on academic engagement and perceived performance. Employing a structured quantitative methodology, survey data were collected from 300 students across diverse disciplines. Descriptive and inferential analyses, including multiple linear regression, were conducted to identify key predictors of AI-driven academic outcomes. Findings reveal that perceived benefits of AI and student engagement are strong positive predictors of improved academic performance, while access-related disparities emerge as significant barriers. Additionally, ethical concerns, policy awareness, and trust in AI-generated content shape students’ attitudes and behaviors, indicating that cognitive and contextual factors influence the educational impact of AI. Grounded in a theoretical framework integrating the Technology Acceptance Model (TAM) and Constructivist Learning Theory, this research highlights AI’s dual role as both an enabler and disruptor of equitable education. It calls for the implementation of transparent governance structures, equitable digital infrastructure, and ethical AI literacy within academic institutions. This study contributes to the evolving discourse on responsible AI adoption in education and offers practical guidance for policymakers, educators, and technology developers aiming to enhance academic integrity and digital inclusion in the AI age.",
+        "doi": "10.67508/iub.icebtm.2025.023",
+        "url": "https://www.semanticscholar.org/paper/18c39717d8fd86fc91a87db1f8758fa27578ab51",
+        "year": 2025,
+        "source": "Semantic Scholar",
+        "author_details": [],
+        "journal": "The Proceedings of the International Conference on Economics, Business and Technology Management (ICEBTM 2025)",
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://ar.iub.edu.bd/bitstream/11348/1428/1/ICEBTM-25-1075.pdf"
+      },
+      "rank": 3,
+      "relevance_score": 59,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S3",
+      "evidence_type": "full_text",
+      "evidence_status": "Text available",
+      "source_format": "pdf"
+    },
+    {
+      "paper": {
+        "title": "Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outcomes",
+        "authors": [
+          "Sadia Riaz",
+          "Arif Mushtaq"
+        ],
+        "abstract": "As higher education institutions adapt to changing teaching and learning, Generative Artificial Intelligence (AI) technologies may boost student engagement and learning outcomes. This study aims to help higher education institutions determine the best ways to integrate Generative AI, an urgent issue. A thorough analysis of Generative AI integration and its different effects on education underpins the research framework. This qualitative study analyses the complex relationships between Generative AI, pedagogical approaches, institutional technological preparedness, student characteristics, and educational environment mediators. This study examines Generative AI integration, pedagogical alignment, technology acceptability, and material customization. This study examines how Generative AI might boost student engagement and learning. It evaluates Generative AI's performance through pedagogical methods and relevant feedback. The study underlines the importance of technical adoption and topic matter in AI integration efficacy. This paper closes with a complete framework that gives educators, institutions, and policymakers practical advice for optimising Generative AI integration in higher education. This approach equips stakeholders with the skills and knowledge to navigate AI-enhanced education's complex landscape. It strives to establish a dynamic, student-centred learning environment. To achieve these goals, the framework uses Generative AI technology's revolutionary power.",
+        "doi": "10.1109/ASET60340.2024.10708721",
+        "url": "https://www.semanticscholar.org/paper/0da4e2bc9fa2dd92d390a9eae6d82a896e9e2ed7",
+        "year": 2024,
+        "source": "Semantic Scholar",
+        "author_details": [
+          {
+            "given": "Sadia",
+            "family": "Riaz"
+          },
+          {
+            "given": "Arif",
+            "family": "Mushtaq"
+          }
+        ],
+        "journal": "2024 Advances in Science and Engineering Technology International Conferences (ASET)",
+        "volume": null,
+        "issue": null,
+        "pages": "1-6",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": ""
+      },
+      "rank": 4,
+      "relevance_score": 59,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S4",
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes in Higher Education",
+        "authors": [
+          "Dr. Abhijit Das",
+          "Dr. Urvesh Chaudhery",
+          "Dr Namrata Yadav Das"
+        ],
+        "abstract": "The integration of Artificial Intelligence (AI) in higher education is reshaping traditional pedagogical models by enhancing personalization, engagement, and administrative efficiency. This study investigates the role of AI in teaching-learning processes in higher education institutions (HEIs) through a quantitative lens, focusing on faculty and student experiences with AI tools. Drawing data from a sample of 250 respondents across Indian universities, the study explores AI’s influence on academic performance, pedagogical innovation, and learner satisfaction. The findings indicate a positive correlation between AI adoption and improved teaching effectiveness, learning outcomes, and administrative convenience. This paper offers policy and practical recommendations for AI integration to support blended learning environments and faculty development. The results contribute to ongoing discussions about digital transformation in higher education.",
+        "doi": "10.51244/ijrsi.2025.120700041",
+        "url": "https://www.semanticscholar.org/paper/e5fccca392392c58390fbb15057f882142af96f2",
+        "year": 2025,
+        "source": "Semantic Scholar",
+        "author_details": [
+          {
+            "given": "Dr. Abhijit",
+            "family": "Das"
+          },
+          {
+            "given": "Dr. Urvesh",
+            "family": "Chaudhery"
+          },
+          {
+            "given": "Dr Namrata",
+            "family": "Yadav Das"
+          }
+        ],
+        "journal": "International Journal of Research and Scientific Innovation",
+        "volume": "XII",
+        "issue": "VII",
+        "pages": "401-407",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": ""
+      },
+      "rank": 5,
+      "relevance_score": 58,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S5",
+      "evidence_type": "full_text",
+      "evidence_status": "Text available",
+      "source_format": "html"
+    },
+    {
+      "paper": {
+        "title": "Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Student Engagement, Learning Outcomes, and Academic Integrity",
+        "authors": [
+          "Ayonote Elenode"
+        ],
+        "abstract": "This study examines the integration of generative artificial intelligence (GenAI) and learning analytics (LA) in fostering personalized learning within Nigerian higher education institutions. Specifically, it explores how these emerging technologies influence student engagement, academic performance, and perceptions of academic integrity in digitally mediated learning environments. A mixed-method research design was adopted, involving 420 undergraduate students and 60 academic staff drawn from three Nigerian universities. Quantitative data were collected through structured questionnaires assessing GenAI usage patterns, learning analytics engagement, levels of digital literacy, and integrity perceptions, while qualitative insights were obtained from semi-structured interviews with academic staff and information and communication technology (ICT) administrators. The findings reveal that 64% of respondents actively use GenAI tools such as ChatGPT and Gemini to support learning activities, while 58% regularly access learning analytics dashboards for performance monitoring and feedback. Regression analysis indicates that GenAI-assisted learning and engagement with learning analytics jointly predict improved academic performance (β = 0.36, p < 0.01) and higher levels of student engagement (β = 0.42, p < 0.001). However, the study also finds that unregulated use of GenAI tools is positively associated with increased concerns about plagiarism and academic misconduct (r = 0.31, p < 0.05). The study concludes that the pedagogically guided integration of GenAI and learning analytics can significantly enhance personalized learning experiences in Nigerian higher education. Nevertheless, this potential can only be realized through the development of robust governance frameworks that emphasize ethical use, digital literacy, academic integrity, and data privacy. The study therefore recommends targeted capacity-building for educators, the establishment of transparent institutional AI policies, and continuous evaluation of the pedagogical impact of GenAI technologies.",
+        "doi": "10.11648/j.eas.20261101.11",
+        "url": "https://www.semanticscholar.org/paper/dfe761ff3c30a584b071dd265b3599f40f71176a",
+        "year": 2026,
+        "source": "Semantic Scholar",
+        "author_details": [],
+        "journal": "Engineering and Applied Sciences",
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "http://article.sciencepg.com/pdf/j.eas.20261101.11"
+      },
+      "rank": 6,
+      "relevance_score": 56,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S6",
+      "evidence_type": "full_text",
+      "evidence_status": "Text available",
+      "source_format": "pdf"
+    },
+    {
+      "paper": {
+        "title": "Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes",
+        "authors": [
+          "S. Mckenzie",
+          "Jennifer Day"
+        ],
+        "abstract": "The symposium will explore ways of better understanding, challenging and expanding the ways that its diverse users think about and use generative AI in higher education, to best respond to our emerging opportunities to achieve AI ethical and pedagogical best practice. The symposium features a discussion between a range of AI in education experts, and session attendees, guided by key questions on how to achieve the best possible use of AI in education. These questions include how to best bring together technological and human interfaces, and how to best use generative AI in education practice. This could include by strategically expanding its current uses to help it improve whole student education, as well as academic education. Student engagement, wellbeing and motivation could be strategically improved via identifying current levels of, and potential improvements in, student and staff knowledge of and attitudes towards educational uses of AI.     \n \n ",
+        "doi": "10.65106/apubs.2025.2750",
+        "url": "https://www.semanticscholar.org/paper/c6baacf1be692b1bca75b151d26e370f4d97ea79",
+        "year": 2025,
+        "source": "Semantic Scholar",
+        "author_details": [],
+        "journal": "ASCILITE Publications",
+        "volume": null,
+        "issue": null,
+        "pages": "123-125",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537"
+      },
+      "rank": 7,
+      "relevance_score": 53,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S7",
+      "evidence_type": "full_text",
+      "evidence_status": "Text available",
+      "source_format": "pdf"
+    },
+    {
+      "paper": {
+        "title": "Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance",
+        "authors": [
+          "K. Hon"
+        ],
+        "abstract": "The integration of Generative AI tools in higher education has sparked significant interest, yet their impact on student learning engagement and academic performance remains unclear. This SLR examines empirical studies to determine whether Generative AI enhances engagement and improves learning outcomes in higher education. Following the PRISMA framework, we analyzed peer-reviewed articles from 2018 to 2024, identifying key trends, methodologies, and conflicting findings. Results reveal mixed evidence: while some studies report increased engagement and performance, others highlight limitations, including over-reliance on AI and variable effectiveness across disciplines. The review also identifies gaps in longitudinal and large-scale studies, calling for more rigorous research to assess Generative AI's pedagogical impact. Findings provide insights for educators and policymakers on optimizing Generative AI integration while addressing potential challenges.",
+        "doi": "10.1177/00472395251400089",
+        "url": "https://www.semanticscholar.org/paper/a57539a5937dfd3487d761ec0b3e7edad2a34208",
+        "year": 2025,
+        "source": "Semantic Scholar",
+        "author_details": [],
+        "journal": "Journal of Educational Technology Systems",
+        "volume": "54",
+        "issue": null,
+        "pages": "537 - 560",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": ""
+      },
+      "rank": 8,
+      "relevance_score": 51,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S8",
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review",
+        "authors": [
+          "Wei-Han Rong",
+          "Mengyun Xiao",
+          "Long Zhao",
+          "Xiaolong Zhou"
+        ],
+        "abstract": "Generative Artificial intelligence (AI) art is increasingly integrated into higher education (HE). While its creative potential has been discussed, its actual pedagogical impact and implications for educational equity remain underexplored. This study conducts a systematic review to evaluate how AI art has been applied in HE settings, what teaching and learning outcomes it supports, and what structural barriers exist in its integration. Using the PRISMA framework, 65 peer-reviewed articles published Scopus and Web of Science. The included studies were synthesized thematically and find that generative AI tools are being used to support ideation, multimodal expression, and interdisciplinary projects. However, barriers such as limited faculty training and unclear evaluation standards may hinder equitable access and long-term integration. This review contributes a conceptual framework for understanding the integration of generative AI art, highlighting opportunities and structural limitations. It offers insights for curriculum designers, educators aiming to support responsible, creative, and inclusive uses of AI in arts education.",
+        "doi": "10.3390/info16121070",
+        "url": "https://www.semanticscholar.org/paper/fb11e772aeec8bda112beefcb96c9d43458ec050",
+        "year": 2025,
+        "source": "Semantic Scholar",
+        "author_details": [],
+        "journal": "Inf.",
+        "volume": "16",
+        "issue": null,
+        "pages": "1070",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://www.mdpi.com/2078-2489/16/12/1070/pdf"
+      },
+      "rank": 9,
+      "relevance_score": 48,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S9",
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE higher education",
+        "authors": [
+          "Swapna S. Nair",
+          "Deepika Gaur",
+          "Sarwat Jahan"
+        ],
+        "abstract": null,
+        "doi": "10.1007/s43621-026-04357-5",
+        "url": "https://doi.org/10.1007/s43621-026-04357-5",
+        "year": 2026,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Swapna S.",
+            "family": "Nair"
+          },
+          {
+            "given": "Deepika",
+            "family": "Gaur"
+          },
+          {
+            "given": "Sarwat",
+            "family": "Jahan"
+          }
+        ],
+        "journal": "Discover Sustainability",
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 10,
+      "relevance_score": 43,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Generative AI in student English learning in Thai higher education: More engagement, better outcomes?",
+        "authors": [
+          "Budi Waluyo",
+          "Sekartiyasa Kusumastuti"
+        ],
+        "abstract": null,
+        "doi": "10.1016/j.ssaho.2024.101146",
+        "url": "https://www.semanticscholar.org/paper/4622e80eba614f212a340999c7320dc5464b1839",
+        "year": 2024,
+        "source": "Semantic Scholar",
+        "author_details": [],
+        "journal": "Social Sciences &amp; Humanities Open",
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://doi.org/10.1016/j.ssaho.2024.101146"
+      },
+      "rank": 11,
+      "relevance_score": 43,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in Higher Education",
+        "authors": [
+          "Irene Diao",
+          "Robert Lightfoot"
+        ],
+        "abstract": null,
+        "doi": "10.18260/1-2--58076",
+        "url": "https://doi.org/10.18260/1-2--58076",
+        "year": null,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Irene",
+            "family": "Diao"
+          },
+          {
+            "given": "Robert",
+            "family": "Lightfoot"
+          }
+        ],
+        "journal": "ASEE-Gulf Southwest (GSW) Regional Conference Proceedings",
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 12,
+      "relevance_score": 43,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education",
+        "authors": [
+          "Deeksha Saraswat"
+        ],
+        "abstract": null,
+        "doi": "10.21275/sr241119221041",
+        "url": "https://doi.org/10.21275/sr241119221041",
+        "year": 2024,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Deeksha",
+            "family": "Saraswat"
+          }
+        ],
+        "journal": "International Journal of Science and Research (IJSR)",
+        "volume": "13",
+        "issue": "11",
+        "pages": "1152-1154",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 13,
+      "relevance_score": 40,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Students’ voices on generative AI: perceptions, benefits, and challenges in higher education",
+        "authors": [
+          "Cecilia Ka Yuk Chan",
+          "Wenjie Hu"
+        ],
+        "abstract": "This study explores university students’ perceptions of generative AI (GenAI) technologies, such as ChatGPT, in higher education, focusing on familiarity, their willingness to engage, potential benefits and challenges, and effective integration. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Students recognized the potential for personalized learning support, writing and brainstorming assistance, and research and analysis capabilities. However, concerns about accuracy, privacy, ethical issues, and the impact on personal development, career prospects, and societal values were also expressed. According to John Biggs’ 3P model, student perceptions significantly influence learning approaches and outcomes. By understanding students’ perceptions, educators and policymakers can tailor GenAI technologies to address needs and concerns while promoting effective learning outcomes. Insights from this study can inform policy development around the integration of GenAI technologies into higher education. By understanding students’ perceptions and addressing their concerns, policymakers can create well-informed guidelines and strategies for the responsible and effective implementation of GenAI tools, ultimately enhancing teaching and learning experiences in higher education. This study focuses on the integration of generative AI (GenAI) technologies, like ChatGPT, into higher education settings. University students’ perceptions of generative AI technologies in higher education were explored, including familiarity, potential benefits, and challenges. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Insights from this study can inform policy development around the integration of GenAI technologies into higher education, helping to create well-informed guidelines and strategies for responsible and effective implementation. This study focuses on the integration of generative AI (GenAI) technologies, like ChatGPT, into higher education settings. University students’ perceptions of generative AI technologies in higher education were explored, including familiarity, potential benefits, and challenges. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Insights from this study can inform policy development around the integration of GenAI technologies into higher education, helping to create well-informed guidelines and strategies for responsible and effective implementation.",
+        "doi": "10.1186/s41239-023-00411-8",
+        "url": "https://www.semanticscholar.org/paper/49b66b980c91f989637b089c2e8284af443aaa25",
+        "year": 2023,
+        "source": "Semantic Scholar",
+        "author_details": [
+          {
+            "given": "Cecilia Ka Yuk",
+            "family": "Chan"
+          },
+          {
+            "given": "Wenjie",
+            "family": "Hu"
+          }
+        ],
+        "journal": "International Journal of Educational Technology in Higher Education",
+        "volume": "20",
+        "issue": "1",
+        "pages": null,
+        "article_number": "43",
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://educationaltechnologyjournal.springeropen.com/counter/pdf/10.1186/s41239-023-00411-8"
+      },
+      "rank": 14,
+      "relevance_score": 35,
+      "eligible": true,
+      "selected": true,
+      "source_id": "S10",
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education Online Courses",
+        "authors": [
+          "Jeffrey L. Simmons"
+        ],
+        "abstract": null,
+        "doi": "10.22371/05.2026.002",
+        "url": "https://doi.org/10.22371/05.2026.002",
+        "year": null,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Jeffrey L.",
+            "family": "Simmons"
+          }
+        ],
+        "journal": null,
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 15,
+      "relevance_score": 35,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "81How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environments",
+        "authors": [
+          "Rama Yusvana",
+          "Azli Nawawi"
+        ],
+        "abstract": null,
+        "doi": "10.1515/9783112206393-005",
+        "url": "https://doi.org/10.1515/9783112206393-005",
+        "year": 2025,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Rama",
+            "family": "Yusvana"
+          },
+          {
+            "given": "Azli",
+            "family": "Nawawi"
+          }
+        ],
+        "journal": "Artificial Intelligence in Higher Education",
+        "volume": null,
+        "issue": null,
+        "pages": "81-104",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 16,
+      "relevance_score": 32,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Mastering knowledge: the impact of generative AI on student learning outcomes",
+        "authors": [
+          "Jessica L. Pallant",
+          "Janneke Blijlevens",
+          "Alexander Campbell",
+          "Ryan Jopp"
+        ],
+        "abstract": null,
+        "doi": "10.1080/03075079.2025.2487570",
+        "url": "https://doi.org/10.1080/03075079.2025.2487570",
+        "year": 2026,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Jessica L.",
+            "family": "Pallant"
+          },
+          {
+            "given": "Janneke",
+            "family": "Blijlevens"
+          },
+          {
+            "given": "Alexander",
+            "family": "Campbell"
+          },
+          {
+            "given": "Ryan",
+            "family": "Jopp"
+          }
+        ],
+        "journal": "Studies in Higher Education",
+        "volume": "51",
+        "issue": "4",
+        "pages": "714-735",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 17,
+      "relevance_score": 27,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "105Intelligent Learning: Generative AI in Higher Education and Authentic Learning",
+        "authors": [
+          "Ivy Shen"
+        ],
+        "abstract": null,
+        "doi": "10.1515/9783112206393-006",
+        "url": "https://doi.org/10.1515/9783112206393-006",
+        "year": 2025,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Ivy",
+            "family": "Shen"
+          }
+        ],
+        "journal": "Artificial Intelligence in Higher Education",
+        "volume": null,
+        "issue": null,
+        "pages": "105-128",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 18,
+      "relevance_score": 27,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Exploring the Broad Impact of AI Technologies on Student Engagement and Academic Performance in University Settings in Afghanistan",
+        "authors": [
+          "Abdul Wajid Fazil",
+          "Musawer Hakimi",
+          "Amir Kror Shahidzay",
+          "Ansarullah Hasas"
+        ],
+        "abstract": "<jats:p>This article explores the pivotal intersection of Artificial Intelligence (AI), student engagement, and academic performance in higher education, specifically at Kabul University. As technology evolves, understanding AI's implications on education becomes critical for effective pedagogical strategies and student readiness. The research aims to bridge the gap between technological advancements and educational practices, comprehensively investigating AI's impact on student engagement and academic performance. The study addresses awareness, ethical considerations, autonomy perceptions, and AI integration into curricula. Employing a quantitative approach, the study involves 200 students from various Kabul University faculties, utilizing SPSS version 23 for analysis. Regression analyses, ANOVA, and structured questionnaires allow a nuanced exploration of AI engagement dimensions. Key findings indicate commendable AI awareness in students' daily lives, with room for improvement in academic integration. Ethical considerations emphasize a baseline for ethical AI use. Autonomy perceptions and AI tool engagement reveal nuanced layers, emphasizing a holistic AI education approach. In conclusion, this research advocates a balanced AI integration in education, offering implications for pedagogical strategies, curriculum development, and institutional policies. The findings guide educators, policymakers, and institutions in navigating AI-enhanced learning environments, ensuring students' technological literacy and ethical grounding.</jats:p>",
+        "doi": "10.31004/riggs.v2i2.268",
+        "url": "https://doi.org/10.31004/riggs.v2i2.268",
+        "year": 2024,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Abdul Wajid",
+            "family": "Fazil"
+          },
+          {
+            "given": "Musawer",
+            "family": "Hakimi"
+          },
+          {
+            "given": "Amir Kror",
+            "family": "Shahidzay"
+          },
+          {
+            "given": "Ansarullah",
+            "family": "Hasas"
+          }
+        ],
+        "journal": "RIGGS: Journal of Artificial Intelligence and Digital Business",
+        "volume": "2",
+        "issue": "2",
+        "pages": "56-63",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://journal.ilmudata.co.id/index.php/RIGGS/article/download/268/77"
+      },
+      "rank": 19,
+      "relevance_score": 20,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "full_text",
+      "evidence_status": "Text available",
+      "source_format": "pdf"
+    },
+    {
+      "paper": {
+        "title": "Enhancing Personalised Learning and Student Engagement Using Generative AI",
+        "authors": [
+          "Adebowale Owoseni",
+          "Oluwaseun Kolade",
+          "Abiodun Egbetokun"
+        ],
+        "abstract": null,
+        "doi": "10.1007/978-3-031-60179-8_5",
+        "url": "https://doi.org/10.1007/978-3-031-60179-8_5",
+        "year": 2024,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Adebowale",
+            "family": "Owoseni"
+          },
+          {
+            "given": "Oluwaseun",
+            "family": "Kolade"
+          },
+          {
+            "given": "Abiodun",
+            "family": "Egbetokun"
+          }
+        ],
+        "journal": "Generative AI in Higher Education",
+        "volume": null,
+        "issue": null,
+        "pages": "123-150",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 20,
+      "relevance_score": 19,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance",
+        "authors": [
+          "Jehan Wajeh Almaqtari",
+          "Emad Alramada",
+          "Ayman Alsabry"
+        ],
+        "abstract": "<jats:p>Artificial intelligence (AI) is reshaping academic practice across research and learning. To address fragmented evidence, this review aims to (i) map commonly used academic AI tools, (ii) synthesize reported effects on research and learning performance, and (iii) outline risks and governance needs. We conducted a qualitative content analysis using publicly available “materials,” including official tool documentation and websites, major academic databases , and user reports; records were screened for relevance to higher education and research, data were charted on features, use-cases, and ethical considerations, and tools were categorized into five domains: AI writing assistants; literature-review &amp; citation tools; data analysis &amp; visualization; productivity &amp; organization; and learning &amp; tutoring. Main results show comparative feature tables that support tool selection and consistent benefit signals: higher research efficiency and writing support, and within education—greater engagement and personalization; persistent risks include academic integrity, privacy, bias, and over-reliance, implying the need for clear governance and assessment design. Verification relied on human fact-checking against primary sources and consistency checks across categories; the review is exploratory and descriptive and doesnot include benchmarking or controlled experiments.</jats:p>",
+        "doi": "10.59628/jast.v4i2.1921",
+        "url": "https://doi.org/10.59628/jast.v4i2.1921",
+        "year": 2026,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Jehan Wajeh",
+            "family": "Almaqtari"
+          },
+          {
+            "given": "Emad",
+            "family": "Alramada"
+          },
+          {
+            "given": "Ayman",
+            "family": "Alsabry"
+          }
+        ],
+        "journal": "مجلة جامعة صنعاء للعلوم التطبيقية والتكنولوجيا",
+        "volume": "4",
+        "issue": "2",
+        "pages": "1665-1681",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": "https://journals.su.edu.ye/index.php/jast/article/download/1921/1300"
+      },
+      "rank": 21,
+      "relevance_score": 17,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "full_text",
+      "evidence_status": "Text available",
+      "source_format": "pdf"
+    },
+    {
+      "paper": {
+        "title": "The Impact of AI Tools on Student Engagement and Academic Performance",
+        "authors": [
+          "Josan D. Tamayo",
+          "Jose Cris O. Sotto",
+          "Clarissa P. Vicente",
+          "MaryAnn T. Lim"
+        ],
+        "abstract": "<jats:p>This study aims to investigate the impact of AI tools on student engagement and academic performance in the classroom. By conducting a quantitative analysis, the study explores the acceptability of AI tools among students and their effectiveness in enhancing engagement and improving academic outcomes. The findings revealed that there is a significant correlation between the use of AI Tools in the student engagement and academic performance of the students. The research provides valuable insights into the potential benefits and challenges of integrating AI tools in educational settings.\n\nKeywords: Artificial Intelligence, AI, AI Tools, Student Engagement, Academic Performance</jats:p>",
+        "doi": "10.56738/issn29603986.geo2025.6.94",
+        "url": "https://doi.org/10.56738/issn29603986.geo2025.6.94",
+        "year": 2025,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Josan D.",
+            "family": "Tamayo"
+          },
+          {
+            "given": "Jose Cris O.",
+            "family": "Sotto"
+          },
+          {
+            "given": "Clarissa P.",
+            "family": "Vicente"
+          },
+          {
+            "given": "MaryAnn T.",
+            "family": "Lim"
+          }
+        ],
+        "journal": "GEO Academic Journal",
+        "volume": "6",
+        "issue": "1",
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 22,
+      "relevance_score": 14,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS' LEARNING AND ACADEMIC PERFORMANCE",
+        "authors": [
+          "Khevin Limosinero"
+        ],
+        "abstract": "<jats:p>This study explores the use and impact of AI tools on Grade 9 students’ learning, focusing on their experiences, challenges, and ethical concerns. Through a combination of survey questionnaires and interviews, data were collected from Grade 9 students to assess the extent to which AI tools are utilized for academic tasks and their perceived effectiveness. The results revealed that most students have positive experiences using AI tools, citing improved understanding of class topics and increased efficiency in completing assignments. However, concerns about the potential erosion of critical thinking skills and maintaining academic integrity were raised, aligning with research by Cornell University and Turnitin. Additionally, students highlighted the need for clearer guidelines, AI literacy training, and better integration of AI tools into the classroom, echoing recommendations from Wiley (2024). The study also uncovered challenges such as over-reliance on AI tools and a lack of understanding of ethical practices, underscoring the importance of fostering responsible AI use. Based on these findings, recommendations were made to establish clear policies, incorporate AI literacy into the curriculum, and provide teacher training on AI integration. This study contributes valuable insights into the role of AI tools in modern education and offers practical strategies for promoting their responsible use in academic settings.</jats:p>",
+        "doi": "10.47722/imrj.2001.51",
+        "url": "https://doi.org/10.47722/imrj.2001.51",
+        "year": 2025,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Khevin",
+            "family": "Limosinero"
+          }
+        ],
+        "journal": "International Multidisciplinary Research Journal",
+        "volume": null,
+        "issue": null,
+        "pages": "26-31",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 23,
+      "relevance_score": 14,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Impact of AI Based Smart Learning Tools on Academic Performance and Engagement of University Students",
+        "authors": [
+          "Ayesha Subhash Bhoir",
+          "Sudhakar Iyer"
+        ],
+        "abstract": null,
+        "doi": "10.22271/27084515.2026.v7.i2b.1010",
+        "url": "https://doi.org/10.22271/27084515.2026.v7.i2b.1010",
+        "year": 2026,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Ayesha Subhash",
+            "family": "Bhoir"
+          },
+          {
+            "given": "Sudhakar",
+            "family": "Iyer"
+          }
+        ],
+        "journal": "Asian Journal of Management and Commerce",
+        "volume": "7",
+        "issue": "2",
+        "pages": "84-87",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 24,
+      "relevance_score": 8,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Evaluating the Impact of AI-Based Personalized Learning Systems on University Students' Academic Performance: A Review and Research Framework",
+        "authors": [
+          "Dhananjaya Lahiru Bandara"
+        ],
+        "abstract": null,
+        "doi": "10.2139/ssrn.6113026",
+        "url": "https://doi.org/10.2139/ssrn.6113026",
+        "year": null,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Dhananjaya Lahiru",
+            "family": "Bandara"
+          }
+        ],
+        "journal": null,
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 25,
+      "relevance_score": 8,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings",
+        "authors": [
+          "Arslan Akram"
+        ],
+        "abstract": "<jats:p>The rapid expansion of generative artificial intelligence and large language models has dramatically altered the\ncreation of written material. While these technologies can enhance the learning process, but, as well, they have\ncreated significant concerns regarding academic integrity, authorship and the fair assessment of students. In response,\nnumerous institutions have already implemented AI-detection software that aims at determining whether some text was\nauthored by a human or generated by AI systems. But there are concerns about the validity, correctness and equity of\nsuch tools in the actual fields of education. This paper gives a systematic review of empirical studies concerning AI\ntext detection tools in learning institutions. In order to identify literature published between 2022 and 2026, it was\nthoroughly searched in large academic databases such as Scopus, Web of Science, and ScienceDirect, following the\nPRISMA 2020 guidelines. Through the use of rigorous inclusion/exclusion criteria, a total of 17 empirical studies were\nselected for in-depth analysis. In the review, the researchers examine the different types of research methodologies used\nto evaluate the performance of AI detection tools, the accuracy of these tools in identifying AI-generated content, and\nthe effectiveness, fairness, and usability of these tools. The results show that the tools, including Turnitin, GPTZero,\nCopyleaks, ZeroGPT, and Originality.ai, are frequently used, but their effectiveness varies depending on the type of\ntext and writing conditions. It is often mentioned in the literature that such systems become quite easily affected by\nparaphrasing, translation or writing style, and that they can falsely categorize the texts written by multilingual or nonnative writers of English. The review also presents a number of technical, ethical and pedagogical difficulties with the\ncontinuation of the use of automated detection systems only. Upon the evidence synthesized, the study elucidates the\nimportance of careful and open usage of AI detection technologies in learning and suggests the directions of future\nresearch to enhance its consistency and at the same time encourages ethical academic procedures.</jats:p>",
+        "doi": "10.33140/amlai.07.03.02",
+        "url": "https://doi.org/10.33140/amlai.07.03.02",
+        "year": 2026,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Arslan",
+            "family": "Akram"
+          }
+        ],
+        "journal": "Advances in Machine Learning &amp; Artificial Intelligence",
+        "volume": "01",
+        "issue": "06",
+        "pages": "01-12",
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 26,
+      "relevance_score": 7,
+      "eligible": true,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "abstract",
+      "evidence_status": "Text available",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "\"Assessing the Perceived Burgeoning Impact of AI-Driven Educational Tools on Academic Performance Among College Students\" Article Sidebar",
+        "authors": [],
+        "abstract": null,
+        "doi": "10.66669/cineforum.v66is2.1055",
+        "url": "https://doi.org/10.66669/cineforum.v66is2.1055",
+        "year": 2026,
+        "source": "Crossref",
+        "author_details": [],
+        "journal": null,
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 27,
+      "relevance_score": 0,
+      "eligible": false,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "The impact of AI tools on undergraduate students? academic performance: A case study of Peru",
+        "authors": [],
+        "abstract": null,
+        "doi": "10.48009/4_iis_2025_112",
+        "url": "https://doi.org/10.48009/4_iis_2025_112",
+        "year": 2025,
+        "source": "Crossref",
+        "author_details": [],
+        "journal": "Issues In Information Systems",
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 28,
+      "relevance_score": 0,
+      "eligible": false,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    },
+    {
+      "paper": {
+        "title": "Impact of AI Tools on Academic Performance and Engagement Among Grade 12 Students with Special Educational Needs: A Study at NIS Academy",
+        "authors": [
+          "Khritish Swargiary"
+        ],
+        "abstract": null,
+        "doi": "10.2139/ssrn.4897490",
+        "url": "https://doi.org/10.2139/ssrn.4897490",
+        "year": null,
+        "source": "Crossref",
+        "author_details": [
+          {
+            "given": "Khritish",
+            "family": "Swargiary"
+          }
+        ],
+        "journal": null,
+        "volume": null,
+        "issue": null,
+        "pages": null,
+        "article_number": null,
+        "accessed_on": "2026-09-14",
+        "open_access_url": null
+      },
+      "rank": 29,
+      "relevance_score": 0,
+      "eligible": false,
+      "selected": false,
+      "source_id": null,
+      "evidence_type": "metadata_only",
+      "evidence_status": "No usable text",
+      "source_format": null
+    }
+  ],
+  "report_notes": [],
+  "evidence_provenance": [
+    {
+      "paper_id": "07806393b703d7d5434a",
+      "source_id": "S2",
+      "title": "Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and AI Literacy in Higher Education",
+      "doi": "10.59075/m1cm0j76",
+      "page_number": 4,
+      "source_format": "pdf",
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 3,
+      "similarity_score": 0.7801356315612793,
+      "evidence_type": "full_text",
+      "source_url": "https://thecrsss.com/index.php/Journal/article/download/1762/1706"
+    },
+    {
+      "paper_id": "fd22f461ff5fdae7caa2",
+      "source_id": "S1",
+      "title": "Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education",
+      "doi": "10.36948/ijfmr.2026.v08i03.81825",
+      "page_number": null,
+      "source_format": null,
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 0,
+      "similarity_score": 0.6962130069732666,
+      "evidence_type": "abstract",
+      "source_url": "https://doi.org/10.36948/ijfmr.2026.v08i03.81825"
+    },
+    {
+      "paper_id": "67779b5182de3b34f1be",
+      "source_id": "S4",
+      "title": "Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outcomes",
+      "doi": "10.1109/ASET60340.2024.10708721",
+      "page_number": null,
+      "source_format": null,
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 0,
+      "similarity_score": 0.782997727394104,
+      "evidence_type": "abstract",
+      "source_url": "https://www.semanticscholar.org/paper/0da4e2bc9fa2dd92d390a9eae6d82a896e9e2ed7"
+    },
+    {
+      "paper_id": "92dd8946b87050639400",
+      "source_id": "S7",
+      "title": "Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes",
+      "doi": "10.65106/apubs.2025.2750",
+      "page_number": 1,
+      "source_format": "pdf",
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 0,
+      "similarity_score": 0.7629475593566895,
+      "evidence_type": "full_text",
+      "source_url": "https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537"
+    },
+    {
+      "paper_id": "cfafaf2f4585a24a54ac",
+      "source_id": "S5",
+      "title": "Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes in Higher Education",
+      "doi": "10.51244/ijrsi.2025.120700041",
+      "page_number": null,
+      "source_format": "html",
+      "section_title": "Article body",
+      "paragraph_number": 1,
+      "html_anchor": "content",
+      "chunk_index": 0,
+      "similarity_score": 0.7807483673095703,
+      "evidence_type": "full_text",
+      "source_url": "https://rsisinternational.org/journals/ijrsi/articles/augmenting-learning-with-artificial-intelligence-an-empirical-examination-of-generative-ai-tools-and-student-outcomes-in-higher-education/"
+    },
+    {
+      "paper_id": "f4bfa7f5f52813b2731e",
+      "source_id": "S8",
+      "title": "Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance",
+      "doi": "10.1177/00472395251400089",
+      "page_number": null,
+      "source_format": null,
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 0,
+      "similarity_score": 0.7565971612930298,
+      "evidence_type": "abstract",
+      "source_url": "https://www.semanticscholar.org/paper/a57539a5937dfd3487d761ec0b3e7edad2a34208"
+    },
+    {
+      "paper_id": "6e69f2a77e027d1fa0ca",
+      "source_id": "S6",
+      "title": "Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Student Engagement, Learning Outcomes, and Academic Integrity",
+      "doi": "10.11648/j.eas.20261101.11",
+      "page_number": 2,
+      "source_format": "pdf",
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 1,
+      "similarity_score": 0.6054960489273071,
+      "evidence_type": "full_text",
+      "source_url": "https://article.sciencepg.com/pdf/j.eas.20261101.11"
+    },
+    {
+      "paper_id": "df5566d684035cdb1e4b",
+      "source_id": "S3",
+      "title": "Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awareness",
+      "doi": "10.67508/iub.icebtm.2025.023",
+      "page_number": 12,
+      "source_format": "pdf",
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 13,
+      "similarity_score": 0.6476346254348755,
+      "evidence_type": "full_text",
+      "source_url": "https://ar.iub.edu.bd/bitstream/handle/11348/1428/ICEBTM-25-1075.pdf?sequence=1"
+    },
+    {
+      "paper_id": "da485bac61a4e19ae935",
+      "source_id": "S10",
+      "title": "Students’ voices on generative AI: perceptions, benefits, and challenges in higher education",
+      "doi": "10.1186/s41239-023-00411-8",
+      "page_number": null,
+      "source_format": null,
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 0,
+      "similarity_score": 0.6626232862472534,
+      "evidence_type": "abstract",
+      "source_url": "https://www.semanticscholar.org/paper/49b66b980c91f989637b089c2e8284af443aaa25"
+    },
+    {
+      "paper_id": "83a2e4706432492d23cc",
+      "source_id": "S9",
+      "title": "Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review",
+      "doi": "10.3390/info16121070",
+      "page_number": null,
+      "source_format": null,
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 0,
+      "similarity_score": 0.559243381023407,
+      "evidence_type": "abstract",
+      "source_url": "https://www.semanticscholar.org/paper/fb11e772aeec8bda112beefcb96c9d43458ec050"
+    },
+    {
+      "paper_id": "07806393b703d7d5434a",
+      "source_id": "S2",
+      "title": "Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and AI Literacy in Higher Education",
+      "doi": "10.59075/m1cm0j76",
+      "page_number": 3,
+      "source_format": "pdf",
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 2,
+      "similarity_score": 0.7470495700836182,
+      "evidence_type": "full_text",
+      "source_url": "https://thecrsss.com/index.php/Journal/article/download/1762/1706"
+    },
+    {
+      "paper_id": "92dd8946b87050639400",
+      "source_id": "S7",
+      "title": "Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes",
+      "doi": "10.65106/apubs.2025.2750",
+      "page_number": 2,
+      "source_format": "pdf",
+      "section_title": null,
+      "paragraph_number": null,
+      "html_anchor": null,
+      "chunk_index": 1,
+      "similarity_score": 0.6979166269302368,
+      "evidence_type": "full_text",
+      "source_url": "https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537"
+    }
+  ],
+  "evidence_coverage": {
+    "writing_sources": 10,
+    "full_text_sources": 5,
+    "html_sources": 1,
+    "pdf_sources": 4,
+    "abstract_only_sources": 5,
+    "selected_chunks": 12,
+    "retrieval_mode": "semantic",
+    "access_failures": 22,
+    "extraction_failures": 0,
+    "provider_failures": 1
+  }
 }
