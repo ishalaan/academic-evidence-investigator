@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 57</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>How does generative AI affect student learning outcomes in higher education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Generative AI has shown potential to enhance student learning outcomes in higher education, though its impact varies depending on implementation and context. Studies indicate that AI-driven assessment systems can improve conceptual understanding, error correction, and student satisfaction through real-time feedback (D, 2026). For instance, a mixed-method study found that AI-based tools significantly boosted academic performance and self-regulated learning, though concerns about academic integrity and algorithmic bias persist (D, 2026). Similarly, research on AI-assisted writing tools revealed a strong positive correlation between students’ perceptions of these tools and their academic writing performance, with ethical use further predicting better outcomes (Ishtiaq, Naseem and Akbar, 2026). These findings suggest that when integrated thoughtfully, generative AI can support skill development and engagement, but its effectiveness hinges on alignment with pedagogical goals.</p><p>However, the evidence also highlights challenges and risks associated with AI adoption. Over-reliance on AI tools has been linked to diminished critical thinking skills and ethical concerns, such as the erosion of academic integrity (Limosinero, 2025). A literature review noted variability in AI’s impact, with some studies reporting minimal gains or negative effects in specific contexts, underscoring the importance of how tools are integrated into curricula (Almaqtari, Alramada and Alsabry, 2026). For example, while AI can enhance efficiency in tasks like writing and research, its misuse—such as cheating or superficial learning—requires proactive governance. The need for clear policies, AI literacy training, and ethical frameworks is emphasised across multiple studies, reflecting a consensus on the necessity of balancing innovation with responsibility (Limosinero, 2025).</p><p>The role of human expertise remains critical in maximising AI’s benefits. Research suggests that generative AI should complement, rather than replace, educators’ guidance. For instance, a study on AI’s use in literature reviews and data analysis highlighted the importance of combining AI’s efficiency with human oversight to ensure quality and depth (Almaqtari, Alramada and Alsabry, 2026). Similarly, the integration of AI into teaching practices must address students’ and staff’s attitudes and knowledge, as strategic adoption can enhance engagement and wellbeing (McKenzie and Day, 2025). This aligns with findings that AI tools are most effective when paired with training and clear guidelines, ensuring they support rather than undermine educational objectives.</p><p>Despite these insights, the evidence is not without limitations. Many studies rely on self-reported data or small samples, which may affect the generalisability of results (Almaqtari, Alramada and Alsabry, 2026). Additionally, the long-term effects of AI on deeper learning outcomes, such as critical thinking or creativity, remain underexplored. While some studies suggest AI can improve efficiency and engagement, others caution against over-reliance, highlighting the need for further research on sustainable integration strategies. Overall, the evidence supports a nuanced view: generative AI holds promise for enhancing learning outcomes when used ethically and strategically, but its success depends on addressing systemic challenges and fostering a culture of responsible innovation.</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>A mixed-method study involving undergraduate and postgraduate students across disciplines found that Generative AI–based feedback systems significantly improved conceptual understanding, timely error correction, and student satisfaction, though the analysis was truncated (D, 2026). A correlational study of 204 Pakistani students revealed strong positive correlations between perceptions of AI-assisted writing tools and academic writing performance (r = .800, p &lt; .001), with ethical use further predicting outcomes (r = .503, p &lt; .001) (Ishtiaq, Naseem and Akbar, 2026). Research on Grade 9 students highlighted positive experiences with AI tools, including improved topic understanding and assignment efficiency, but also raised concerns about critical thinking erosion and academic integrity, alongside calls for AI literacy training and policy frameworks (Limosinero, 2025). A literature review noted variability in AI’s impact, with some studies reporting minimal gains or negative effects in specific contexts, emphasising the role of curricular integration and tool design (Almaqtari, Alramada and Alsabry, 2026).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The evidence highlights variability in AI&#39;s impact, with some studies reporting minimal gains or negative effects in specific contexts, underscoring the need for curriculum-aligned integration (Almaqtari, Alramada and Alsabry, 2026).</li><li>Over-reliance on AI tools risks diminishing critical thinking skills and ethical awareness, necessitating clearer guidelines and training to mitigate misuse (Tamayo et al., 2025; Limosinero, 2025).</li><li>Concerns about academic integrity and algorithmic bias persist, requiring further research on detection mechanisms and equitable AI design (D, 2026; Limosinero, 2025).</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S3">
+                Almaqtari, J.W., Alramada, E. and Alsabry, A. (2026) ‘An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance’, <em>مجلة جامعة صنعاء للعلوم التطبيقية والتكنولوجيا</em>, 4(2), pp. 1665-1681.
+                Available at: <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">https://doi.org/10.59628/jast.v4i2.1921</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S1">
+                D, R. (2026) ‘Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education’, <em>International Journal For Multidisciplinary Research</em>, 8(3), article 81825.
+                Available at: <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">https://doi.org/10.36948/ijfmr.2026.v08i03.81825</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Ishtiaq, M., Naseem, A. and Akbar, G. (2026) ‘The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance’, <em>The Regional Tribune</em>, 5(7), p. 42.
+                Available at: <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">https://doi.org/10.55737/trt/v-vii.336</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S6">
+                Limosinero, K. (2025) ‘EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE’, <em>International Multidisciplinary Research Journal</em>, pp. 26-31.
+                Available at: <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">https://doi.org/10.47722/imrj.2001.51</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                McKenzie, S. and Day, J. (2025) ‘Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes’, <em>ASCILITE Publications</em>, pp. 123-125.
+                Available at: <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">https://doi.org/10.65106/apubs.2025.2750</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S5">
+                Tamayo, J.D. et al. (2025) ‘The Impact of AI Tools on Student Engagement and Academic Performance’, <em>GEO Academic Journal</em>, 6(1).
+                Available at: <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">https://doi.org/10.56738/issn29603986.geo2025.6.94</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education</strong><span>Relevance score: 62</span></div>
+                <p class="reference-note">Paper ID: fd22f461ff5fdae7caa2</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.696<br>Retrieved from: https://doi.org/10.36948/ijfmr.2026.v08i03.81825</li></ul></details>
+                <p class="reference-note">Rajasekaran D · 2026 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid advancement of Generative Artificial Intelligence (GAI) has significantly transformed assessment and feedback mechanisms in higher education. Traditional assessment practices often suffer from delayed feedback, limited personalization, and high faculty workload, which may negatively affect student engagement and learning outcomes. Generative AI–based assessment and feedback systems offer adaptive, real-time, and personalized evaluation models that promise enhanced learning effectiveness. This study evaluates the impact of Generative AI–driven assessment and feedback systems on student learning outcomes in higher education institutions. Using a mixed-method research design, data were collected from undergraduate and postgraduate students exposed to AI-supported assessments across multiple disciplines. Statistical tools such as simple percentage analysis, paired t-tests, and regression analysis were employed to assess improvements in academic performance, learner engagement, and self-regulated learning. The findings reveal that Generative AI–based feedback significantly improves conceptual understanding, timely error correction, and student satisfaction. However, concerns regarding academic integrity, algorithmic bias, and ethical data use remain critical challenges. The study concludes that while Generative AI can substantially enhance assessment effectiveness, its successful adoption requires ethical governance, faculty training, and transparent AI models. The paper offers practical implications for educators, policymakers, and institutional leaders aiming to integrate AI responsibly into higher education assessment frameworks.</p></details>
+                <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes</strong><span>Relevance score: 53</span></div>
+                <p class="reference-note">Paper ID: 92dd8946b87050639400</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1, PDF page 1 · full_text · Similarity 0.763<br>Retrieved from: https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537</li><li>Chunk 2, PDF page 2 · full_text · Similarity 0.698<br>Retrieved from: https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537</li></ul></details>
+                <p class="reference-note">Stephen McKenzie, Jennifer Day · 2025 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The symposium will explore ways of better understanding, challenging and expanding the ways that its diverse users think about and use generative AI in higher education, to best respond to our emerging opportunities to achieve AI ethical and pedagogical best practice. The symposium features a discussion between a range of AI in education experts, and session attendees, guided by key questions on how to achieve the best possible use of AI in education. These questions include how to best bring together technological and human interfaces, and how to best use generative AI in education practice. This could include by strategically expanding its current uses to help it improve whole student education, as well as academic education. Student engagement, wellbeing and motivation could be strategically improved via identifying current levels of, and potential improvements in, student and staff knowledge of and attitudes towards educational uses of AI.</p></details>
+                <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE higher education</strong><span>Relevance score: 43</span></div>
+                <p class="reference-note">Paper ID: 648f320408a61e5e177c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Swapna S. Nair, Deepika Gaur, Sarwat Jahan · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in Higher Education</strong><span>Relevance score: 43</span></div>
+                <p class="reference-note">Paper ID: 0a928cf94df5e5bc8532</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Irene Diao, Robert Lightfoot · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education</strong><span>Relevance score: 40</span></div>
+                <p class="reference-note">Paper ID: 5c252d9d92c6ba33b73b</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Deeksha Saraswat · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education Online Courses</strong><span>Relevance score: 35</span></div>
+                <p class="reference-note">Paper ID: 1506d90098ce5f8d5cc2</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jeffrey L. Simmons · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>81How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environments</strong><span>Relevance score: 32</span></div>
+                <p class="reference-note">Paper ID: c2cfe37c8f10158f7d1a</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Rama Yusvana, Azli Nawawi · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Mastering knowledge: the impact of generative AI on student learning outcomes</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 998e31c15aa2ac777d1e</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jessica L. Pallant, Janneke Blijlevens, Alexander Campbell, Ryan Jopp · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>105Intelligent Learning: Generative AI in Higher Education and Authentic Learning</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 578e1d746667b6c12f69</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ivy Shen · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enhancing Personalised Learning and Student Engagement Using Generative AI</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 77fac735a1eb3b81a4b6</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Adebowale Owoseni, Oluwaseun Kolade, Abiodun Egbetokun · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: fc2bcacb0858bc056205</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 17, PDF page 15 · full_text · Similarity 0.560<br>Retrieved from: https://journals.su.edu.ye/index.php/jast/en/article/download/1921/1300</li><li>Chunk 2, PDF page 2 · full_text · Similarity 0.529<br>Retrieved from: https://journals.su.edu.ye/index.php/jast/en/article/download/1921/1300</li></ul></details>
+                <p class="reference-note">Jehan Wajeh Almaqtari, Emad Alramada, Ayman Alsabry · 2026 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Artificial intelligence (AI) is reshaping academic practice across research and learning. To address fragmented evidence, this review aims to (i) map commonly used academic AI tools, (ii) synthesize reported effects on research and learning performance, and (iii) outline risks and governance needs. We conducted a qualitative content analysis using publicly available “materials,” including official tool documentation and websites, major academic databases , and user reports; records were screened for relevance to higher education and research, data were charted on features, use-cases, and ethical considerations, and tools were categorized into five domains: AI writing assistants; literature-review &amp; citation tools; data analysis &amp; visualization; productivity &amp; organization; and learning &amp; tutoring. Main results show comparative feature tables that support tool selection and consistent benefit signals: higher research efficiency and writing support, and within education—greater engagement and personalization; persistent risks include academic integrity, privacy, bias, and over-reliance, implying the need for clear governance and assessment design. Verification relied on human fact-checking against primary sources and consistency checks across categories; the review is exploratory and descriptive and doesnot include benchmarking or controlled experiments.</p></details>
+                <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance</strong><span>Relevance score: 14</span></div>
+                <p class="reference-note">Paper ID: 2702a498b04650f790be</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.454<br>Retrieved from: https://doi.org/10.55737/trt/v-vii.336</li></ul></details>
+                <p class="reference-note">Mushba Ishtiaq, Dr. Afshan Naseem, Gulnaz Akbar · 2026 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This study explores how students&#39; perceptions of AI-supported learning tools are related to their academic writing outcomes, and how responsible and ethical use of AI can directly predict these outcomes. The research design used was quantitative correlational research design. A sample of 204 undergraduate and postgraduate students from public and private universities in Pakistan was selected for collecting data using a structured questionnaire which was rated on a five-point Likert scale. The instrument assessed three constructs: AI-Assisted Writing Perceptions (AIWPS), Academic Writing Performance (AWPS), and Ethical and Responsible AI Writing Use (ERAIWUS). Pearson correlation and multiple regression of statistical analysis were performed. The findings showed that students&#39; perceptions of the AI-assisted writing tools were positively correlated with the academic writing performance (r = .800, p &lt; .001). There was also a strong positive correlation between ethical and responsible use of AI and academic writing performance (r = .503, p &lt; .001). Multiple regression analysis was performed to determine if both variables explained a significant portion of the variance in academic writing performance. Both variables were found to be significant and together accounted for 64.9% of the academic writing performance variance (R² = .649, F(2, 201) = 185.82, p &lt; .001). The study findings suggest that AI-powered learning tools can be successfully used to support students&#39; academic writing abilities in an ethical and responsible way. The results underscore the need to foster responsible use of AI in the educational context to enhance the potential value of AI technologies and preserve academic integrity.</p></details>
+                <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Impact of AI Tools on Student Engagement and Academic Performance</strong><span>Relevance score: 14</span></div>
+                <p class="reference-note">Paper ID: 6ddf8219845d56c367d0</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.528<br>Retrieved from: https://doi.org/10.56738/issn29603986.geo2025.6.94</li></ul></details>
+                <p class="reference-note">Josan D. Tamayo, Jose Cris O. Sotto, Clarissa P. Vicente, MaryAnn T. Lim · 2025 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This study aims to investigate the impact of AI tools on student engagement and academic performance in the classroom. By conducting a quantitative analysis, the study explores the acceptability of AI tools among students and their effectiveness in enhancing engagement and improving academic outcomes. The findings revealed that there is a significant correlation between the use of AI Tools in the student engagement and academic performance of the students. The research provides valuable insights into the potential benefits and challenges of integrating AI tools in educational settings. Keywords: Artificial Intelligence, AI, AI Tools, Student Engagement, Academic Performance</p></details>
+                <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE</strong><span>Relevance score: 14</span></div>
+                <p class="reference-note">Paper ID: 9dfadfa6f720db891ef2</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.510<br>Retrieved from: https://doi.org/10.47722/imrj.2001.51</li></ul></details>
+                <p class="reference-note">Khevin Limosinero · 2025 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This study explores the use and impact of AI tools on Grade 9 students’ learning, focusing on their experiences, challenges, and ethical concerns. Through a combination of survey questionnaires and interviews, data were collected from Grade 9 students to assess the extent to which AI tools are utilized for academic tasks and their perceived effectiveness. The results revealed that most students have positive experiences using AI tools, citing improved understanding of class topics and increased efficiency in completing assignments. However, concerns about the potential erosion of critical thinking skills and maintaining academic integrity were raised, aligning with research by Cornell University and Turnitin. Additionally, students highlighted the need for clearer guidelines, AI literacy training, and better integration of AI tools into the classroom, echoing recommendations from Wiley (2024). The study also uncovered challenges such as over-reliance on AI tools and a lack of understanding of ethical practices, underscoring the importance of fostering responsible AI use. Based on these findings, recommendations were made to establish clear policies, incorporate AI literacy into the curriculum, and provide teacher training on AI integration. This study contributes valuable insights into the role of AI tools in modern education and offers practical strategies for promoting their responsible use in academic settings.</p></details>
+                <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Impact of AI Based Smart Learning Tools on Academic Performance and Engagement of University Students</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: dc587f60544692619b89</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ayesha Subhash Bhoir, Sudhakar Iyer · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.22271/27084515.2026.v7.i2b.1010" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review and Research Framework</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 2f9cc1e9ab917178941e</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Dhananjaya Lahiru Bandara · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>&#34;Assessing the Perceived Burgeoning Impact of AI-Driven Educational Tools on Academic Performance Among College Students&#34; Article Sidebar</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 560929fd2fcb87117d11</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Author not supplied · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.66669/cineforum.v66is2.1055" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Human AI Collaboration Tools for boosting productivity of Library Staff in academic institutions</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: c45c941dd7134651fc0c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">ENDOUWARE, ENDOUWARE, · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.61955/xrcars" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The impact of AI tools on undergraduate students? academic performance: A case study of Peru</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: a28498c4ebc7a22bda22</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Author not supplied · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.48009/4_iis_2025_112" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Impact of AI Tools on Academic Performance and Engagement Among Grade 12 Students with Special Educational Needs: A Study at NIS Academy</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 1d906461938f3e10a009</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Khritish Swargiary · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.2139/ssrn.4897490" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: 95c6adc596f048f598cd9a6130d78418 · Report ID: 57</p>
+        <p>Started: 2026-09-13 19:55:26 · Updated: 2026-09-13 19:56:55 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>2</dd><dt>Raw papers retrieved</dt><dd>20</dd><dt>Valid papers retained</dt><dd>20</dd><dt>Relevant papers retained</dt><dd>16</dd><dt>Duplicates removed</dt><dd>0</dd><dt>Noisy records removed</dt><dd>0</dd><dt>Irrelevant records removed</dt><dd>4</dd><dt>Evidence limit removed</dt><dd>6</dd><dt>Provider failures</dt><dd>1</dd><dt>Final evidence count</dt><dd>6</dd><dt>Elapsed seconds</dt><dd>88.637</dd><dt>Semantic scholar requests</dt><dd>1</dd><dt>Semantic scholar disabled</dt><dd>True</dd><dt>Fulltext papers resolved</dt><dd>2</dd><dt>Abstract fallbacks</dt><dd>4</dd><dt>Metadata only papers</dt><dd>14</dd><dt>Total chunks created</dt><dd>27</dd><dt>Chunks selected</dt><dd>8</dd><dt>Pdf extraction failures</dt><dd>0</dd><dt>Fulltext access failures</dt><dd>18</dd><dt>Html papers resolved</dt><dd>0</dd><dt>Pdf papers resolved</dt><dd>2</dd><dt>Papers discovered</dt><dd>20</dd><dt>Semantic retrieval seconds</dt><dd>21.851</dd><dt>Sources cited</dt><dd>6</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The selected evidence provides mixed quantitative and qualitative findings on generative AI&#39;s impact, covering academic performance, engagement, ethical concerns, and pedagogical applications. While abstract-only sources limit depth, full-text excerpts include statistical analyses (e.g., regression results, t-tests) and mixed-method designs. Evidence highlights both positive outcomes (improved conceptual understanding, engagement) and challenges (academic integrity risks, over-reliance). However, the scope is narrower than the research question, with limited emphasis on longitudinal effects or discipline-specific impacts.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        <dl class="metrics"><dt>Writing sources</dt><dd>6</dd><dt>Full text sources</dt><dd>2</dd><dt>Html sources</dt><dd>0</dd><dt>Pdf sources</dt><dd>2</dd><dt>Abstract only sources</dt><dd>4</dd><dt>Selected chunks</dt><dd>8</dd><dt>Retrieval mode</dt><dd>semantic</dd><dt>Access failures</dt><dd>18</dd><dt>Extraction failures</dt><dd>0</dd><dt>Provider failures</dt><dd>1</dd></dl>
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-13 19:55:26</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-13 19:55:30</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:30</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-13 19:55:36</td><td>Retrieval</td><td>provider paused</td><td>Semantic Scholar request limit reached or access unavailable; using other sources for the rest of this investigation.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:36</td><td>Retrieval</td><td>provider failed</td><td>Semantic Scholar: rate limit reached. Continuing with available sources. No further Semantic Scholar requests will be made in this investigation.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:36</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:37</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-13 19:55:37</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:37</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:37</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:37</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:37</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:37</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:40</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:41</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:41</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:41</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:41</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:43</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:44</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:44</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">fc2bcacb0858bc056205</a> — An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:46</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">fc2bcacb0858bc056205</a> — An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:47</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">fc2bcacb0858bc056205</a> — An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:47</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">fc2bcacb0858bc056205</a> — An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:47</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">2702a498b04650f790be</a> — The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:47</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">2702a498b04650f790be</a> — The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>html failed</td><td>The HTML page did not provide sufficient article-body text; checking abstract fallback. Paper <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">2702a498b04650f790be</a> — The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">2702a498b04650f790be</a> — The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">2702a498b04650f790be</a> — The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">6ddf8219845d56c367d0</a> — The Impact of AI Tools on Student Engagement and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">6ddf8219845d56c367d0</a> — The Impact of AI Tools on Student Engagement and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>html failed</td><td>The network request failed; checking abstract fallback. Paper <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">6ddf8219845d56c367d0</a> — The Impact of AI Tools on Student Engagement and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">6ddf8219845d56c367d0</a> — The Impact of AI Tools on Student Engagement and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">6ddf8219845d56c367d0</a> — The Impact of AI Tools on Student Engagement and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">9dfadfa6f720db891ef2</a> — EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:49</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">9dfadfa6f720db891ef2</a> — EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:50</td><td>Processing</td><td>html failed</td><td>The article URL did not return HTML; checking abstract fallback. Paper <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">9dfadfa6f720db891ef2</a> — EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:50</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">9dfadfa6f720db891ef2</a> — EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:50</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">9dfadfa6f720db891ef2</a> — EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:50</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.22271/27084515.2026.v7.i2b.1010" target="_blank" rel="noopener noreferrer">dc587f60544692619b89</a> — Impact of AI Based Smart Learning Tools on Academic Performance and Engagement of University Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:50</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.22271/27084515.2026.v7.i2b.1010" target="_blank" rel="noopener noreferrer">dc587f60544692619b89</a> — Impact of AI Based Smart Learning Tools on Academic Performance and Engagement of University Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.22271/27084515.2026.v7.i2b.1010" target="_blank" rel="noopener noreferrer">dc587f60544692619b89</a> — Impact of AI Based Smart Learning Tools on Academic Performance and Engagement of University Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.22271/27084515.2026.v7.i2b.1010" target="_blank" rel="noopener noreferrer">dc587f60544692619b89</a> — Impact of AI Based Smart Learning Tools on Academic Performance and Engagement of University Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.66669/cineforum.v66is2.1055" target="_blank" rel="noopener noreferrer">560929fd2fcb87117d11</a> — &#34;Assessing the Perceived Burgeoning Impact of AI-Driven Educational Tools on Academic Performance Among College Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:51</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.66669/cineforum.v66is2.1055" target="_blank" rel="noopener noreferrer">560929fd2fcb87117d11</a> — &#34;Assessing the Perceived Burgeoning Impact of AI-Driven Educational Tools on Academic Performance Among College Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:52</td><td>Processing</td><td>html failed</td><td>The HTML page did not provide sufficient article-body text; checking abstract fallback. Paper <a href="https://doi.org/10.66669/cineforum.v66is2.1055" target="_blank" rel="noopener noreferrer">560929fd2fcb87117d11</a> — &#34;Assessing the Perceived Burgeoning Impact of AI-Driven Educational Tools on Academic Performance Among College Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:52</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.66669/cineforum.v66is2.1055" target="_blank" rel="noopener noreferrer">560929fd2fcb87117d11</a> — &#34;Assessing the Perceived Burgeoning Impact of AI-Driven Educational Tools on Academic Performance Among College Students.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:52</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.61955/xrcars" target="_blank" rel="noopener noreferrer">c45c941dd7134651fc0c</a> — Human AI Collaboration Tools for boosting productivity of Library Staff in academic institutions.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:52</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.61955/xrcars" target="_blank" rel="noopener noreferrer">c45c941dd7134651fc0c</a> — Human AI Collaboration Tools for boosting productivity of Library Staff in academic institutions.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:53</td><td>Processing</td><td>html failed</td><td>The HTML page did not provide sufficient article-body text; checking abstract fallback. Paper <a href="https://doi.org/10.61955/xrcars" target="_blank" rel="noopener noreferrer">c45c941dd7134651fc0c</a> — Human AI Collaboration Tools for boosting productivity of Library Staff in academic institutions.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:53</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.61955/xrcars" target="_blank" rel="noopener noreferrer">c45c941dd7134651fc0c</a> — Human AI Collaboration Tools for boosting productivity of Library Staff in academic institutions.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:53</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48009/4_iis_2025_112" target="_blank" rel="noopener noreferrer">a28498c4ebc7a22bda22</a> — The impact of AI tools on undergraduate students? academic performance: A case study of Peru.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:53</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.48009/4_iis_2025_112" target="_blank" rel="noopener noreferrer">a28498c4ebc7a22bda22</a> — The impact of AI tools on undergraduate students? academic performance: A case study of Peru.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:54</td><td>Processing</td><td>html failed</td><td>The article URL did not return HTML; checking abstract fallback. Paper <a href="https://doi.org/10.48009/4_iis_2025_112" target="_blank" rel="noopener noreferrer">a28498c4ebc7a22bda22</a> — The impact of AI tools on undergraduate students? academic performance: A case study of Peru.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:54</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48009/4_iis_2025_112" target="_blank" rel="noopener noreferrer">a28498c4ebc7a22bda22</a> — The impact of AI tools on undergraduate students? academic performance: A case study of Peru.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:54</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.2139/ssrn.4897490" target="_blank" rel="noopener noreferrer">1d906461938f3e10a009</a> — Impact of AI Tools on Academic Performance and Engagement Among Grade 12 Students with Special Educational Needs: A Stud.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:54</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.2139/ssrn.4897490" target="_blank" rel="noopener noreferrer">1d906461938f3e10a009</a> — Impact of AI Tools on Academic Performance and Engagement Among Grade 12 Students with Special Educational Needs: A Stud.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:54</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.2139/ssrn.4897490" target="_blank" rel="noopener noreferrer">1d906461938f3e10a009</a> — Impact of AI Tools on Academic Performance and Engagement Among Grade 12 Students with Special Educational Needs: A Stud.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:54</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.2139/ssrn.4897490" target="_blank" rel="noopener noreferrer">1d906461938f3e10a009</a> — Impact of AI Tools on Academic Performance and Engagement Among Grade 12 Students with Special Educational Needs: A Stud.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:55</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:55</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:55</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">fc2bcacb0858bc056205</a> — An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:55</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">2702a498b04650f790be</a> — The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:55</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">6ddf8219845d56c367d0</a> — The Impact of AI Tools on Student Engagement and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 19:55:55</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">9dfadfa6f720db891ef2</a> — EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:16</td><td>Processing</td><td>chunks selected</td><td>Relevant passages selected.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:16</td><td>Processing</td><td>semantic completed</td><td>Hybrid evidence retrieval completed.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:16</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:16</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-13 19:56:22</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:22</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-13 19:56:22</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:31</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:31</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:37</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:37</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:43</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:49</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:55</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-13 19:56:55</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 57</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 59</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>How does generative AI affect student learning outcomes in higher education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Generative AI has shown potential to enhance student learning outcomes in higher education through adaptive assessment and feedback systems. Studies indicate that AI-driven tools can improve conceptual understanding, error correction, and student satisfaction by providing real-time, personalised evaluations (D, 2026). For instance, (Ishtiaq, Naseem and Akbar, 2026) highlights a strong positive correlation between students&#39; perceptions of AI-assisted writing tools and their academic writing performance, with ethical use further predicting improved outcomes. Similarly, (Limosinero, 2025) notes that Grade 9 students reported enhanced understanding of topics and assignment efficiency when using AI tools, though concerns about critical thinking and academic integrity were raised. These findings suggest that AI can support skill development when integrated responsibly, but its effectiveness depends on ethical frameworks and user awareness.</p><p>The impact of AI on academic performance and engagement is further supported by mixed-method studies. (D, 2026)’s regression analysis revealed that Generative AI feedback significantly correlates with improved academic performance, while (Tamayo et al., 2025)’s quantitative analysis found a significant link between AI tool usage and student engagement. (Almaqtari, Alramada and Alsabry, 2026)’s review of AI tools across domains emphasises increased engagement and personalisation in education, though risks like over-reliance and bias persist. However, (Limosinero, 2025) and (Ishtiaq, Naseem and Akbar, 2026) caution that without clear guidelines, students may develop harmful dependencies, undermining critical thinking and academic integrity. These studies collectively underscore the dual role of AI as both a facilitator and a potential disruptor, depending on its implementation and governance.</p><p>Ethical considerations and responsible use emerge as critical themes across the evidence. (D, 2026) and (Ishtiaq, Naseem and Akbar, 2026) stress the need for transparent AI models, faculty training, and policies to address algorithmic bias and data ethics. (Limosinero, 2025) aligns with these points, noting students’ calls for AI literacy education and classroom integration strategies. (Almaqtari, Alramada and Alsabry, 2026)’s risk analysis further highlights persistent challenges, including privacy concerns and the erosion of traditional skills. While (McKenzie and Day, 2025) advocates for expanding AI’s educational applications to enhance student wellbeing and motivation, it also emphasises the importance of aligning technological interfaces with pedagogical goals. These insights suggest that successful AI integration requires balancing innovation with ethical safeguards and stakeholder collaboration.</p><p>Practical implications for higher education institutions include fostering AI literacy, designing transparent assessment systems, and embedding ethical training into curricula. (D, 2026) and (Ishtiaq, Naseem and Akbar, 2026) recommend faculty development to ensure effective AI tool utilization, while (Limosinero, 2025) advocates for clear policies to prevent misuse. (Almaqtari, Alramada and Alsabry, 2026)’s categorization of AI tools into domains offers a framework for selecting appropriate technologies, though controlled experiments remain needed to validate their long-term efficacy. Overall, the evidence supports AI as a transformative tool when guided by ethical governance, but its impact on learning outcomes hinges on addressing systemic challenges and prioritising student-centered design.</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>A mixed-method study involving undergraduate and postgraduate students across multiple disciplines found that Generative AI–based feedback significantly improved conceptual understanding, timely error correction, and satisfaction, though concerns about academic integrity and algorithmic bias were noted (D, 2026).</li><li>A quantitative correlational study with 204 students revealed a strong positive correlation (r = .800, p &lt; .001) between students&#39; perceptions of AI-assisted writing tools and academic writing performance, with ethical use further predicting outcomes (r = .503, p &lt; .001). Regression analysis showed these factors together explained 64.9% of variance in writing performance (Ishtiaq, Naseem and Akbar, 2026).</li><li>Another quantitative analysis identified a significant correlation between AI tool usage and student engagement and academic performance, though specific statistical methods or sample sizes were not detailed (Tamayo et al., 2025).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The mixed-methods design of (D, 2026) may limit generalisability, as findings are context-specific to participating institutions. Further evidence from diverse educational settings would strengthen claims about broader applicability.</li><li>(Almaqtari, Alramada and Alsabry, 2026)’s exploratory review lacks controlled experiments, relying on qualitative synthesis of tool documentation and user reports. Controlled studies could clarify causal relationships between AI use and academic outcomes.</li><li>(Ishtiaq, Naseem and Akbar, 2026)’s correlational design cannot establish causality between AI perceptions and performance. Longitudinal studies tracking AI integration over time would better assess sustained impacts.</li><li>(Limosinero, 2025) focuses on Grade 9 students, limiting insights into higher education. Research with university-level samples is needed to address the research question directly.</li><li>(McKenzie and Day, 2025)’s symposium-based discussion lacks empirical data, offering speculative recommendations. Quantitative studies on AI’s pedagogical effectiveness would provide more concrete evidence for policy decisions.</li><li>Reporter review note: Summary contains model-generated wording requiring human review (invalid syntax). Unresolved author-year citations are not verified references; check claims against Ranked Sources.</li><li>Reporter review note: Findings contains model-generated wording requiring human review (missing claim citation). Unresolved author-year citations are not verified references; check claims against Ranked Sources.</li><li>Reporter review note: Limitations contains model-generated wording requiring human review (invalid syntax). Unresolved author-year citations are not verified references; check claims against Ranked Sources.</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S3">
+                Almaqtari, J.W., Alramada, E. and Alsabry, A. (2026) ‘An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance’, <em>مجلة جامعة صنعاء للعلوم التطبيقية والتكنولوجيا</em>, 4(2), pp. 1665-1681.
+                Available at: <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">https://doi.org/10.59628/jast.v4i2.1921</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S1">
+                D, R. (2026) ‘Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education’, <em>International Journal For Multidisciplinary Research</em>, 8(3), article 81825.
+                Available at: <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">https://doi.org/10.36948/ijfmr.2026.v08i03.81825</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Ishtiaq, M., Naseem, A. and Akbar, G. (2026) ‘The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance’, <em>The Regional Tribune</em>, 5(7), p. 42.
+                Available at: <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">https://doi.org/10.55737/trt/v-vii.336</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S6">
+                Limosinero, K. (2025) ‘EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE’, <em>International Multidisciplinary Research Journal</em>, pp. 26-31.
+                Available at: <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">https://doi.org/10.47722/imrj.2001.51</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                McKenzie, S. and Day, J. (2025) ‘Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes’, <em>ASCILITE Publications</em>, pp. 123-125.
+                Available at: <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">https://doi.org/10.65106/apubs.2025.2750</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S5">
+                Tamayo, J.D. et al. (2025) ‘The Impact of AI Tools on Student Engagement and Academic Performance’, <em>GEO Academic Journal</em>, 6(1).
+                Available at: <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">https://doi.org/10.56738/issn29603986.geo2025.6.94</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>The complete ranking was not saved for this older report. These are its saved evidence sources in their original order.</p>
+        <ol><li>Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education — <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">View source</a></li><li>Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes — <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">View source</a></li><li>An Overview and Impact Analysis of AI Tools in Academic Research, Learning, and Educational Performance — <a href="https://doi.org/10.59628/jast.v4i2.1921" target="_blank" rel="noopener noreferrer">View source</a></li><li>The Impact of AI-Assisted Learning Tools on Students’ Academic Writing Performance — <a href="https://doi.org/10.55737/trt/v-vii.336" target="_blank" rel="noopener noreferrer">View source</a></li><li>The Impact of AI Tools on Student Engagement and Academic Performance — <a href="https://doi.org/10.56738/issn29603986.geo2025.6.94" target="_blank" rel="noopener noreferrer">View source</a></li><li>EXPLORING THE USE AND IMPACT OF AI TOOLS ON GRADE 9 STUDENTS&#39; LEARNING AND ACADEMIC PERFORMANCE — <a href="https://doi.org/10.47722/imrj.2001.51" target="_blank" rel="noopener noreferrer">View source</a></li></ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        <p>No audit was recorded for this report.</p>
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        <p>No agent activity was recorded for this report.</p>
+    </section>
+    <p>Saved report ID: 59</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

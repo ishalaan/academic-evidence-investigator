@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 49</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>What are the main applications of large language models in education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Large language models (LLMs) are increasingly applied in education to enhance instructional processes, automate assessments, and support personalized learning. A systematic review of 37 studies in dental education highlights their use in seven domains, including examinations (24 studies), educational resource creation (5 studies), and assignment assessment (3 studies) (Kong, Fok and Yiu, 2025). Similarly, a broader analysis of educational applications identifies five major areas: instructional content generation, teaching support and planning, grading and assessment, question and quiz generation, and tutoring and learning assistance (Ramos and Casas, no date). These applications leverage LLMs&#39; capacity to automate pedagogical tasks, such as generating adaptive materials and streamlining feedback, while also enabling interactive tools that simulate one-on-one tutoring (Ramos and Casas, no date). For instance, LLMs can create dynamic question banks or provide real-time feedback on student work, reducing the administrative burden on educators (Ramos and Casas, no date).</p><p>Beyond general use cases, LLMs are being adapted for specialized educational contexts, such as industrial training. In smart manufacturing education, LLMs are integrated with IIoT infrastructure to simulate real-time process monitoring and decision-making, bridging theoretical knowledge with practical industry workflows (Imani et al., 2025). This approach supports contextual learning by contextualizing technical data, such as metallization levels, through interactive dashboards (Imani et al., 2025). However, challenges persist, particularly in multilingual settings. While LLMs perform reasonably well in languages with extensive training data, such as English, their effectiveness drops significantly for low-resource languages like Arabic or Telugu, raising concerns about equitable access to educational tools (Gupta et al., 2025). This highlights the need for careful validation of LLMs in diverse linguistic environments before deployment (Gupta et al., 2025).</p><p>The integration of LLMs in education also introduces risks related to bias, misinformation, and over-reliance on automated systems. A review of 70 empirical studies identifies model-level risks, including superficial understanding of complex concepts and potential biases in generated content (Delikoura, Fung and Hui, 2025). These risks extend to cognitive outcomes, such as reduced critical thinking skills or diminished independent learning abilities, when students rely heavily on LLMs for answers (Delikoura, Fung and Hui, 2025). Additionally, the lifecycle of LLMs in education—from training to customization—may perpetuate algorithmic biases, particularly if historical data reflects systemic inequities (Lee et al., 2024). For example, pre-trained models may inherit biases from their training data, affecting fairness in grading or tutoring scenarios (Lee et al., 2024).</p><p>Despite these challenges, LLMs offer transformative potential when paired with pedagogical strategies that emphasize critical engagement. Educational frameworks suggest that teachers should guide students in developing digital literacy to navigate LLM limitations, such as verifying information and recognizing hallucinations (Kasneci et al., 2023). Furthermore, LLMs can enhance accessibility by providing multilingual support, as seen in their use for grading translations or offering targeted feedback in non-English languages (Gupta et al., 2025). However, their success depends on contextual adaptation and ethical oversight. For instance, in healthcare education, LLMs are used to generate patient education materials and support clinical decision-making, demonstrating their versatility across disciplines (Santos et al., 2025). Overall, the applications of LLMs in education are expanding, but their impact hinges on balancing innovation with safeguards against bias and over-reliance (Ramos and Casas, no date).</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>Large language models (LLMs) are increasingly applied in education to automate grading and assessment, with studies showing their use in evaluating student assignments and examinations. In dental education, 37 studies highlighted LLMs’ role in streamlining assessment processes, reducing manual workload, and providing scalable feedback mechanisms (Kong, Fok and Yiu, 2025). Similarly, broader educational analyses identified grading as a core application, enabling rapid, consistent evaluation of written responses while allowing educators to focus on higher-order tasks (Ramos and Casas, no date). These systems leverage LLMs’ ability to parse complex texts and apply predefined rubrics, though challenges like bias and accuracy remain (Delikoura, Fung and Hui, 2025).</li><li>LLMs support personalized learning through adaptive content generation and tutoring, tailoring educational materials to individual needs. A review of educational applications emphasized their use in creating dynamic instructional resources, such as interactive quizzes and customized feedback, which enhance student engagement (Ramos and Casas, no date). In industrial contexts, LLMs integrate with IIoT frameworks to simulate smart factory environments, offering real-time data analysis and decision-making tools that bridge theoretical education with practical skills (Imani et al., 2025). Such applications demonstrate LLMs’ capacity to adapt to diverse educational settings, though multilingual performance disparities highlight the need for language-specific validation (Gupta et al., 2025).</li><li>LLMs are being deployed to enhance teaching support and planning, automating repetitive tasks to improve pedagogical efficiency. Research indicates their use in generating lesson plans, curating educational resources, and facilitating collaborative learning scenarios (Ramos and Casas, no date). In healthcare education, LLMs assist in patient education and clinical decision-making, providing accessible explanations of complex concepts and simulating real-world diagnostic scenarios (Santos et al., 2025). These applications underscore LLMs’ potential to democratize access to high-quality educational tools, though concerns about over-reliance on automated systems and misinformation persist (Delikoura, Fung and Hui, 2025).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The focus on technical applications overlooks pedagogical integration challenges, such as teacher training and curriculum alignment, which could hinder effective implementation (Kasneci et al., 2023). Further evidence on adoption strategies and educator preparedness would clarify practical barriers.</li><li>Multilingual performance disparities in LLMs may limit equitable access, particularly for low-resource languages, despite their potential for global educational use (Gupta et al., 2025). Additional studies on language-specific training data and cross-linguistic efficacy are needed.</li><li>Current evaluations often prioritize task accuracy over societal impacts, such as algorithmic bias and ethical implications, which are critical for educational equity (Chang et al., 2023). Broader assessments incorporating stakeholder perspectives and long-term consequences would strengthen understanding.</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S10">
+                Chang, Y.C. et al. (2023) ‘A Survey on Evaluation of Large Language Models’, <em>ACM Transactions on Intelligent Systems and Technology</em>, 15, pp. 1 - 45.
+                Available at: <a href="https://doi.org/10.1145/3641289" target="_blank" rel="noopener noreferrer">https://doi.org/10.1145/3641289</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Delikoura, I., Fung, Y.R. and Hui, P. (2025) ‘From Superficial Outputs to Superficial Learning: Risks of Large Language Models in Education’, <em>ArXiv</em>, abs/2509.21972.
+                Available at: <a href="https://doi.org/10.48550/arXiv.2509.21972" target="_blank" rel="noopener noreferrer">https://doi.org/10.48550/arXiv.2509.21972</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S5">
+                Gupta, V. et al. (2025) ‘Multilingual Performance Biases of Large Language Models in Education’, <em>ArXiv</em>, abs/2504.17720.
+                Available at: <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">https://doi.org/10.48550/arXiv.2504.17720</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S3">
+                Imani, M. et al. (2025) ‘Applications of Large Language Models in Industrial Internet of Things Education’, <em>2025 11th International Conference on Web Research (ICWR)</em>, pp. 257-263.
+                Available at: <a href="https://doi.org/10.1109/ICWR65219.2025.11006194" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/ICWR65219.2025.11006194</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S7">
+                Kasneci, E. et al. (2023) ‘ChatGPT for good? On opportunities and challenges of large language models for education’, <em>Learning and Individual Differences</em>.
+                Available at: <a href="https://doi.org/10.1016/j.lindif.2023.102274" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.lindif.2023.102274</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S1">
+                Kong, M., Fok, E.H.W. and Yiu, C. (2025) ‘A Scoping Review of Large Language Models in Dental Education: Applications, Challenges, and Prospects’, <em>International Dental Journal</em>, 75.
+                Available at: <a href="https://doi.org/10.1016/j.identj.2025.103854" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.identj.2025.103854</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S6">
+                Lee, J. et al. (2024) ‘The life cycle of large language models in education: A framework for understanding sources of bias’, <em>Br. J. Educ. Technol.</em>, 55, pp. 1982-2002.
+                Available at: <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">https://doi.org/10.1111/bjet.13505</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                Ramos, L.T. and Casas, E. (no date) ‘Applications, Trends, and Perspectives of Large Language Models in Education: A Literature Review’.
+                Available at: <a href="https://doi.org/10.36227/techrxiv.176413429.91587404/v1" target="_blank" rel="noopener noreferrer">https://doi.org/10.36227/techrxiv.176413429.91587404/v1</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S9">
+                Santos, J.F. et al. (2025) ‘Applications of large language models in cardiovascular disease: a systematic review’, <em>European Heart Journal. Digital Health</em>, 6, pp. 540 - 553.
+                Available at: <a href="https://doi.org/10.1093/ehjdh/ztaf028" target="_blank" rel="noopener noreferrer">https://doi.org/10.1093/ehjdh/ztaf028</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>A Scoping Review of Large Language Models in Dental Education: Applications, Challenges, and Prospects</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: f0b6f0236fdb727d4c1b</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Mengjie Kong, Elise Hoi Wan Fok, C. Yiu · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Introduction and aims With the rapid development of large language models (LLMs), their potential in dental clinical healthcare and education has become increasingly evident. However, the application of this emerging technology within dental education has not yet been systematically reviewed. This scoping review aims to summarize current applications, identify challenges encountered in the implementation process, and outline future prospects. Methods A comprehensive literature search was conducted in the PubMed, Web of Science, and Embase databases to identify studies related to LLMs and dental education. Relevant studies were screened, selected, and subjected to data extraction to collate information pertinent to the research questions. Results A total of 37 studies were included. LLMs have been applied across seven distinct domains in dental education, notably in dental examinations (n = 24), educational information resources (n = 5), and assessment of students’ assignments (n = 3). These applications have introduced several challenges, including technical issues (ie, inaccurate information, inability in image analysis, inaccessibility, and high cost) and application aspects (ie, ethical issues, absence of usage guidelines, potential harm to students’ knowledge and skills, and cautious attitudes towards LLMs). Addressing these challenges requires coordinated efforts from students, educators, curriculum administrators, and technical developers. Conclusions The application of LLMs in dental education remains in its early stage. Future research should focus on expanding the range of applications and establishing standardized, ethically satisfying, and technically sound guidelines for integrating LLMs into dental education.</p></details>
+                <a href="https://doi.org/10.1016/j.identj.2025.103854" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Applications, Trends, and Perspectives of Large Language Models in Education: A Literature Review</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: a7408830fbf2943927e9</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Leo Thomas Ramos, Edmundo Casas · No date · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This work presents a review of recent literature on the use of Large Language Models (LLMs) in education, with the goal of clarifying their current applications, methodological foundations, and emerging directions. The analysis is guided by research questions addressing where LLMs are being applied, what strategies are used to implement them, how they are evaluated, and what challenges accompany their adoption. To answer these questions, we focused on recent studies published in diverse educational settings and synthesized evidence across multiple domains. The findings show that LLMs are being applied in five major areas: instructional content generation, teaching support and planning, grading and assessment, question and quiz generation, and tutoring and learning assistance. Across these domains, LLMs enable adaptive materials, automate pedagogical tasks, and support personalized learning, yet they also introduce persistent challenges related to misinformation, bias, academic integrity, equity of access, and over-reliance on automated systems. Beyond mapping current practices, the review identifies methodological gaps in evaluation, recurring limitations across domains, and emerging trends such as multimodal integration, embodied avatars, multi-agent orchestration, and personalization. Drawing from these insights, this work provides both a critical assessment of the state of the field and a forward-looking perspective intended to guide future research and practice in the responsible integration of LLMs into education.</p></details>
+                <a href="https://doi.org/10.36227/techrxiv.176413429.91587404/v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Applications of Large Language Models in Industrial Internet of Things Education</strong><span>Relevance score: 26</span></div>
+                <p class="reference-note">Paper ID: 0d6ce54aa193581bad9d</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Mehdi Imani, Ali Imanifard, Babak Majidi, Abdolah Shamisa · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This paper explores the potential of Large Language Models (LLMs) to enhance educational experiences in the Industrial Internet of Things (IIoT), focusing on the domain of smart steel manufacturing. We address the critical shortage of authentic industrial datasets for academic research by presenting an industry-validated IIoT educational dataset derived from three months of operational data from a steel plant, enriched with domain-specific annotations. We propose a comprehensive IIoT framework specifically designed for smart steel manufacturing, integrating LLMs with IIoT infrastructure. This novel architecture unifies real-time process monitoring, predictive analytics, and adaptive learning, simulating a smart factory ecosystem. It facilitates humanmachine collaboration and replicates quality control workflows, thereby bridging the gap between educational theory and industrial practice. A key component of our framework is an interactive decision-making dashboard powered by LLMs. This AI-driven tool contextualizes IIoT data, offering dynamic visualizations of critical parameters such as metallization levels and H2/CO ratios. It further enables scenario-based simulations for energy optimization in a risk-free environment, empowering learners to experiment and understand complex industrial processes. Our study demonstrates the transformative potential of LLMs in HoT education, offering a practical and engaging learning environment that directly aligns with industrial realities.</p></details>
+                <a href="https://doi.org/10.1109/ICWR65219.2025.11006194" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>From Superficial Outputs to Superficial Learning: Risks of Large Language Models in Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 667c4618ccaf897f9d77</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Iris Delikoura, Yi R. Fung, Pan Hui · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large Language Models (LLMs) are transforming education by enabling personalization, feedback, and knowledge access, while also raising concerns about risks to students and learning systems. Yet empirical evidence on these risks remains fragmented. This paper presents a systematic review of 70 empirical studies across computer science, education, and psychology. Guided by four research questions, we examine: (i) which applications of LLMs in education have been most frequently explored; (ii) how researchers have measured their impact; (iii) which risks stem from such applications; and (iv) what mitigation strategies have been proposed. We find that research on LLMs clusters around three domains: operational effectiveness, personalized applications, and interactive learning tools. Across these, model-level risks include superficial understanding, bias, limited robustness, anthropomorphism, hallucinations, privacy concerns, and knowledge constraints. When learners interact with LLMs, these risks extend to cognitive and behavioural outcomes, including reduced neural activity, over-reliance, diminished independent learning skills, and a loss of student agency. To capture this progression, we propose an LLM-Risk Adapted Learning Model that illustrates how technical risks cascade through interaction and interpretation to shape educational outcomes. As the first synthesis of empirically assessed risks, this review provides a foundation for responsible, human-centred integration of LLMs in education.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2509.21972" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Multilingual Performance Biases of Large Language Models in Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 43ee383b1ecc8b4661a3</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Vansh Gupta, Sankalan Pal Chowdhury, Vilém Zouhar, Donya Rooein, Mrinmaya Sachan · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are increasingly being adopted in educational settings. These applications expand beyond English, though current LLMs remain primarily English-centric. In this work, we ascertain if their use in education settings in non-English languages is warranted. We evaluated the performance of popular LLMs on four educational tasks: identifying student misconceptions, providing targeted feedback, interactive tutoring, and grading translations in eight languages (Mandarin, Hindi, Arabic, German, Farsi, Telugu, Ukrainian, Czech) in addition to English. We find that the performance on these tasks somewhat corresponds to the amount of language represented in training data, with lower-resource languages having poorer task performance. Although the models perform reasonably well in most languages, the frequent performance drop from English is significant. Thus, we recommend that practitioners first verify that the LLM works well in the target language for their educational task before deployment.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The life cycle of large language models in education: A framework for understanding sources of bias</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: d2f6998a4632765d090d</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Jinsook Lee, Yann Hicke, Renzhe Yu, Christopher Brooks, René F. Kizilcec · 2024 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are increasingly adopted in educational contexts to provide personalized support to students and teachers. The unprecedented capacity of LLM‐based applications to understand and generate natural language can potentially improve instructional effectiveness and learning outcomes, but the integration of LLMs in education technology has renewed concerns over algorithmic bias, which may exacerbate educational inequalities. Building on prior work that mapped the traditional machine learning life cycle, we provide a framework of the LLM life cycle from the initial development of LLMs to customizing pre‐trained models for various applications in educational settings. We explain each step in the LLM life cycle and identify potential sources of bias that may arise in the context of education. We discuss why current measures of bias from traditional machine learning fail to transfer to LLM‐generated text (eg, tutoring conversations) because text encodings are high‐dimensional, there can be multiple correct responses, and tailoring responses may be pedagogically desirable rather than unfair. The proposed framework clarifies the complex nature of bias in LLM applications and provides practical guidance for their evaluation to promote educational equity. What is already known about this topic The life cycle of traditional machine learning (ML) applications which focus on predicting labels is well understood. Biases are known to enter in traditional ML applications at various points in the life cycle, and methods to measure and mitigate these biases have been developed and tested. Large language models (LLMs) and other forms of generative artificial intelligence (GenAI) are increasingly adopted in education technologies (EdTech), but current evaluation approaches are not specific to the domain of education. What this paper adds A holistic perspective of the LLM life cycle with domain‐specific examples in education to highlight opportunities and challenges for incorporating natural language understanding (NLU) and natural language generation (NLG) into EdTech. Potential sources of bias are identified in each step of the LLM life cycle and discussed in the context of education. A framework for understanding where to expect potential harms of LLMs for students, teachers, and other users of GenAI technology in education, which can guide approaches to bias measurement and mitigation. Implications for practice and/or policy Education practitioners and policymakers should be aware that biases can originate from a multitude of steps in the LLM life cycle, and the life cycle perspective offers them a heuristic for asking technology developers to explain each step to assess the risk of bias. Measuring the biases of systems that use LLMs in education is more complex than with traditional ML, in large part because the evaluation of natural language generation is highly context‐dependent (eg, what counts as good feedback on an assignment varies). EdTech developers can play an important role in collecting and curating datasets for the evaluation and benchmarking of LLM applications moving forward.</p></details>
+                <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>ChatGPT for good? On opportunities and challenges of large language models for education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 06372867271a6588c2ab</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Enkelejda Kasneci, Kathrin Seßler, S. Küchemann, M. Bannert, Daryna Dementieva, F. Fischer, Urs Gasser, G. Groh, Stephan Günnemann, Eyke Hüllermeier, Stephan Krusche, Gitta Kutyniok, Tilman Michaeli, Claudia Nerdel, J. Pfeffer, Oleksandra Poquet, Michael Sailer, Albrecht Schmidt, Tina Seidel, Matthias Stadler, J. Weller, Jochen Kuhn, Gjergji Kasneci · 2023 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models represent a significant advancement in the field of AI. The underlying technology is key to further innovations and, despite critical views and even bans within communities and regions, large language models are here to stay. This position paper presents the potential benefits and challenges of educational applications of large language models, from student and teacher perspectives. We briefly discuss the current state of large language models and their applications. We then highlight how these models can be used to create educational content, improve student engagement and interaction, and personalize learning experiences. With regard to challenges, we argue that large language models in education require teachers and learners to develop sets of competencies and literacies necessary to both understand the technology as well as their limitations and unexpected brittleness of such systems. In addition, a clear strategy within educational systems and a clear pedagogical approach with a strong focus on critical thinking and strategies for fact checking are required to integrate and take full advantage of large language models in learning settings and teaching curricula. Other challenges such as the potential bias in the output, the need for continuous human oversight, and the potential for misuse are not unique to the application of AI in education. But we believe that, if handled sensibly, these challenges can offer insights and opportunities in education scenarios to acquaint students early on with potential societal biases, criticalities, and risks of AI applications. We conclude with recommendations for how to address these challenges and ensure that such models are used in a responsible and ethical manner in education.</p></details>
+                <a href="https://doi.org/10.1016/j.lindif.2023.102274" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Industrial applications of large language models</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 79c0a272730fa318ec30</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Mubashar Raza, Zarmina Jahangir, Muhammad Bilal Riaz, Muhammad Jasim Saeed, Muhammad Awais Sattar · 2025 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are artificial intelligence (AI) based computational models designed to understand and generate human like text. With billions of training parameters, LLMs excel in identifying intricate language patterns, enabling remarkable performance across a variety of natural language processing (NLP) tasks. After the introduction of transformer architectures, they are impacting the industry with their text generation capabilities. LLMs play an innovative role across various industries by automating NLP tasks. In healthcare, they assist in diagnosing diseases, personalizing treatment plans, and managing patient data. LLMs provide predictive maintenance in automotive industry. LLMs provide recommendation systems, and consumer behavior analyzers. LLMs facilitates researchers and offer personalized learning experiences in education. In finance and banking, LLMs are used for fraud detection, customer service automation, and risk management. LLMs are driving significant advancements across the industries by automating tasks, improving accuracy, and providing deeper insights. Despite these advancements, LLMs face challenges such as ethical concerns, biases in training data, and significant computational resource requirements, which must be addressed to ensure impartial and sustainable deployment. This study provides a comprehensive analysis of LLMs, their evolution, and their diverse applications across industries, offering researchers valuable insights into their transformative potential and the accompanying limitations.</p></details>
+                <a href="https://doi.org/10.1038/s41598-025-98483-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Applications of large language models in cardiovascular disease: a systematic review</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 6918d225e7bdbbe277f9</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">José Ferreira Santos, R. Ladeiras-Lopes, F. Leite, H. Dores · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Abstract Cardiovascular disease (CVD) remains the leading cause of morbidity and mortality worldwide. Large language models (LLMs) offer potential solutions for enhancing patient education and supporting clinical decision-making. This study aimed to evaluate LLMs’ applications in CVD and explore their current implementation, from prevention to treatment. Following the Preferred Reporting Items for Systematic Reviews and Meta-Analyses guidelines, this systematic review assessed LLM applications in CVD. A comprehensive PubMed search identified relevant studies. The review prioritized pragmatic and practical applications of LLMs. Key applications, benefits, and limitations of LLMs in CVD prevention were summarized. Thirty-five observational studies met the eligibility criteria. Of these, 54% addressed primary prevention and risk factor management, while 46% focused on established CVD. Commercial LLMs were evaluated in all but one study, with 91% (32 studies) assessing ChatGPT. The LLM applications were categorized as follows: 72% addressed patient education, 17% clinical decision support, and 11% both. In 68% of studies, the primary objective was to evaluate LLMs’ performance in answering frequently asked patient questions, with results indicating accurate, comprehensive, and generally safe responses. However, occasional misinformation and hallucinated references were noted. Additional applications included patient guidance on CVD, first aid, and lifestyle recommendations. Large language models were assessed for medical questions, diagnostic support, and treatment recommendations in clinical decision support. Large language models hold significant potential in CVD prevention and treatment. Evidence supports their potential as an alternative source of information for addressing patients’ questions about common CVD. However, further validation is needed for their application in individualized care, from diagnosis to treatment.</p></details>
+                <a href="https://doi.org/10.1093/ehjdh/ztaf028" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>From Algorithms to Classrooms: The Future of Education with Large Language Models</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: 59d51e20990c81a2ff35</p>
+                
+                
+                <p class="reference-note">Myint Swe Khine, Ernest Afari · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003567257-12" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large language models in education: A focus on the complementary relationship between human teachers and ChatGPT</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: 207bc24df676813bbc0f</p>
+                
+                
+                <p class="reference-note">Jae-Bong Jeon, Seongyong Lee · 2023 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/s10639-023-11834-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>A Survey on Evaluation of Large Language Models</strong><span>Relevance score: 16</span></div>
+                <p class="reference-note">Paper ID: 57565e57b2b43529adf3</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Yu-Chu Chang, Xu Wang, Jindong Wang, Yuan Wu, Kaijie Zhu, Hao Chen, Linyi Yang, Xiaoyuan Yi, Cunxiang Wang, Yidong Wang, Weirong Ye, Yue Zhang, Yi Chang, Philip S. Yu, Qian Yang, Xingxu Xie · 2023 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are gaining increasing popularity in both academia and industry, owing to their unprecedented performance in various applications. As LLMs continue to play a vital role in both research and daily use, their evaluation becomes increasingly critical, not only at the task level, but also at the society level for better understanding of their potential risks. Over the past years, significant efforts have been made to examine LLMs from various perspectives. This paper presents a comprehensive review of these evaluation methods for LLMs, focusing on three key dimensions: what to evaluate, where to evaluate, and how to evaluate. Firstly, we provide an overview from the perspective of evaluation tasks, encompassing general natural language processing tasks, reasoning, medical usage, ethics, education, natural and social sciences, agent applications, and other areas. Secondly, we answer the ‘where’ and ‘how’ questions by diving into the evaluation methods and benchmarks, which serve as crucial components in assessing the performance of LLMs. Then, we summarize the success and failure cases of LLMs in different tasks. Finally, we shed light on several future challenges that lie ahead in LLMs evaluation. Our aim is to offer invaluable insights to researchers in the realm of LLMs evaluation, thereby aiding the development of more proficient LLMs. Our key point is that evaluation should be treated as an essential discipline to better assist the development of LLMs. We consistently maintain the related open-source materials at: https://github.com/MLGroupJLU/LLM-eval-survey</p></details>
+                <a href="https://doi.org/10.1145/3641289" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Improving Large Foundation Models in Education for Multicultural Understanding</strong><span>Relevance score: 14</span></div>
+                <p class="reference-note">Paper ID: a8bbc56cedd5fe92a23c</p>
+                
+                
+                <p class="reference-note">Jindong Wang, Shudong Liu · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003567257-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models (LLMs) in Aerospace Use Cases and Applications</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: fbe9e21302b0409aa3d5</p>
+                
+                
+                <p class="reference-note">Vineet Bhatia, Sumati Sidharth, Bhavesh Bhatia · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003771654-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Introduction to Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 654c73ab606269e96c13</p>
+                
+                
+                <p class="reference-note">Ajay Rawat, Vardan Pathak · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-2733-4_1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Foundatıons of Large Language Models and Theır Educatıonal Potentıal</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 6bcdb19b4a4bdddd8026</p>
+                
+                
+                <p class="reference-note">ÜMİT MURAT AKKAYA · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.70269/10.70269/9697784831" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models in Chemistry</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: ef44bd2e7ec08757d5ed</p>
+                
+                
+                <p class="reference-note">Zhiling Zheng · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003669012-4" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: df76897b989ae7327bc2</p>
+                
+                
+                <p class="reference-note">John Atkinson-Abutridy · 2024 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003517245-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Introduction to Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 73d929f3310f0b251b66</p>
+                
+                
+                <p class="reference-note">Bhawna Singh · 2024 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0569-1_1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>A Review on LLMs for IoT Ecosystem: State-of-the-art, Lightweight Models, Use Cases, Key Challenges, Future Directions</strong><span>Relevance score: 7</span></div>
+                <p class="reference-note">Paper ID: 2a176220e88b7c3a69cb</p>
+                
+                
+                <p class="reference-note">Partha Pratim Ray · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>The emergence of Large Language Models (LLMs) has profoundly reshaped computational linguistics, enabling unprecedented reasoning, context awareness, and semantic understanding capabilities. Integrating these sophisticated models into Internet-of-Things (IoT) ecosystems holds transformative potential for enabling intelligent, autonomous, and contextuallyaware applications. This article begins with an extensive state-ofthe-art survey of existing literature on the integration of LLMs within IoT environments, establishing foundational insights into current capabilities, limitations, and deployment frameworks. Subsequently, the manuscript contributes a comprehensive analysis of lightweight LLMs and embedding models suitable for resource-constrained IoT platforms while introducing a taxonomy of sub-billion-parameter (&lt; 1B), mid-range (1B-2B), and exact 2B-parameter LLMs-spanning families such as Qwen, Llama, SmolLM, and IBM&#39;s Granite-as well as embedding models under 1B parameters optimized for low-latency retrieval. Comparative assessments elucidate trade-offs in model size, inference latency, context windows, energy consumption, and performance across models categorized by parameter count. Next, a diverse spectrum of prospective use cases-including home healthcare, smart agriculture, industrial optimization, and environmental monitoring-demonstrates the practical efficacy of deploying tailored LLM-IoT frameworks for real-world problemsolving. Later, the article systematically explores key challenges that must be addressed to fully realize the integration of LLMs within IoT contexts, encompassing resource constraints, heterogeneous data processing, privacy and security risks, latency requirements, model interpretability, and ethical considerations. Finally, we outline critical directions for future research, advocating advancements in IoT-specific model architectures, multimodal sensor fusion strategies, real-time adaptive inference methods, energy-aware inference scheduling, and privacy-preserving federated learning paradigms.</p></details>
+                <a href="https://doi.org/10.36227/techrxiv.174844330.01320055/v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>How to Use LLMs Ethically in Academic Writing?</strong><span>Relevance score: 6</span></div>
+                <p class="reference-note">Paper ID: 47263698e7c43265c2c0</p>
+                
+                
+                <p class="reference-note">Tiantian Yu · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>This paper presents an experimental study based on selected Large Language Models (LLMs) and Artificial Intelligence Generated Content (AIGC) detection systems, conducted within a mixed-methods research paradigm that combines empirical validation and Qualitative Content Analysis (QCA). The empirical validation process consists of both a condition optimization experiment and the main experiment, while the materials for qualitative content analysis are directly derived from these experimental outputs. In the experiments, six LLMs are evaluated using four different AIGC detectors. Through the analysis of the contents generated by these LLMs, the existing theoretical framework, which is referred to as the authors’ checklist, for the application of LLMs in academic writing is revised. The updated framework refines the checklist step for assessing and amending the accuracy of AI-generated content. The updated framework contains five steps, Intellectual Contribution, Accuracy of Conceptions, Accuracy of Demonstrations, Academic Competency, and Transparency, for authors’ academic writing with the assistance of LLMs. Additionally, it emphasizes the importance of authors’ innovation and proficiency in prompting LLMs when ethically using LLMs in academic writing.</p></details>
+                <a href="https://doi.org/10.70088/50wkze06" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Hacker&#39;s Guide to LLMs: Practical Use Cases and Attack Scenarios in Bug Bounty Hunting</strong><span>Relevance score: 4</span></div>
+                <p class="reference-note">Paper ID: 69635050854cd4f3fb02</p>
+                
+                
+                <p class="reference-note">Fazel Mohammad Ali Pour, Mersad Baradaran, Saeid Ghasemshirazi · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This work explores the innovative use of Large Language Models (LLMs) in cybersecurity, focusing on bug bounty hunting, vulnerability discovery, and advanced attack scenarios. It delves into how LLMs can identify security flaws, automate exploit development, and simulate adversarial attacks with unprecedented efficiency. The study examines prompt manipulation, adversarial input crafting, security bypass techniques, and the risks associated with LLM-driven cybersecurity threats. By providing real-world applications and mitigation strategies, this research equips security professionals with actionable insights to harness LLMs effectively while addressing their challenges in modern cybersecurity.</p></details>
+                <a href="https://doi.org/10.2139/ssrn.5168044" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Deaf students who use American Sign Language and their academic and social
+                    experiences in mainstream college settings</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: ae075a985b9bf13ddaf7</p>
+                
+                
+                <p class="reference-note">John S. Pirone · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.17760/d20209093" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>LLMs, Agents, and Workflow Orchestration</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 885e8d411201ff67b2ae</p>
+                
+                
+                <p class="reference-note">Jamuna S Murthy, G M Siddesh · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003600954-7" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Excessive use of LLMs by postgraduate medical students: An academic disaster!</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: eb43740da1e907b4d33e</p>
+                
+                
+                <p class="reference-note">Prerana  Kumari · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.66765/amme.2026.011" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Identifying Optimal Use Cases for ChatGPT</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 323cf378bd113b2389f8</p>
+                
+                
+                <p class="reference-note">Author not supplied · 2022 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.5040/bci-0kgf.ch-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Evidence-based use of AI in clinical and academic settings - Case Study</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: ab33525715bd0fccd238</p>
+                
+                
+                <p class="reference-note">Anjum Ahmed · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.26226/m.6657251f918878861e1bd868" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: 9995c3bdc7ac49ef8a0322e5f1552ce3 · Report ID: 49</p>
+        <p>Started: 2026-09-12 20:30:53 · Updated: 2026-09-12 20:31:37 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>2</dd><dt>Raw papers retrieved</dt><dd>30</dd><dt>Valid papers retained</dt><dd>27</dd><dt>Relevant papers retained</dt><dd>14</dd><dt>Duplicates removed</dt><dd>0</dd><dt>Noisy records removed</dt><dd>3</dd><dt>Irrelevant records removed</dt><dd>13</dd><dt>Evidence limit removed</dt><dd>4</dd><dt>Provider failures</dt><dd>1</dd><dt>Final evidence count</dt><dd>10</dd><dt>Elapsed seconds</dt><dd>44.363</dd><dt>Sources cited</dt><dd>9</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The retrieved evidence comprehensively addresses the main applications of large language models (LLMs) in education, including instructional content generation, teaching support, grading, tutoring, and assessment. Studies cover diverse educational contexts (e.g., dental education, IIoT training, multilingual settings) and highlight both opportunities and challenges. However, some papers focus on niche domains or risks rather than direct applications, and there is limited exploration of K-12 or specific subject-area implementations.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-12 20:30:53</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-12 20:30:57</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-12 20:30:57</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-12 20:31:11</td><td>Retrieval</td><td>provider failed</td><td>Semantic Scholar was unavailable. Continuing with available sources.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:11</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:11</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-12 20:31:11</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:11</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-12 20:31:16</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:16</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-12 20:31:16</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:25</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:25</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:31</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:31</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:37</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 20:31:37</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 49</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

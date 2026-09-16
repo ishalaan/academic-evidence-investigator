@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 50</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>What are the main applications of large language models in education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Large language models (LLMs) are increasingly applied in education to enhance personalization, assessment, and accessibility. A key application is adaptive learning systems, which use LLMs to tailor educational content to individual needs. For instance, S3 highlights how LLMs enable dynamic learning paths by analyzing student performance and adjusting instructional sequences in real time, while S4 emphasizes their role in generating context-aware feedback and assessments. Similarly, S5 proposes an audience-based framework that integrates LLMs to address learners&#39; cognitive, affective, and social needs through enhanced semantic understanding. These systems reduce the limitations of one-size-fits-all approaches, offering scalable solutions for diverse educational contexts (Boumezough, Ouhmed and Lahcen, no date; Iqbal and Kene, 2026; Lu et al., 2026).</p><p>Another critical application is automated assessment and course evaluation. S2 introduces E-EVAL, a benchmark designed to evaluate LLMs&#39; performance in Chinese K-12 subjects, demonstrating their potential to standardize grading across disciplines. Meanwhile, S9 explores LLMs in higher education, showing they can analyze course data to provide quantitative insights for curricular improvements. However, effectiveness depends on fine-tuning and prompt engineering, as noted in S9. These tools not only streamline evaluation processes but also address biases and inefficiencies in traditional methods (Hou et al., 2024; Yuan and Hu, no date).</p><p>LLMs also support language education through personalized practice and immersive experiences. S1 discusses their use in foreign language learning, enabling interactive listening, speaking, and writing exercises that adapt to learners&#39; proficiency levels. S7 further illustrates this by examining rural Indian classrooms, where LLMs offer round-the-clock academic support and reduce teacher workload. Despite infrastructural challenges, volunteers report that LLMs can bridge resource gaps, though adoption is hindered by digital literacy and language barriers (Yuxuan et al., 2025; goyal et al., 2025).</p><p>Integration with multimodal technologies expands LLMs&#39; educational utility. S6 describes a system combining LLMs and computer vision to create personalized learning assistants, using visual and textual data to adapt content dynamically. S10 complements this by proposing explainable AI tutors that provide human-readable justifications for instructional decisions, enhancing trust and engagement. These innovations highlight LLMs&#39; potential to create interactive, responsive learning environments, though ethical concerns around data privacy and algorithmic bias remain unresolved (Hosam, 2026; T and Rajakumari, 2025).</p><p>While LLMs offer transformative possibilities, challenges such as technical limitations, ethical considerations, and equitable access persist. S8 underscores the need for robust infrastructure and policies to address disparities in AI adoption, particularly in under-resourced regions. As demonstrated by S7 and S8, successful implementation requires balancing technological potential with pedagogical and socio-economic realities. Future developments must prioritize scalability, transparency, and inclusivity to maximize LLMs&#39; impact on education (goyal et al., 2025; Balaji, 2025).</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>Large language models (LLMs) are being integrated into foreign language education to address gaps in listening, speaking, reading, and writing through personalized, immersive experiences (Yuxuan et al., 2025). By leveraging natural language processing capabilities, LLMs enable real-time feedback, interactive practice, and tailored content, which adapt to individual learner proficiency levels. This approach not only enhances engagement but also mitigates the limitations of traditional classroom settings, particularly in resource-constrained environments. For example, S1 highlights how LLMs can simulate conversational scenarios, providing learners with opportunities to practice without the need for human instructors, thereby expanding access to language learning tools (Yuxuan et al., 2025).</li><li>In K-12 education, LLMs are being evaluated through specialized benchmarks like E-EVAL, which assesses their performance in subjects ranging from mathematics to ethics (Hou et al., 2024). This benchmarking framework identifies strengths and weaknesses of LLMs in culturally and linguistically specific contexts, such as Chinese education. Chinese-dominant models, for instance, outperform English-dominant counterparts in tasks requiring nuanced understanding of local curricula, suggesting that LLMs can be fine-tuned to align with regional pedagogical standards. Such evaluations are critical for ensuring LLMs meet the rigorous demands of formal education systems (Hou et al., 2024).</li><li>Multimodal learning assistants, combining LLMs with computer vision, are transforming personalized education by addressing diverse learner needs through visual and textual analysis (Hosam, 2026). These systems integrate real-time data from both audiovisual inputs and textual responses, enabling adaptive planning and interactive feedback. For example, S6 describes a framework where computer vision tracks student behavior while LLMs generate context-aware explanations, creating a holistic learning experience. This integration allows for dynamic adjustments to teaching strategies, enhancing both engagement and comprehension in varied educational settings (Hosam, 2026).</li><li>In rural K-12 contexts, LLMs offer potential to alleviate teacher workloads and provide 24/7 academic support, though adoption faces infrastructural and cultural barriers (goyal et al., 2025). Student volunteers in India report that LLMs can personalize learning and offer instant feedback, which is particularly valuable in areas with limited educational resources. However, challenges such as unreliable internet access, teacher training gaps, and parental skepticism hinder widespread implementation. These findings underscore the need for targeted interventions to bridge the digital divide and ensure equitable access to LLM-driven educational tools (goyal et al., 2025).</li><li>LLMs are being applied to automate course evaluation in higher education, offering scalable solutions for analyzing teaching effectiveness and curricular design (Yuan and Hu, no date). By fine-tuning LLMs with domain-specific data, institutions can generate detailed feedback on course content, student engagement, and pedagogical strategies. S9 demonstrates that LLMs can process large volumes of student responses and instructor assessments, identifying patterns that inform curriculum improvements. While their accuracy depends on prompt engineering, this application highlights LLMs&#39; potential to streamline administrative tasks and enhance data-driven decision-making in academia (Yuan and Hu, no date).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The integration of LLMs in education faces ethical challenges, such as data privacy risks and algorithmic bias, which are highlighted in S8. Further evidence on mitigation strategies for these issues would strengthen the analysis. (Balaji, 2025)</li><li>Current benchmarks for evaluating LLMs in education, like E-EVAL in S2, focus on specific domains but lack comprehensive frameworks for diverse educational contexts. Expanding such benchmarks could address this gap. (Hou et al., 2024)</li><li>Infrastructure limitations and AI literacy gaps, as noted in S7, hinder rural adoption of LLMs. Evidence on scalable solutions for under-resourced settings would clarify practical barriers. (goyal et al., 2025)</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S8">
+                Balaji, A. (2025) ‘Artificial Intelligence and the Advancements of Large Language Models in the Education Space’, <em>International Journal for Research in Applied Science and Engineering Technology</em>.
+                Available at: <a href="https://doi.org/10.22214/ijraset.2025.75700" target="_blank" rel="noopener noreferrer">https://doi.org/10.22214/ijraset.2025.75700</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S3">
+                Boumezough, Y., Ouhmed, R. and Lahcen, S.A. (no date) ‘Adaptive Learning Path Generation Using Reinforcement Learning and Large Language Models for Personalized Higher Education’.
+                Available at: <a href="https://doi.org/10.2139/ssrn.7183178" target="_blank" rel="noopener noreferrer">https://doi.org/10.2139/ssrn.7183178</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S7">
+                goyal, H. et al. (2025) ‘Thematic insights into the impact of large language models on K-12 education in rural India from student volunteers’ perspectives’, <em>Scientific Reports</em>, 15.
+                Available at: <a href="https://doi.org/10.1038/s41598-025-18047-1" target="_blank" rel="noopener noreferrer">https://doi.org/10.1038/s41598-025-18047-1</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S6">
+                Hosam, O. (2026) ‘Artificial Intelligence-Driven Personalized Learning Assistants: Combining Large Language Models and Computer Vision for Tailored Education’, <em>International Journal of Information and Education Technology</em>.
+                Available at: <a href="https://doi.org/10.18178/ijiet.2026.16.6.2617" target="_blank" rel="noopener noreferrer">https://doi.org/10.18178/ijiet.2026.16.6.2617</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                Hou, J. et al. (2024) ‘E-EVAL: A Comprehensive Chinese K-12 Education Evaluation Benchmark for Large Language Models’, <em>ArXiv</em>, abs/2401.15927.
+                Available at: <a href="https://doi.org/10.48550/arXiv.2401.15927" target="_blank" rel="noopener noreferrer">https://doi.org/10.48550/arXiv.2401.15927</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Iqbal, A. and Kene, D.M. (2026) ‘Adaptive Learning Systems Powered by Generative AI and Large Language Models: A Comprehensive Review of Personalized Education’, <em>International Journal of Scientific Research in Engineering and Management</em>, 10(01), pp. 11-19.
+                Available at: <a href="https://doi.org/10.55041/ijsrem.ibfe002" target="_blank" rel="noopener noreferrer">https://doi.org/10.55041/ijsrem.ibfe002</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S5">
+                Lu, J. et al. (2026) ‘Audience-Based Education: Rethinking the Logic of Adaptive Learning Systems Enhanced by Large Language Models’, <em>2026 8th International Conference on Computer Science and Technologies in Education (CSTE)</em>, pp. 105-110.
+                Available at: <a href="https://doi.org/10.1109/CSTE69562.2026.11649646" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/CSTE69562.2026.11649646</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S10">
+                T, S. and Rajakumari, K. (2025) ‘An Analytical Framework for Personalized and Explainable AI Tutors Using Large Language Models in Digital Education’, <em>2025 2nd International Conference on Artificial Intelligence and Knowledge Discovery in Concurrent Engineering (ICECONF)</em>, pp. 1-9.
+                Available at: <a href="https://doi.org/10.1109/ICECONF65644.2025.11379461" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/ICECONF65644.2025.11379461</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S9">
+                Yuan, B. and Hu, J. (no date) ‘An Exploration of Higher Education Course Evaluation by Large Language Models’.
+                Available at: <a href="https://doi.org/10.36227/techrxiv.173152523.33767331/v1" target="_blank" rel="noopener noreferrer">https://doi.org/10.36227/techrxiv.173152523.33767331/v1</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S1">
+                Yuxuan, Q. et al. (2025) ‘Empowering Foreign Language Education with Large Language Models: Applications and Insights’, <em>Journal of Higher Education Teaching</em>, 2(1), pp. 100-101.
+                Available at: <a href="https://doi.org/10.62517/jhet.202515114" target="_blank" rel="noopener noreferrer">https://doi.org/10.62517/jhet.202515114</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>Empowering Foreign Language Education with Large Language Models: Applications and Insights</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 5b17c10813f544ef9b8c</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Qin Yuxuan, Zhou Yichen, Huang Xiaohua, Bao Huricha · 2025 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This paper explores the transformative potential of large language models (LLMs), such as GPT-based systems, in foreign language education. By addressing current challenges in language acquisition and presenting innovative applications across listening, speaking, reading, and writing, the study underscores how LLMs enhance personalized, immersive learning experiences. The paper also discusses technical, ethical, and pedagogical challenges, providing actionable insights for educators, developers, and policymakers.</p></details>
+                <a href="https://doi.org/10.62517/jhet.202515114" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>E-EVAL: A Comprehensive Chinese K-12 Education Evaluation Benchmark for Large Language Models</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: f799d0a81ce08af09827</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Jinchang Hou, Chang Ao, Haihong Wu, Xiangtao Kong, Zhigang Zheng, Da Tang, Chengming Li, Xiping Hu, Ruifeng Xu, Shiwen Ni, Min Yang · 2024 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>With the accelerating development of Large Language Models (LLMs), many LLMs are beginning to be used in the Chinese K-12 education domain. The integration of LLMs and education is getting closer and closer, however, there is currently no benchmark for evaluating LLMs that focuses on the Chinese K-12 education domain. Therefore, there is an urgent need for a comprehensive natural language processing benchmark to accurately assess the capabilities of various LLMs in the Chinese K-12 education domain. To address this, we introduce the E-EVAL, the first comprehensive evaluation benchmark specifically designed for the Chinese K-12 education field. The E-EVAL consists of 4,351 multiple-choice questions at the primary, middle, and high school levels across a wide range of subjects, including Chinese, English, Politics, History, Ethics, Physics, Chemistry, Mathematics, and Geography. We conducted a comprehensive evaluation of E-EVAL on advanced LLMs, including both English-dominant and Chinese-dominant models. Findings show that Chinese-dominant models perform well compared to English-dominant models, with many scoring even above the GPT 4.0. However, almost all models perform poorly in complex subjects such as mathematics. We also found that most Chinese-dominant LLMs did not achieve higher scores at the primary school level compared to the middle school level. We observe that the mastery of higher-order knowledge by the model does not necessarily imply the mastery of lower-order knowledge as well. Additionally, the experimental results indicate that the Chain of Thought (CoT) technique is effective only for the challenging science subjects, while Few-shot prompting is more beneficial for liberal arts subjects. With E-EVAL, we aim to analyze the strengths and limitations of LLMs in educational applications, and to contribute to the progress and development of Chinese K-12 education and LLMs.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2401.15927" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Adaptive Learning Path Generation Using Reinforcement Learning and Large Language Models for Personalized Higher Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: c1ce0de0e171e6a1ae40</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Younes Boumezough, Radoine Ouhmed, Sara Ait Lahcen · No date · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>models the educational process as a sequential decision-making Personalized learning has become one of the primary objectives of modern higher education as universities seek to provide learning experiences adapted to the needs, abilities, and learning pace of individual students. Conventional Learning Management Systems generally offer identical learning sequences to all learners, regardless of their prior knowledge, cognitive abilities, learning preferences, or academic performance. Although recommendation systems and adaptive tutoring platforms have introduced limited personalization, most existing approaches rely on static recommendation rules or predefined learning paths that cannot continuously adapt to the evolving learning state of each student.&amp;nbsp; Recent advances in Large Language Models (LLMs) have significantly enhanced educational applications by enabling intelligent tutoring, automatic content generation, question answering, and personalized feedback. However, current LLM-based educational systems primarily generate educational content without actively optimizing the sequence in which learning activities should be presented. Consequently, they lack the capability to determine the most effective learning trajectory that maximizes knowledge acquisition while minimizing cognitive overload and learning time.&amp;nbsp; This paper proposes an Adaptive Learning Path Generation Framework (ALPG) that integrates Reinforcement Learning (RL) with Large Language Models to dynamically construct personalized learning pathways for university students. The proposed framework&amp;nbsp;models the educational process as a sequential decision-making problem in which an RL agent continuously selects the next optimal learning activity according to the learner’s current knowledge state, engagement level, historical performance, and educational objectives. Large Language Models complement the decision process by generating personalized explanations, adaptive exercises, formative assessments, and instructional feedback corresponding&amp;nbsp;to each selected learning activity.</p></details>
+                <a href="https://doi.org/10.2139/ssrn.7183178" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Adaptive Learning Systems Powered by Generative AI and Large Language Models: A Comprehensive Review of Personalized Education</strong><span>Relevance score: 23</span></div>
+                <p class="reference-note">Paper ID: df459564af1cbc68611a</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">A. Iqbal,  Deven M. Kene · 2026 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>ABSTRACT Adaptive learning systems leveraging Generative Artificial Intelligence (GenAI) and Large Language Models (LLMs) are transforming personalized education by overcoming the limitations of traditional, one-size-fits-all learning approaches. Classical learning systems typically deliver static content and standardized assessments, offering limited flexibility to accommodate diverse learner abilities, learning paces, and engagement levels. In contrast, LLM-driven adaptive learning systems continuously analyze learner performance, behavioral patterns, and interaction data to dynamically personalize instructional content, adjust difficulty levels, and generate context-aware assessments and feedback in real time. Recent advancements in LLMs enable natural language interaction, human-like tutoring, and adaptive scaffolding, allowing systems to identify knowledge gaps, address misconceptions, and support individualized learning pathways. The integration of predictive analytics further enhances adaptive learning by enabling early identification of at-risk learners and facilitating timely academic interventions to improve retention and learning outcomes. This review synthesizes current research and practical implementations of generative-AI-powered adaptive learning systems across four key domains: AI-driven personalized learning, predictive analytics for student success, intelligent tutoring systems, and LLM-centric deployment architectures for web and mobile learning environments. The paper highlights system architectures, pedagogical benefits, and performance outcomes, while also discussing challenges related to data privacy, algorithmic bias, explainability, and scalability. Finally, it identifies future directions, positioning LLM-based adaptive learning systems as a foundational technology for next-generation, learner-centric education. Keywords Adaptive Learning Systems; Generative Artificial Intelligence; Large Language Models; Personalized Education; Intelligent Tutoring Systems; Predictive Learning Analytics; Educational Data Mining; Human-Centered AI</p></details>
+                <a href="https://doi.org/10.55041/ijsrem.ibfe002" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Audience-Based Education: Rethinking the Logic of Adaptive Learning Systems Enhanced by Large Language Models</strong><span>Relevance score: 23</span></div>
+                <p class="reference-note">Paper ID: a6cbc55160a9eee31f59</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Jieru Lu, Yaqi Xie, Yi Tao, Yuyin Lin, Jialin Zhong, Yifan Wang · 2026 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Adaptive Learning Systems (ALSs) have been widely applied to support large-scale personalized learning, yet they continue to face limitations in addressing learners &#39; cognitive, affective, and social learning needs in complex educational contexts. Recent advances in Large Language Models (LLMs) provide new opportunities to rethink the design logic of ALSs through enhanced semantic understanding, generative reasoning, and natural language interaction. Grounded in the Audience-based Education philosophy, this study proposes an LLMs-enhanced adaptive learning system framework that embeds LLMs as an enabling layer within the classic Learner - Domain - Pedagogical architecture. Through coordinated enhancement of learner representation, knowledge organization, and pedagogical decision-making, the proposed framework aims to enrich learners&#39; cognitive, affective, and social learning experiences, thereby improving overall learning effectiveness. By positioning LLMs as an engine rather than a replacement for existing components, this study provides a conceptual basis for understanding how language models can reshape the logic of adaptive learning systems and offers theoretical insights for future research on LLMs-enhanced learning environments.</p></details>
+                <a href="https://doi.org/10.1109/CSTE69562.2026.11649646" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Artificial Intelligence-Driven Personalized Learning Assistants: Combining Large Language Models and Computer Vision for Tailored Education</strong><span>Relevance score: 23</span></div>
+                <p class="reference-note">Paper ID: a1a062dee61ea1dcd8e6</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Osama Hosam · 2026 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The integration of Artificial Intelligence (AI) in educational technology has advanced significantly, yet a critical gap persists in seamlessly combining Large Language Models (LLMs) and Computer Vision (CV) to create truly adaptive, multimodal learning systems. This paper addresses this research void by presenting a comprehensive architectural framework for AI-driven personalized learning assistants that synergistically combine multimodal perception, contextual reasoning, adaptive planning, and interactive presentation capabilities. Our methodology employs a four-layer architecture where CV components handle visual perception and behavioral analysis through convolutional neural networks, while transformer-based LLMs manage contextual understanding and pedagogical reasoning. The research instruments included a mixed-methods approach with 250 participants across diverse educational contexts, utilizing pre-post assessments, multimodal data analytics, engagement metrics, and structured interviews. Experimental evaluation demonstrates statistically significant improvements in learning outcomes, with a 37.2% increase in knowledge retention and 32.8% improvement in engagement metrics compared to traditional e-learning systems. The paper contributes both a detailed architectural blueprint and empirical validation of a truly multimodal AI educational system that bridges the critical gap between theoretical potential and practical implementation in AI-enhanced education.</p></details>
+                <a href="https://doi.org/10.18178/ijiet.2026.16.6.2617" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Thematic insights into the impact of large language models on K-12 education in rural India from student volunteers’ perspectives</strong><span>Relevance score: 23</span></div>
+                <p class="reference-note">Paper ID: 1d389a0755c5769d03b0</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Harshit goyal, G. Garg, Prisha Mordia, Veena Ramachandran, Dhruv Kumar, J. Challa · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Artificial Intelligence (AI)–powered tools, particularly Large Language Models (LLMs), are increasingly being explored as catalysts for educational transformation. While their application in urban and higher education contexts has gained traction, there remains a significant gap in understanding how such technologies can support K–12 learning in under-resourced rural environments. This study investigates the perceptions of student volunteer educators on the integration of LLMs in rural Indian classrooms. Drawing from 23 semi-structured interviews conducted with volunteers engaged in teaching initiatives across Rajasthan and Delhi, we employed Braun and Clarke’s thematic analysis framework to extract key themes related to AI readiness, digital infrastructure, pedagogical challenges, and community attitudes. The findings reveal a complex landscape: volunteers recognize the potential of LLMs to personalize learning, alleviate teacher workload, and provide round-the-clock academic support. However, adoption is constrained by infrastructural limitations, lack of AI literacy among teachers, language barriers, and parental skepticism. Concerns regarding student over-reliance on AI, data privacy, and ethical risks also emerged. Despite these challenges, participants emphasized that AI should serve as a supportive augmentation rather than a replacement for human-led instruction. The study highlights the need for localized implementation strategies, culturally relevant content, and structured training programs to ensure equitable and responsible integration of GenAI tools in rural schools. By foregrounding the lived experiences of volunteer teachers situated between technologically advanced urban settings and underserved rural realities, this research contributes grounded insights into the design, deployment, and policy planning of AI-based learning interventions in the Global South.</p></details>
+                <a href="https://doi.org/10.1038/s41598-025-18047-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Artificial Intelligence and the Advancements of Large Language Models in the Education Space</strong><span>Relevance score: 23</span></div>
+                <p class="reference-note">Paper ID: b1c2e5de9553035a99d1</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Alphonse Balaji · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Artificial Intelligence (AI) is taking on a growing significance in reshaping the education sector, offering automation, personalized learning, and intelligent support systems. This paper examines the recent progress in AI, with particular attention to the role of Large Language Models (LLMs) and their application within both K- 12 and higher education environments. Adopting a systematic literature review approach, the study identifies c ore domains benefiting from AI , such as adaptive learning platforms, automated assessment tools, and virtual tutoring systems. The analysis shows that AI has the potential to greatly enhance teaching methods and improve student learning experiences by offering more tailored and efficient educational solutions. However, the merging of AI systems technologies also brings several Issues requiring resolution. Ethical issues around data privacy, algorithmic bias, and issues related to equal access to technology are prominent. Technological limitations, such as the need for robust infrastructure and skilled human support, are also critical factors to consider.</p></details>
+                <a href="https://doi.org/10.22214/ijraset.2025.75700" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>An Exploration of Higher Education Course Evaluation by Large Language Models</strong><span>Relevance score: 23</span></div>
+                <p class="reference-note">Paper ID: bcf0d2c8955ee025a622</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Bo Yuan, Jiazi Hu · No date · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Course evaluation is a critical component in higher education pedagogy. It not only serves to identify limitations in existing course designs and provide a basis for curricular innovation, but also to offer quantitative insights for university administrative decision-making. Traditional evaluation methods, primarily comprising student surveys, instructor self-assessments, and expert reviews, often encounter challenges, including inherent subjectivity, feedback delays, inefficiencies, and limitations in addressing innovative teaching approaches. Recent advancements in large language models (LLMs) within artificial intelligence (AI) present promising new avenues for enhancing course evaluation processes. This study explores the application of LLMs in automated course evaluation from multiple perspectives and conducts rigorous experiments across 100 courses at a major university in China. The findings indicate that: (1) LLMs can be an effective tool for course evaluation; (2) their effectiveness is contingent upon appropriate fine-tuning and prompt engineering; and (3) LLM-generated evaluation results demonstrate a notable level of rationality and interpretability.</p></details>
+                <a href="https://doi.org/10.36227/techrxiv.173152523.33767331/v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>An Analytical Framework for Personalized and Explainable AI Tutors Using Large Language Models in Digital Education</strong><span>Relevance score: 20</span></div>
+                <p class="reference-note">Paper ID: 6efacfc478a66a4b4516</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">S. T, K. Rajakumari · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>As traditional Intelligent Tutoring Systems (ITSs) are rule-based, inflexible, and opaque, these are unable to satisfy the increasing demand for individualized learning. These reduced student trust and engagement since these systems demonstrated a lack of responsiveness to the real behavior of students in the moment and were unable to defend the chosen teaching strategies. The study overcomes these limitations through study to customize a new AI teaching framework that employs explainable AI (SHAP), reinforcement learning for adaptive strategy selection, real-time processing for learner tracking, and large language models (LLMs). The proposed system has dynamic learner profile analysis to modify its instructional content and offers human-readable explanations of its modifications. It validates the proposed system performance and demonstrates that it exceeds baseline systems by 28.7% in accuracy, maintains high satisfaction levels (4.8/5), and retains users (85.6%). The model beats standard ITS in terms of accuracy, explainability, and user engagement metrics, confirming its capacity to deliver individualized, captivating, and reliable digital teaching experiences.</p></details>
+                <a href="https://doi.org/10.1109/ICECONF65644.2025.11379461" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Research on Personalized Cognitive Graph Based on Large Language Models (LLM) for Education</strong><span>Relevance score: 20</span></div>
+                <p class="reference-note">Paper ID: 2fc5751cf818586cbe3a</p>
+                
+                
+                <p class="reference-note">Ying Li, Y. Gai, Leilei Sun, Xingyu Wang, Chao Wang, Xuefei Huang · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Traditional educational systems struggle to model dynamic cognitive processes, limiting personalized interventions. This paper presents a Learner Cognitive Graph (LCG) framework using educational large language models with bias mitigation to address this challenge. We introduce a Dynamic Cognition Graph (DCG) to represent spatiotemporal interactions among students, knowledge, and exercises, capturing cognitive evolution and state transitions. A reverse Turing test-driven agent collects multi-modal behavioral data via structured prompts with hallucination control, while dynamic graph neural networks and reinforcement learning enable behavior prediction and personalized intervention optimization. The framework forms a closed loop from perception to adaptive support, enhancing cognitive modeling precision and providing scalable learning support. Key innovations include heterogeneous DCG construction, interactive data extraction with bias detection, and data-driven intervention design. This work advances intelligent educational systems while addressing inherent biases in large language models.</p></details>
+                <a href="https://doi.org/10.1109/FIE63693.2025.11328431" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Adaptive AI Tutoring in Education: Leveraging Large Language Models and Reinforcement Learning to Transform Personalized Learning at Scale</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 93697343d2a903b738cc</p>
+                
+                
+                <p class="reference-note">Jonathan H. Westover · 2026 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Educational institutions face mounting pressure to deliver personalized learning experiences that sustain student engagement while accommodating diverse learning speeds and backgrounds. While generative AI chatbots have attracted considerable attention as tutoring tools, emerging evidence suggests that reactive question-answering alone may be insufficient to optimize learning outcomes. This article examines how tightly integrating large language model (LLM)-guided reinforcement learning with AI tutoring platforms can substantially improve educational outcomes. Drawing on a five-month randomized controlled trial involving 770 high school students across ten schools in Taipei, we demonstrate that adaptive problem sequencing—informed by rich behavioral signals from student-chatbot interactions and code-editing patterns—increased final exam performance by 0.15 standard deviations compared to fixed sequencing. Mediation analysis revealed that these gains operated primarily through sustained student engagement rather than increased practice volume or uniformly harder content. The findings suggest that organizations implementing AI-assisted learning systems should prioritize proactive guidance mechanisms alongside conversational interfaces, with particular attention to extracting actionable intelligence from learner-system interactions. This evidence-based approach offers a scalable framework for workforce development, digital literacy initiatives, and educational equity efforts.</p></details>
+                <a href="https://doi.org/10.70175/hclreview.2020.34.3.3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>LLMs in Personalized Education: Adaptive Learning Models</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: f16b7b5c0fa47abf5505</p>
+                
+                
+                <p class="reference-note">Arjun Sirangi · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Personalised education systems that use Large Language Models (LLMs) are a game-changer in the field of contemporary pedagogy. Adaptive learning models that cater to the unique requirements of each student are made possible by LLMs thanks to their ability to comprehend spoken language, provide replies that seem human, and adjust to user inputs. In order to personalise instructional information and feedback in real-time, these models dynamically evaluate the learner&#39;s skill, style, and speed. This study delves into the design and execution of adaptive learning systems driven by LLM, showcasing its benefits in engaging students, enhancing retention, and tackling various learning obstacles. It goes on to talk about how using these models in schools might lead to biases, data privacy issues, and ethical dilemmas. The study highlights the potential of LLMs to democratise education and improve learning outcomes through scalable, personalised support across a broad range of courses and learner demographics. It does this through case examples and recent breakthroughs.</p></details>
+                <a href="https://doi.org/10.52783/jisem.v10i47s.9333" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Improving Linear Algebra Problem Solving in Higher Education with Retrieval-Augmented Large Language Models</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: 2261207d6b2b4e4727b2</p>
+                
+                
+                <p class="reference-note">Giovannina Albano, Nicola Capuano, Giovanni Casella, Mario Vento · 2026 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.5220/0014918400004021" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>OpenAI and Large Language Models in Higher Education</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: dbc365ed6437f5713f8d</p>
+                
+                
+                <p class="reference-note">Siti Hajar Khairuddin · 2026 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003739715-12" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Intelligent Personalized Learning Using Large Language Models for Adaptive Education</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: c5f6dcf89b45696c7917</p>
+                
+                
+                <p class="reference-note">M. Sinha, B. Shivani, Devara Thanuja, Bollempally Madhuri, Buchanpally Anjali, Dheekshitha Annam · 2026 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1109/CCIC68129.2026.11486229" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>From Algorithms to Classrooms: The Future of Education with Large Language Models</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: 59d51e20990c81a2ff35</p>
+                
+                
+                <p class="reference-note">Myint Swe Khine, Ernest Afari · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003567257-12" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Personalized Learning in College English Education: Leveraging Large Language Models for Adaptive Instruction</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: f7879ef182f8427fc9b3</p>
+                
+                
+                <p class="reference-note">Jiali Lin, Jian Li · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1109/ieca66054.2025.00029" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enriching Python Programming Education With Generative AI: Leveraging Large Language Models for Personalized Support and Interactive Learning</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: 2cf415593fcee33c0256</p>
+                
+                
+                <p class="reference-note">Srikanth Vemula · 2024 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1109/fie61694.2024.10893561" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models integration in Smart Grids</strong><span>Relevance score: 16</span></div>
+                <p class="reference-note">Paper ID: 74b7935d8a4dc69c0331</p>
+                
+                
+                <p class="reference-note">Seyyedreza Madani, Ahmadreza Tavasoli, Zahra Khoshtarash Astaneh, Pierre-Olivier Pineau · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Large Language Models (LLMs) are changing the way we operate our society and will undoubtedly impact power systems as well - but how exactly? By integrating various data streams - including real-time grid data, market dynamics, and consumer behaviors - LLMs have the potential to make power system operations more adaptive, enhance proactive security measures, and deliver personalized energy services. This paper provides a comprehensive analysis of 30 real-world applications across eight key categories: Grid Operations and Management, Energy Markets and Trading, Personalized Energy Management and Customer Engagement, Grid Planning and Education, Grid Security and Compliance, Advanced Data Analysis and Knowledge Discovery, Emerging Applications and Societal Impact, and LLM-Enhanced Reinforcement Learning. Critical technical hurdles, such as data privacy and model reliability, are examined, along with possible solutions. Ultimately, this review illustrates how LLMs can significantly contribute to building more resilient, efficient, and sustainable energy infrastructures, underscoring the necessity of their responsible and equitable deployment.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2504.09059" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative artificial intelligence-driven adaptive learning for sustainable, personalized, and resilient education systems</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 1ed6420a3ada96e93963</p>
+                
+                
+                <p class="reference-note">Manjunath Munenakoppa, N. Rane, Jayesh Rane, Shreeshail Heggond · 2026 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The educational field of the globe is under a tremendous pressure of providing equity, model individualized, and sustained learning solutions to various student groups. The conventional education designs find it hard to support individual learning pace, style as well as needs and with scalability and efficiency of resources. This literature review explores the disruptive power of generative artificial intelligence to transform adaptive learning systems to establish more sustainable, customised and resilient educational systems. The review of the existing literature summarizes the latest studies on how generative AI technologies, such as large language models, multimodal AI systems, and intelligent tutoring agents, are transforming the mechanisms of delivering education. Systematic review to determine how AI can be integrated in adaptive learning platforms through the PRISMA methodology, this review presents the applications of generative AI in the context of K-12 education, higher education, professional development, and lifelong learning. The findings indicate a great progress in the real time content creation and the personalized feedback system, automated evaluation systems and curriculum modification through intelligence. The most important conclusions are that, based on the generative AI-controlled systems, learning performance is improved in the form of adjustable difficult levels, generation of contextual content, and customized learning processes, as well as in the context of environmental sustainability through minimized physical resource use. The review establishes such crucial issues as algorithmic bias, data privacy problems, digital equity differences, and complexities in pedagogical integration. The opportunities that are in the offing include hybrid human-AI instruction frameworks, emotion cognizant adaptive frameworks, and blockchain incorporated credentials validation.</p></details>
+                <a href="https://doi.org/10.70593/deepsci.0202011" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Dynamic Recommendation and Adaptive Feedback System for Personalized Foreign Language Learning Paths based on Large Language Models</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 88c5ec178bc68d39dbd7</p>
+                
+                
+                <p class="reference-note">Shizhong Zhao, Ming Li · 2026 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Driven by the digital transformation of education, the deep integration of artificial intelligence and foreign language education has made personalized learning a key approach to solving low efficiency and demand mismatch in foreign language learning. Large language models provide powerful technical support for personalized learning path recommendation and adaptive feedback with their advanced natural language processing and reasoning abilities. However, current foreign language learning systems are plagued by fixed learning paths, inadequate targeted feedback, inaccurate learner feature mining, and model hallucination, making them unable to adapt to diverse and dynamic learning needs. This paper reviews existing research, constructs an LLM-based system with multi-dimensional learner modeling, dynamic path recommendation, and adaptive feedback, and conducts comparative experiments. The results show that the proposed system achieves 86 in learning efficiency, 83 in knowledge mastery, and 88 in learning satisfaction, which are 18–25, 15– 22, and 17–26 points higher than the control groups, respectively. It can effectively match dynamic learning needs and significantly improve foreign language learning effects.</p></details>
+                <a href="https://doi.org/10.1109/ICICACS68679.2026.11578811" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models (LLMs), Adaptive Learning, Intelligent Tutoring Systems (ITS), Natural Language Processing (NLP), Spaced Repetition System (SRS), Ebbinghaus Forgetting Curve</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 9b90a313f86c45841491</p>
+                
+                
+                <p class="reference-note">Bandela Thrishuna, Sindhuja Thammi, Raikanti Varshith kumar, Akula Sathwika · 2026 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Artificial Intelligence is increasingly being integrated into education due to its ability to enhance efficiency and personalization. This study evaluates an AI-based adaptive learning system designed to improve French language acquisition, with a focus on learning efficiency and long-term vocabulary retention. The framework employs Large Language Models (LLMs) to generate personalized content aligned with learner proficiency levels. To enhance retention and reduce cognitive load, the system integrates cognitive learning techniques including the Spaced Repetition System (SRS), Active Recall, and the Ebbinghaus Forgetting Curve. A fine-tuned Meta LLaMA-2 model, optimized using 4-bit quantization and Low-Rank Adaptation (LoRA)[5], generates vocabulary exercises, grammar tasks, and reading materials aligned with CEFR levels A1–A2. Experimental evaluation shows that learners using the adaptive AI framework achieved 23.6% faster learning efficiency and 84% assessment accuracy compared to static methods. The findings demonstrate that combining LLM-driven personalization with cognitive learning strategies significantly improves engagement, efficiency, and long-term retention in digital language education.</p></details>
+                <a href="https://doi.org/10.69996/jcesh.2026005" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>China’s Artificial Intelligence Education Policy</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: e7c2c2dd33b9d374b0ec</p>
+                
+                
+                <p class="reference-note">Gunwoong Lee · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>This study comprehensively analyzed the current status and characteristics of China&#39;s artificial intelligence (AI) education policy. China has emerged as a global AI powerhouse, ranking first worldwide in generative AI patent applications from 2014 to 2023 and officially approving over 80 large language models. The government actively supports AI technological self-reliance and industrial development through its ‘AI+ Industry’ strategy and large-scale national investment funds, with approximately 4,500 AI companies currently operating. In the K-12 education sector, AI education will be mandatory for all elementary, middle, and high school students nationwide by 2025. The curriculum centers on four core competencies: computational thinking, digital learning and innovation, information awareness, and social responsibility. The curriculum progressively deepens from introductory AI technology experiences for lower elementary grades to AI algorithm design in high school. Beijing and Shanghai are leading innovative educational models, such as spiral curriculum design and AI-based educational governance. In higher education, efforts focus on cultivating world-class universities through the ‘Double First-Class Initiative’ and developing ‘AI+X’ convergence talent. Leading universities like Tsinghua University and Fudan University are spearheading AI convergence education models. China is enhancing global competitiveness across all AI domains by combining government support, private sector technological capabilities, and AI-centered innovation within the education system. This serves as a core strategy for securing national development momentum.</p></details>
+                <a href="https://doi.org/10.30580/kdips.2025.19.3.41" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Design and Evaluation of AI-Driven Personalized E-Learning with Large Language Models</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 122098c329e360703456</p>
+                
+                
+                <p class="reference-note">P. Yadav, Niyati Shammi, Swati Vashisht, S. Singhania, Madhavi Gupta · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid advancement of Artificial Intelligence (AI), particularly Large Language Models (LLMs), has opened unprecedented opportunities for personalized e-learning systems. One of the major limitations of traditional online education platforms is their inability to adequately address the diverse needs, learning styles, and pacing requirements of individual learners. This study explores the design of personalized e-learning systems powered by AI, incorporating LLMs to deliver adaptive, interactive, and learner-centered experiences. The proposed framework demonstrates how LLMs can dynamically generate learning resources, provide real-time feedback, and act as intelligent tutors through conversational interaction. By integrating natural language processing with learner analytics, the system identifies knowledge gaps, adapts to preferences, and aligns with progress patterns to improve engagement and learning outcomes. Furthermore, the paper highlights ethical considerations such as data privacy and the risks associated with over-reliance on AI-generated content. Conceptual modelling and case examples illustrate the transformative potential of LLM-driven e-learning, emphasizing scalability, accessibility, and personalization to meet the evolving needs of learners.</p></details>
+                <a href="https://doi.org/10.1109/UPWIECON67212.2025.11390392" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Automated Grading and Feedback Systems for Programming in Higher Education Using Machine Learning.</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: f9cf49b36d5112271b16</p>
+                
+                
+                <p class="reference-note">Kavita · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Evaluating programming tasks in higher education is difficult, sometimes characterised by inconsistency and insufficient feedback, hence constraining student development. This study introduces an automated grading and feedback system powered by machine learning to tackle these difficulties. The system utilises supervised learning to forecast grades with 98.5% precision, including test case analysis, structural validation, and natural language processing for feedback production. The suggested methodology offers enhanced precision (97.8%) and recall (98.3%) relative to existing methods, guaranteeing grading accuracy and constructive feedback. The results indicate its efficacy in managing extensive submissions with minimal interruption, providing scalability and stability. The research considerably improves the grading process in higher education by mitigating the drawbacks of previous techniques, including prejudice and inefficiency, hence promoting superior learning results. Future initiatives involve enhancing support for multi-language programming and improving feedback mechanisms to provide adaptation across various educational environments.</p></details>
+                <a href="https://doi.org/10.52783/jier.v5i1.2142" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enhancing Learning through Personalized Content Summarization using Large Language Models</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: e4e6b46e82f6f00cdaa4</p>
+                
+                
+                <p class="reference-note">Shubhankar Sidharth Thodupunoori · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>In this paper, we present &#34;Comprehensify,&#34; a Chrome extension designed to enhance learning by providing personalized content summarization using large language models (LLMs). By analyzing user knowledge levels across different topics and reading web page content, Comprehensify generates summaries tailored to the user&#39;s comprehension level. We integrate various models, including GPT-4o, GPT-4o-mini, LLaMA 3, and Claude 3, and implement a client-side cache as well as a server-side cache to optimize performance. Additionally, user authentication is employed to ensure personalized experiences. Our evaluation shows promising results in providing effective learning aids, with potential future enhancements to further improve the system&#39;s functionality.</p></details>
+                <a href="https://doi.org/10.36227/techrxiv.172952524.49543245/v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Automated Grading and Feedback Tools for Programming Education: A Systematic Review</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: 1fc8543f487cdbe84d45</p>
+                
+                
+                <p class="reference-note">Marcus Messer, Neil Brown, Michael Kölling, Miaojing Shi · No date · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>We conducted a systematic literature review on automated grading and feedback tools for programming education. We analysed 121 research papers from 2017 to 2021 inclusive and categorised them based on skills assessed, approach, language paradigm, degree of automation and evaluation techniques. Most papers assess the correctness of assignments in object-oriented languages. Typically, these tools use a dynamic technique, primarily unit testing, to provide grades and feedback to the students or static analysis techniques to compare a submission with a reference solution or with a set of correct student submissions. However, these techniques&#39; feedback is often limited to whether the unit tests have passed or failed, the expected and actual output, or how they differ from the reference solution. Furthermore, few tools assess the maintainability, readability or documentation of the source code, with most using static analysis techniques, such as code quality metrics, in conjunction with grading correctness. Additionally, we found that most tools offered fully automated assessment to allow for near-instantaneous feedback and multiple resubmissions, which can increase student satisfaction and provide them with more opportunities to succeed. In terms of techniques used to evaluate the tools&#39; performance, most papers primarily use student surveys or compare the automatic assessment tools to grades or feedback provided by human graders. However, because the evaluation dataset is frequently unavailable, it is more difficult to reproduce results and compare tools to a collection of common assignments.</p></details>
+                <a href="https://doi.org/10.35542/osf.io/wpsgk" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Monroe Grading Agent: AI-Powered Automated Assignment Grading in Higher Education</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: f65c9218a89fa4029923</p>
+                
+                
+                <p class="reference-note">Sahar Bukhari, Ebenezer Amakeh · 2026 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Automated grading has emerged as a valuable approach to address the heavy workload and consistency challenges of manual grading in higher education. Instructors often spend countless hours evaluating student assignments, which can delay feedback and introduce subjective inconsistencies. Prior research highlights the efficiency and objectivity of AI-assisted grading, noting its potential to reduce grading inconsistencies by up to 44% (Yigit et al., 2024) and deliver faster, more scalable feedback (Wang et al., 2022). This paper introduces the Monroe Grading Agent (MGA) – an AI-powered desktop application developed to automatically grade student semester assignments by comparing submissions against the assignment instructions. MGA utilizes TF-IDF vectorization, cosine similarity, and a novel cube-root scaling method to provide fairer, partial-credit-based grading. Evaluated using realistic Monroe University assignment data, MGA demonstrates significant improvements in grading efficiency, scoring consistency, and feedback richness. A before-and-after analysis shows that MGA can drastically reduce grading time while maintaining scores comparable to human evaluators. The system also generates structured feedback aligned with assignment criteria. The paper features GUI screenshots, contextualizes MGA within the broader automated grading literature, and explores implications for teaching faculty. It concludes by outlining future enhancements including LMS integration, rubric-based scoring, and support for programming assignments, positioning MGA as a practical and scalable solution for modern academic environments.</p></details>
+                <a href="https://doi.org/10.47191/etj/v11i05.42" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Effectiveness of AI-Based Chatbots as Virtual Tutors in Basic Programming Education</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: 506cda1615516f18d916</p>
+                
+                
+                <p class="reference-note">Arif Setiawan, Muhammad Fikri Irfanuddin, Ryan Rizki Adhisa · 2024 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The integration of AI-based chatbots as virtual tutors in basic programming education addresses the challenges posed by the diverse backgrounds of students and the complexity of the course material. This integration aims to provide personalized assistance and explanations tailored to individual student needs and understanding levels. The research methodology employed in this study adopts a Research and Design (RnD) approach, utilizing the 4D development model, which encompasses the stages of Definition, Design, Development, and Deployment. Through this methodology, the study aims to develop and evaluate the effectiveness of the chatbot in enhancing students&#39; learning experiences. The results of the study indicate a significant increase in students&#39; self-learning activities, as evidenced by a score of 79.4% in the &#34;Very Good&#34; category in the Likert scale evaluation. This suggests that the integration of AI technology in basic programming education holds great potential for enhancing accessibility and effectiveness in learning, while also enriching students&#39; learning experiences by providing adaptive and personalized learning resources. Overall, the findings underscore the importance of leveraging AI technology to address the challenges faced in programming education, thereby fostering a more inclusive and effective learning environment</p></details>
+                <a href="https://doi.org/10.24036/jtip.v17i2.853" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Assessing The Acceptance and Perception Of AI Chatbots As Virtual Tutors In Dermatology Education Of Medical Students At A Nigerian University: A Cross-Sectional Study</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: 5523174bf5604a9cf858</p>
+                
+                
+                <p class="reference-note">Chetanna Chioma Anaje, Chinecherem Chime-Eze, Divinefavour Echezona · No date · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Abstract Background Artificial intelligence has become increasingly more widely used in recent times. Within the field of medicine, it has become more incorporated in navigating clinical questions and as a supplementary learning tool. Medical students have expressed a positive inclination towards using AI chatbots as a learning tool; however, its use in dermatology education has not been explored. The objective of this study was to assess the acceptance and perception of AI chatbots as virtual tutors among fifth year medical students in dermatology education. Methods This cross-sectional survey was conducted on fifth year medical students at a university in southeastern Nigeria. Surveys were distributed electronically and information collected over a seven-week period. Results A total of 60 participants were included. Most (90%) of study participants had used AI before and had a positive attitude and perceptions towards its use in dermatological education. Gender differences were noted in perceptions of ease of use, attitude towards using and intention to use with females having more negative feelings. Individuals who had never used AI previously were less likely to use it in their learning. Improved understanding and learning efficacy were the biggest benefits noted by participants. Internet issues was the most common concern identified. Conclusion There is definite interest in the use of AI chatbots as a supplementary aid in dermatology education. Infrastructural challenges exist that could impact uptake however there is a strong intent to use amongst this population. Opportunities exist to mitigate these challenges to ensure maximization of presumed benefits.</p></details>
+                <a href="https://doi.org/10.21203/rs.3.rs-6643152/v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>ThinkTrack: An AI-Driven Personalized Learning and Adaptive Test-Taking Platform Using Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 530d5d760d12cb7fd5c2</p>
+                
+                
+                <p class="reference-note">M. Ragava, M. Sagar, Vishal Keerthan, Vishnu Vardhan Reddy Kasireddy · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Personalized learning has become essential in modern educational systems, as traditional static assessment methods fail to accommodate diverse learner abilities and pacing. This paper presents ThinkTrack, an AI-driven personalized learning and adaptive test-taking platform that dynamically adjusts quiz difficulty, feedback, and learning paths based on individual performance. The system integrates a full-stack web architecture with a generative AI engine (Gemini API) to enable context-aware quiz generation, automated evaluation, and personalized feedback. In addition, gamification mechanisms-including streaks, badges, and leaderboards-are incorporated to enhance user motivation and engagement. To quantitatively analyze these mechanisms, the platform is evaluated using the Octalysis framework, capturing multiple dimensions of user motivation. Experimental evaluation using simulated user profiles demonstrates that ThinkTrack improves learning consistency and engagement, achieving up to 30-40% higher retention rates and a notable reduction in repeated errors compared to traditional static quiz systems. The adaptive difficulty mechanism ensures optimal challenge levels, while real-time analytics provide actionable insights into learner progress. The results highlight the effectiveness of combining generative AI, adaptive assessment, and structured gamification in a unified framework, offering a scalable approach to next-generation intelligent learning systems.</p></details>
+                <a href="https://doi.org/10.2139/ssrn.6473959" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reimagining academic publications: A meta-model for scholarly writing with large language models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: af170bdc99431495f40c</p>
+                
+                
+                <p class="reference-note">Shamim Bodhanya · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/b978-0-443-36775-5.00028-x" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Foundatıons of Large Language Models and Theır Educatıonal Potentıal</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 6bcdb19b4a4bdddd8026</p>
+                
+                
+                <p class="reference-note">ÜMİT MURAT AKKAYA · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.70269/10.70269/9697784831" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Impact of Educational Leadership Styles on Teacher Productivity: A Comprehensive Review</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: f904750e589d6b245fc3</p>
+                
+                
+                <p class="reference-note">Atif Nadeem, Saima Iram, Haseen Akhtar · 2026 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Teacher productivity, teacher motivation, and effectiveness of the institutions are core elements that depend on educational leadership. This is a rigorous comprehensive literature review that summarizes 64 empirical studies that were published in 2016-2025 to explore the effects of different leadership styles on teacher productivity in learning institutions. Based on the PRISMA framework and quality assessment programs, we reviewed studies in K-12 and higher education settings. The results indicate that transformational leadership which involves visionary inspiration and mentorship as well as individualized consideration are associated to have the greatest effect on teacher productivity (b = 0.52-0.70), instructional leadership which is based on pedagogical support (b = 0.45-0.65) and democratic leadership based on collaboration (b = 0.40-0.55). Transactional leadership has a small short-term impact (b = 0.20-0.35) but is not sustainable whereas autocratic and laissez-faire leadership styles have negative implications on teacher performance. The most important mediating variables are job satisfaction, school climate, and professional development engagement. It is important to note that the effectiveness of leadership is heavily contextual such as the resources available in the school, the structure of governance, the cultural values and the socioeconomic context. Instead of adopting the single style, integrated, hybrid methods involving transformational vision, instructional expertise, and collaborative structures are more effective. The review marks out such crucial problems as the administrative overload, resource limitations, and the lack of preparedness among leaders. The main implications of the study to practitioners will be the creation of multifaceted leadership competence, instructional focus, positive school climate, and lifelong professional growth. The policymakers would need to enhance principal preparation, provide an environment where effective leadership can be achieved and align accountability and support development. Future studies ought to examine contextual moderators, implementation processes and long-term sustainability of leadership strategies. This review establishes that strategic educational leadership is one of the pillars of investment in enhancing teacher productivity and organizational performance. References Abbasi, S., Abbasi, P., Alvi, H., Murk, T., &amp; Sajjad, R. (2025). The impact of leadership styles on teacher effectiveness: A study in Larkana schools. The Critical Review of Social Sciences Studies. https://doi.org/10.59075/08p39x93 Adriantoni, A., Komariah, A., Nurdin, D., &amp; Herawan, E. (2023). The effect of transformational leadership and madrasah climate on elementary school teacher performance. Journal of Innovation in Educational and Cultural Research, 4(2). https://doi.org/10.46843/jiecr.v4i2.647 Ahmed, A. A. (2024). The impact of principal leadership styles on teachers’ job performance in primary schools. Human Nature Journal of Social Sciences. https://doi.org/10.71016/hnjss/rzk5dd68 Akullo, E. A., &amp; Kamanyire, V. (2023). Head teacher leadership styles and teacher performance in primary schools in Kaabong District, Uganda. Journal of Education and Practice. https://doi.org/10.47941/jep.1182 Alzoraiki, M., Ahmad, A. R., Ateeq, A., &amp; Milhem, M. (2024). The role of transformational leadership in enhancing school culture and teaching performance in Yemeni public schools. Frontiers in Education. https://doi.org/10.3389/feduc.2024.1413607 Andriadi, D., &amp; Sulistiyo, U. (2024). The influence of transformational and instructional leadership styles of school principals on teachers’ performance, motivation, job satisfaction, and student achievement in primary and secondary schools. PPSDP International Journal of Education, 3(2). https://doi.org/10.59175/pijed.v3i2.335 Angwaomaodoko, &amp; Anthony, E. (2023). The effect of leadership styles on teacher job satisfaction in Nigerian secondary schools. International Research in Education, 11(2). https://doi.org/10.5296/ire.v11i2.21012 Arina, Y., Revita, Y., Gistituati, N., &amp; Rusdinal, R. (2023). The influence of principals’ participative leadership style and work climate on public middle school teacher performance. Edunesia: Jurnal Ilmiah Pendidikan, 4(3). https://doi.org/10.51276/edu.v4i3.487 As-Sadeq, H. A., &amp; Khoury, G. (2006). Leadership styles in the Palestinian large-scale industrial enterprises. Journal of European Industrial Training. https://doi.org/10.1108/02621710610692043 Bhatti, N., Maitlo, G. M., Shaikh, N. A., Hashmi, M. A., &amp; Shaikh, F. M. (2012). The impact of autocratic and democratic leadership style on job satisfaction. International Business Research, 5(2), 192–201. https://doi.org/10.5539/ibr.v5n2p192 Camatog, D. C., &amp; Fu, X. (2024). Transforming leadership: Evaluating the impact of leadership styles on technical colleges in the National Capital Region, Philippines. International Multidisciplinary Research Journal. https://doi.org/10.54476/ioer-imrj/065077 Dahari, L. (2024). Adapting leadership: A literature review of effective management styles in modern educational settings. Sumy State University Journal. https://doi.org/10.21272/1817-9215.2024.2-04 Djumiastin, P., Muhimmah, H. A., &amp; Subrata, H. (2025). Comparative study of leadership styles in public and private elementary schools. Al-Qalam: Jurnal Ilmiah Keagamaan dan Kemasyarakatan, 19(6). https://doi.org/10.35931/aq.v19i6.5691 Duran, C., &amp; Barlas, P. J. (2025). Leading with impact: The relationship between school heads’ multifactor leadership styles and teachers’ job satisfaction in public secondary schools. British Journal of Teacher Education and Pedagogy, 4(6). https://doi.org/10.32996/bjtep.2025.4.6.1 Ed-Valsania, S., Lagua, A., &amp; Moriano, J. A. (2022). Burnout: A review of theory and measurement. International Journal of Environmental Research and Public Health, 19(3), Article 1780. https://doi.org/10.3390/ijerph19031780 Guin, K. (2004). Chronic teacher turnover in urban elementary schools. Education Policy Analysis Archives, 12(42). https://doi.org/10.14507/epaa.v12n42.2004 Hadijah, N. (2024). The impact of leadership styles on teacher performance. Research Invention Journal of Law, Communication and Languages. https://doi.org/10.59298/rijlcl/2024/411318 Han, Y. (2025). The impact of leadership styles on effective education management. Forum for Linguistic Studies, 7(2). https://doi.org/10.30564/fls.v7i2.7839 Harianto, J. E., Umam, F. C., Ginanjar, F., Hidayat, Y., &amp; Muiz, A. (2025). The impact of leadership styles on school performance: A comparative study of educational management models. International Journal for Science Review, 2(3). https://doi.org/10.71364/ijfsr.v2i3.23 Harsoyo, R. (2022). Bernard M. Bass’s transformational leadership theory and its application in improving the quality of Islamic educational institutions. Sajie: South Asian Journal of Islamic Education, 3(2). https://doi.org/10.21154/sajiem.v3i2.112 Hossen, B. (2024). Administrators’ leadership styles in Industrial Revolution 4.0 toward a proposed leadership educational model. International Multidisciplinary Research Journal. https://doi.org/10.54476/ioer-imrj/196274 Htun, S. S., Chakkaravarthy, M., &amp; Bhaumik, A. (2025). Impact of emotional intelligence and leadership styles on employees’ job performance: A review paper. Journal of Multidisciplinary Research for SMET, 1(1). https://doi.org/10.64297/jmrsmet.v1i1.3 Hutasuhut, N. A., Simbolon, A. M. Y., Salsabilah, D., Siregar, R., &amp; Siregar, S. A. (2025). The role of educational leadership in improving educational quality. Academia: Jurnal Inovasi Riset Akademik, 5(4). https://doi.org/10.51878/academia.v5i4.8226 Jaarsveld, L. V., Mentz, P. J., &amp; Ellis, S. (2019). Implementing the multifactor leadership questionnaire (MLQ) in a challenging context. International Journal of Educational Management. https://doi.org/10.1108/IJEM-02-2018-0041 Joseph, C., &amp; Sultana, M. (2025). Leadership styles of school heads and their impact on teacher performance: A qualitative study in private schools of District South Karachi. The Critical Review of Social Sciences Studies. https://doi.org/10.59075/qnfe3s74 Kairupan, D. (2023). Transactional and transformational leadership styles on the effectiveness of work from home and work productivity. Telaah Bisnis, 24(1). https://doi.org/10.35917/tb.v24i1.335 Khan, F. (2023). Transformational leadership and teacher work performance: Mediating effect of job autonomy and trust in school principal. Educational Management Administration &amp; Leadership. https://doi.org/10.1177/17411432231172359 Lamja, D. (2024). Boosting teacher motivation and performance with transformational leadership in education. International Journal of Science and Research. https://doi.org/10.21275/SR24116024616 Marjono, F. K., &amp; Heryjanto, A. (2023). The influence of the principal’s leadership style and school culture on teacher performance mediated by work motivation. Jurnal Indonesia Sosial Sains, 4(11). https://doi.org/10.59141/jiss.v4i11.923 Nadapdap, E., Laili, E. F., Natsir, M., &amp; Setyadi, M. C. S. (2025). Exploring the influence of digital competence, work–life balance, and transformational leadership on teacher productivity through job satisfaction in rural educational contexts. East African Scholars Journal of Economics, Business and Management, 8(1). https://doi.org/10.36349/easjebm.2025.v08i01.006 Noor, S., Adnan, M., Rehman, L., &amp; Shafiq, A. (2024). The impact of leadership styles on teacher self-efficacy and professional development. Bulletin of Business and Economics. https://doi.org/10.61506/01.00424 Novita, P., Cahya, Y. F., &amp; Meilani, P. (2025). Reconstructing educational leadership theory: Building a holistic framework for 21st century schools. Feedforward Journal of Human Resource, 5(1). https://doi.org/10.19166/ff.v5i1.9577 Pacia, D. R., &amp; Guevarra, P. M. (2023). Influence of path–goal the</p></details>
+                <a href="https://doi.org/10.63544/ijss.v5i1.217" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Leveraging prompt-based LLMs for automated scoring and feedback generation in higher education</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 4534a7e37bb11005af04</p>
+                
+                
+                <p class="reference-note">Eman Mudhi AlGhamdi, Yuheng Li, Dragan Gašević, Guanliang Chen · 2026 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.compedu.2025.105511" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Responsible, Ethical, and Effective Use of LLMs in Higher Education</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 2bdebe62edff2ed02420</p>
+                
+                
+                <p class="reference-note">Chong Ho Yu, Sunny Chan · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003567257-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reshaping Learning Environments: the Potential of Augmented Reality in the Classroom</strong><span>Relevance score: 7</span></div>
+                <p class="reference-note">Paper ID: 27562eba9f93238fa00e</p>
+                
+                
+                <p class="reference-note">Asmaa Elkourchi, Said El Abdellaoui · 2026 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Educating future generations of citizens is crucial to the development of any society. Modern learning is constantly evolving to address the changing needs of its learners in an increasingly digitalized world. There are numerous educational technologies currently accessible, and some have greater potential to transform learning than others. This review focuses on the applications of Augmented Reality (AR) in all learning contexts, particularly focusing on learning in K-12 environments as well as in Higher Education. There are specific objectives of modern learning that are examined by current educational models, and there are several barriers which are preventing educators from fulfilling all of their aims. Although there are several challenges facing students in K-12 learning environments, AR demonstrates the capacity to influence learning positively. For example, learning via AR can aid in increasing levels of engagement, motivation, and higher-order thinking, as well as improving academic attainment and subject specific skills through various mechanisms. Learning can be experienced through diverse AR deliveries, by means of interactive, immersive, and experiential approaches, affecting learning across various dimensions. AR has been implemented in a variety of educational scenarios including STEM education and language learning. It can concretize abstract knowledge to adapt to the needs of diverse learner profiles, yet its large-scale popularization remains constrained by three core barriers: financial costs, requirements for teachers&#39; continuous professional development, and uneven access to technical infrastructure. From a forward-looking perspective, the current field of educational AR research and development has identified adaptive learning environments that prioritize sustainability, inclusivity, and adaptation to the diverse heterogeneous needs of students as a core emerging research direction. This paper integrates these three dimensions to put forward a prospective outlook on the development trajectory and existing challenges of AR integration in educational scenarios across primary, secondary, and higher education.</p></details>
+                <a href="https://doi.org/10.1109/ICCSC71566.2026.11650199" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Storytelling Pedagogy for Creativity and Critical Thinking in Level VII History through Storytelling in Tech-Limited Settings</strong><span>Relevance score: 5</span></div>
+                <p class="reference-note">Paper ID: d349a59a47235ee9a6fb</p>
+                
+                
+                <p class="reference-note">Raziah Tajammal, Ramshah Tajammal, Dr. Sadia Butt, Dr. Tayyaba Ashraf, Mahnoor Anwar · 2025 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This action research explores the effectiveness of storytelling as a pedagogical strategy to enhance creativity and critical thinking skills among 64 Grade VII students (aged 12–13) in a technology-limited, middle-class school in Pakistan. The study was motivated by persistent challenges in traditional history education, which often relies on rote memorization, leading to student disengagement and a lack of higher-order cognitive development. The investigation employed a quasi-experimental design conducted over a two-week period. The intervention consisted of a pre-test to establish a baseline, two structured storytelling practice sessions, and a post-test. During the sessions, students were guided to create and present their own historical narratives using the “4 Ws” framework (who, what, when, why) to scaffold their analytical reasoning. This methodology was intentionally designed to be a low-cost, replicable model for educators in developing countries with constrained resources. Quantitative results demonstrated substantial improvement. The average score for story writing increased by 25%, from 57% to 82%. When assessed against a 5-point rubric, creativity scores rose from 2.80 to 4.28, and critical thinking scores improved from 2.77 to 4.13, indicating significant growth in both skill sets. Qualitative data from student narratives provided deeper context, revealing an enhanced ability to connect historical causes and consequences. A notable finding was students&#39; spontaneous use of perspective-taking, often drawing narrative inspiration from the popular historical drama Diriliş Ertuğrul. While the study is limited by its sample size and short duration, the findings strongly suggest that storytelling is a viable, low-tech pedagogy for fostering higher-order thinking in resource-constrained settings. Future research should involve longitudinal studies with larger samples to validate the long-term impact and explore cross-disciplinary applications. References Adesina, O. C. (2006). Teaching history in twentieth century Nigeria: The challenges of change. History in Africa, 33, 17–37. https://doi.org/10.1353/hia.2006.0002 Adesote, S. A., &amp; Fatoki, O. R. (2013). The role of ICT in the teaching and learning of history in the 21st century. Global Journal of Education Research, 8(21), 2155–2159. Akhtar, Q., Butt, S., &amp; Niaz, M. (2024). Time series analysis of poverty reduction indicators: Case of Pakistan, India and Bangladesh. Qlantic Journal of Social Sciences and Humanities, 5(2), 170–183. Allison, J. (2008). History educators and the challenge of immersive pasts: A critical review of virtual reality ‘tools’ and history pedagogy. Learning, Media and Technology, 33(4), 343–352. https://doi.org/10.1080/17439880802497099 Alidri, A. (2022). Using emerging technologies to innovate the teaching and learning of history at Gulu University [Conference paper, 10th Pan-Commonwealth Forum (PCF10)]. https://doi.org/10.56059/pcf10.8873 Asif, M., &amp; Shaheen, A. (2022). Creating a high-performance workplace by the determination of importance of job satisfaction, employee engagement, and leadership. Journal of Business Insight and Innovation, 1(2), 9–15. Astuti, C. W. (2017). The effectiveness of storytelling technique in teaching spoken narrative text to eleventh grade of senior high school students [Final project, Semarang State University]. Semarang State University. https://lib.unnes.ac.id/10213 Aurangzeb, M., Tunio, M., Rehman, Z., &amp; Asif, M. (2021). Influence of administrative expertise on human resources practitioners on the job performance: Mediating role of achievement motivation. International Journal of Management, 12(4), 408–421. Barzaq, M. (2009). Integrating sequential thinking through teaching stories in the curriculum. Action Research. AlQattan Center for Educational Research and Development QCERD. Bates, A. W. (2015). Teaching in a digital age: Guidelines for designing teaching and learning. BCcampus. https://opentextbc.ca/teachinginadigitalage/ Booth, A. (1993). Learning history in university: Student views on teaching and assessment. Studies in Higher Education, 18(2), 227–235. https://doi.org/10.1080/03075079312331382389 Butt, S., Mubeen, I., &amp; Yazdani, N. (2024). Exploring the lived experiences of individuals to manage and cope with type 2 diabetes applying IPA. Pakistan Languages and Humanities Review, 8(2), 526–539. Butt, S., &amp; Yazdani, N. (2023). Implementation of quality management practices and firm’s innovation performance: Mediation of knowledge creation processes and moderating role of digital transformation. Pakistan Journal of Humanities and Social Sciences, 11(4), 3881–3902. Chang, C. (2014). An IPA-embedded model for evaluating creativity curricula. Innovations in Education and Teaching International, 51(1), 59–71. https://doi.org/10.1080/14703297.2013.856144 Dussel, I. (2022). Digital colonialism and education: Challenges for the global South. Comparative Education Review, 66(3), 456–478. https://doi.org/10.1086/720123 Ghernaout, D., Touahmia, M., Aichouni, M., Alghamdi, A., &amp; Messaoudene, N. A. (2018). Fostering students’ creativity through innovative learning tools. Higher Education Research, 3(1), 9. https://doi.org/10.11648/j.her.20180301.13 Hadjiyanni, T., &amp; Zollinger, S. W. (2010). Stimulating student interest in design history classes. Archnet-IJAR: International Journal of Architectural Research, 4(2/3), 296. Haleem, A., Javaid, M., Qadri, M. A., &amp; Suman, R. (2022). Understanding the role of digital technologies in education: A review. Sustainability, 14(7), 4234. https://doi.org/10.3390/su14074234 Hammerness, K., &amp; Kennedy, B. (2018). Teaching practices grounded in foundational knowledge, visions, and contexts. The New Educator, 15(1), 66–83. https://doi.org/10.1080/1547688X.2018.1506070 Hicks, D., Ogle, J. T., &amp; van Hover, S. (2025). Simulations in social studies: Practical implications from classroom to extended reality. Annals of Social Studies Research for Teachers, 7(1), 29–53. https://doi.org/10.29173/assert86 Isbell, R., Sobol, J., Lindauer, L., &amp; Lowrance, A. (2004). The effects of storytelling and story reading on the oral language complexity and story comprehension of young children. Early Childhood Education Journal, 32(3), 157–163. Khan Academy. (2024). Khan Academy efficacy results, November 2024. https://blog.khanacademy.org/khan-academy-efficacy-results-november-2024/ Kim, S. (2023). The role of educational technology in post-war Korea: A historical analysis. Asia Pacific Education Review, 24(4), 567–583. https://doi.org/10.1007/s12564-023-09845-6 Koster, J. B. (2012). Growing artists: Teaching the art to young children. Wadsworth. Le, T. T. A., Nguyen, T. A. M., Bui, T. T., Luu, T. D., &amp; Dinh, T. K. L. (2021). Applying mind map in teaching history in primary schools – Case study of Dak Lak Province, Vietnam. Journal of Nonformal Education, 7(1), 119–126. https://doi.org/10.15294/jne.v7i1.29278 Masih, M., Suleman, S., Khan, M. H., Sahito, D. Z., &amp; Shahid, D. S. (2025). The future classroom: Integrating AI and social media for adaptive learning. Inverge Journal of Social Sciences, 4(3), 98–111. https://doi.org/10.63544/ijss.v4i3.150 OECD. (2022). Education at a glance 2022: OECD indicators. Organisation for Economic Co-operation and Development. https://doi.org/10.1787/3197152b-en Phillips, K. H. (1996). Teaching kids to sing. Schirmer Books. Rahmadina, S., Hindana, N. F., Haq, A. F., Alifia, F. E., Mahardika, I. K., Yusmar, F., Firdausi, S., &amp; Astuti, S. R. D. (2025). Evolusi pendidikan klasik dan modern serta kajian terhadap faktor-faktor pendidikan. NUSRA: Jurnal Penelitian Dan Ilmu Pendidikan, 6(1), 39–47. https://doi.org/10.55681/nusra.v6i1.3381 Rashdi, S. M. F., Agha, N., &amp; Hina, B. (2025). The Impact of Maternal Employment on Children’s Educational Attainment at Primary School Level: A Sociological Study of Working Mothers in Khairpur City. Inverge Journal of Social Sciences, 4(3), 288–297. https://doi.org/10.63544/ijss.v4i3.167 Sebbowa, D. K., &amp; Ng’ambi, D. (2020). Teaching history in ways C21st students learn—a design-based research perspective. International Journal of Learning, Teaching and Educational Research, 19(9), 259–280. https://doi.org/10.26803/ijlter.19.9.14 Shah, D. M. I., &amp; Tahir, D. A. R. (2025). The meanings of the ‘wisdom’ and the ‘hikmat’: A philosophical and analytical discourse. Inverge Journal of Social Sciences, 4(2), 33–41. https://doi.org/10.63544/ijss.v4i2.123 Silvita, S., Sutarno, &amp; Indrowati, M. (2024). Improving evaluation skills through flipped-problem-based learning with digital storytelling task: A systematic review. Journal of Higher Education Theory and Practice, 24(1), 167–185. https://doi.org/10.33423/jhetp.v24i1.6769 Skinner, B. F. (1953). Science and human behavior. Macmillan. Sultana, I., &amp; Sajjad, P. D. S. (2025). Shaping young minds: How school environment predicts social and emotional learning (SEL) in primary schools. Inverge Journal of Social Sciences, 4(3), 143–155. https://doi.org/10.63544/ijss.v4i3.154 UNESCO. (2007). ICT in education in sub-Saharan Africa [Working paper]. United Nations Educational, Scientific and Cultural Organization. https://unesdoc.unesco.org/ark:/48223/pf0000152061 UNESCO. (2022). The ICT competency framework for teachers harnessing OER project: Digital skills development for teachers (Document CI-2022/WS/4). United Nations Educational, Scientific and Cultural Organization. https://unesdoc.unesco.org/ark:/48223/pf0000383206 Van Broekhoven, K. (2023). The evaluation and selection of creative ideas in educational settings: Current knowledge and future directions. Creativity Research Journal, 37(2), 307–313. https://doi.org/10.1080/10400419.2023.2253403 Vygotsky, L. S. (1978). Mind in society: The development of higher psychological processes. Harvard University Press. World Bank. (2019). Reimagining human connections: Technology and innovation in education at the World Bank. World Bank Group. https:/</p></details>
+                <a href="https://doi.org/10.63544/ijss.v4i4.189" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Leveraging Transformers and LLMs for Automated Grading and Feedback Generation Using a Novel Dataset</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 0f01ee478482cfd81cb1</p>
+                
+                
+                <p class="reference-note">Asmaa G. Khalf, Emad Nabil, Wael H. Gomaa, Oussama Benrhouma, Amira M. El-Mandouh · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Automated Short Answer Grading (ASAG) has garnered significant attention in the field of educational technology due to its potential to improve the efficiency, scalability, and consistency of student assessments. This study introduces a novel dataset of 651 student responses from a Database Transaction course exam at Beni-Suef University, referred to as the Beni-Suef Transaction Processing (BeSTraP) dataset. The BeSTraP is specifically designed to support ASAG evaluation. To assess ASAG performance, five approaches were employed: string-based similarity, semantic similarity, a hybrid of both, fine-tuning transformer-based models, and the application of Large Language Models (LLMs). The experimental results indicated that fine-tuned transformers, particularly GPT-2, achieved the highest Pearson correlation with human scores (0.8813) on the new dataset and maintained robust performance on the Mohler benchmark (0.7834). In addition to grading, the framework integrates automated feedback generation through LLMs, further enriching the assessment process. This research contributes (i) a novel, domain-specific dataset derived from an actual university examination, (ii) a comprehensive comparison of traditional and transformer-based approaches, and (iii) evidence of the efficacy of fine-tuned models in providing accurate and scalable grading solutions. The created dataset will be publicly available for the community.</p></details>
+                <a href="https://doi.org/10.3390/data11030057" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Chatbots as Virtual Leaders</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 43030efb336d9a9f7da1</p>
+                
+                
+                <p class="reference-note">Austin Musundire · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This study examines the use of chatbots as virtual leaders in Australian schools, focusing on their role in decision-making and strategy. Chatbots streamline tasks, enhance stakeholder engagement, and provide data-driven insights, improving operational efficiency. Despite these benefits, issues such as technical integration, user acceptance, and data security remain challenges. Customizable solutions, robust training, and data protection strategies are critical for successful implementation. Recommendations include fostering collaboration, promoting equitable use of algorithms, and ensuring ethical chatbot practices. Future research should explore the long-term impact of chatbots on education, leadership, and professional development.</p></details>
+                <a href="https://doi.org/10.4018/979-8-3693-8734-4.ch001" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Challenges and Opportunities in Integrating Socio-Emotional Values in Teaching Mathematics Instruction: Evidence from Rizal II District, Dinagat Islands</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: daaadc952239b852cf04</p>
+                
+                
+                <p class="reference-note">Angelu Pastor · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Purpose: This study examined the challenges and opportunities mathematics teachers encounter in integrating socio-emotional values into their instruction in the Rizal II District of the Dinagat Islands, Philippines. The study also determined whether perceptions of challenges and opportunities differed significantly when teachers were grouped according to profile variables. Method: A quantitative descriptive design was employed, involving 72 mathematics teachers from elementary and secondary schools. A validated researcher-made questionnaire with excellent reliability (Cronbach’s alpha: 0.928 for challenges; 0.935 for opportunities) was used. Data were analyzed using descriptive statistics, independent sample t-tests, and one-way analysis of variance (ANOVA) at a 0.05 level of significance. Results: Findings revealed that teachers perceived integration as highly challenging (M = 3.34), particularly in linking mathematics to ethical decision-making, incorporating fairness and justice, and addressing emotional aspects of learning. Opportunities were likewise rated highly (M = 3.32), emphasizing collaboration, empathy, resilience, and critical reflection. No significant differences were found across teachers’ demographic and professional profiles. Conclusion: Integrating socio-emotional values in mathematics is essential yet complex. Teachers recognize its importance but face systemic barriers, including rigid curricula, resource limitations, and lack of training. Nonetheless, their openness to innovate indicates a strong foundation for advancing socio-emotional integration. Implications: The study recommends strengthening teacher professional development, developing instructional resources, and aligning curriculum policies to support socio-emotional integration in mathematics. Building collaborative platforms for teachers to share best practices may also sustain innovation and contribute to holistic learner development in the Philippine context. Keywords: Socio-Emotional Values; Mathematics Education; Teacher Challenges; Instructional Opportunities; Dinagat Islands; Philippines</p></details>
+                <a href="https://doi.org/10.69481/coise" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Teachers’ Readiness in Integrating AI into Classroom Instruction</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 74615344395c3a27cdeb</p>
+                
+                
+                <p class="reference-note">Devie Patricio, Eddie Wilson Broqueza, Anthony Molacruz, Joshua Rhey Oliveros · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This study examined the readiness of teachers at STI College Muñoz-EDSA to integrate Artificial Intelligence (AI) into classroom instruction. The research focused on instructors’ perceptions, challenges, training needs, and institutional support requirements for AI adoption. A qualitative descriptive design was employed, as it enabled the researchers to capture teachers’ experiences and perspectives without imposing predetermined categories. Data were gathered from 15 faculty members representing three academic departments through structured open-ended questionnaires. Responses were analyzed thematically, following Braun and Clarke’s (2006) six-phase framework. Findings revealed that while teachers expressed optimism regarding AI’s potential to enhance teaching efficiency and learner engagement, they also raised concerns about overdependence, ethical dilemmas, data privacy, and accuracy of AI-generated content. Limited access to formal training, lack of institutional policies, and restricted availability of AI tools emerged as major barriers to integration. Teachers emphasized the need for structured professional development, including hands-on workshops, prompt engineering skills, and ethical guidelines. The study concludes that teacher readiness for AI integration is shaped not only by individual attitudes and digital literacy but also by institutional support, infrastructure, and policy frameworks. It recommends phased AI adoption, investments in capacity-building, and the formulation of ethical standards to ensure sustainable and responsible use of AI in higher education. Keywords: Artificial Intelligence, Teacher Readiness, Educational Technology, Ethical Use of AI, AI Integration, Professional Development, Qualitative Study, Higher Education, Instructional Innovation, Faculty Perceptions</p></details>
+                <a href="https://doi.org/10.69481/triac" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Automated Grading of First-year HTML CSS using LLMs</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 6e6ac2e0987335fb800f</p>
+                
+                
+                <p class="reference-note">Ms Jocelyne Smith · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Rising student enrolments in introductory computer science courses at tertiary institutions are creating significant grading bottlenecks. Educators are struggling to manage increasing workloads, resulting in an inability to provide timely and personalised feedback, impairing effective student skill development. This issue is particularly pronounced in universities constrained by budgetary limitations. This study investigates the use of artificial intelligence (AI), specifically large language models (LLMs), for the automated grading of first-year HTML and CSS assignments. The first phase of the research focuses on developing an automated grading system. Advanced AI techniques, such as Prompt Engineering, Tool Use, and Multi-Agent Collaboration, are employed to improve feedback accuracy and relevance. The second phase compares the effectiveness of different LLMs. Local-inference LLMs (i.e. models running on the researcher&#39;s own machine, e.g., Llama, Gemma) are compared to API-inference models (models running on the cloud, e.g., ChatGPT). The models are compared in terms of processing time, computational cost, and accuracy in order to determine their suitability in providing personalised feedback. Our findings demonstrate that API-inference models, specifically ChatGPT, outperform others likely due to large-scale infrastructure, large diverse datasets and advanced reasoning capabilities. This research highlights ChatGPT-4o-mini as the most effective model for providing scalable and cost-effective grading solutions in educational settings. The model demonstrated a significant improvement in efficiency, being able to grade and provide detailed personalised feedback for 240 submissions in just 45 minutes. A task that would take a lecturer, who grades between 4 and 5 submissions per hour, 48 to 60 hours to complete. The research highlights AI&#39;s potential to significantly reduce grading workloads and improve educational outcomes, especially at institutions with limited budgets. This system could assist assessment grading at the UFS Department of Computer Science and Informatics, with future work focusing on refinement and expanding the approach to other coding languages such as C# and SQL.</p></details>
+                <a href="https://doi.org/10.38140/ufs.29645342.v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Automated Grading of First-year HTML CSS using LLMs</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 64e6e6435f2772f1b3c2</p>
+                
+                
+                <p class="reference-note">Ms Jocelyne Smith · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Rising student enrolments in introductory computer science courses at tertiary institutions are creating significant grading bottlenecks. Educators are struggling to manage increasing workloads, resulting in an inability to provide timely and personalised feedback, impairing effective student skill development. This issue is particularly pronounced in universities constrained by budgetary limitations. This study investigates the use of artificial intelligence (AI), specifically large language models (LLMs), for the automated grading of first-year HTML and CSS assignments. The first phase of the research focuses on developing an automated grading system. Advanced AI techniques, such as Prompt Engineering, Tool Use, and Multi-Agent Collaboration, are employed to improve feedback accuracy and relevance. The second phase compares the effectiveness of different LLMs. Local-inference LLMs (i.e. models running on the researcher&#39;s own machine, e.g., Llama, Gemma) are compared to API-inference models (models running on the cloud, e.g., ChatGPT). The models are compared in terms of processing time, computational cost, and accuracy in order to determine their suitability in providing personalised feedback. Our findings demonstrate that API-inference models, specifically ChatGPT, outperform others likely due to large-scale infrastructure, large diverse datasets and advanced reasoning capabilities. This research highlights ChatGPT-4o-mini as the most effective model for providing scalable and cost-effective grading solutions in educational settings. The model demonstrated a significant improvement in efficiency, being able to grade and provide detailed personalised feedback for 240 submissions in just 45 minutes. A task that would take a lecturer, who grades between 4 and 5 submissions per hour, 48 to 60 hours to complete. The research highlights AI&#39;s potential to significantly reduce grading workloads and improve educational outcomes, especially at institutions with limited budgets. This system could assist assessment grading at the UFS Department of Computer Science and Informatics, with future work focusing on refinement and expanding the approach to other coding languages such as C# and SQL.</p></details>
+                <a href="https://doi.org/10.38140/ufs.29645342" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Applications of KSP in a CORBA-Based Distributed System for Advanced Information Systems</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: d25516dc87ef01dc6073</p>
+                
+                
+                <p class="reference-note">T. Liao, Chao-Chun Yang, Ta-Yin Hu · 2003 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://www.semanticscholar.org/paper/9ac0cac7f043487152fb30363b0666a2b7cd51da" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Differentiated Instruction: Challenges and Opportunities in EFL Classroom</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 8df7b183d4e9198a5168</p>
+                
+                
+                <p class="reference-note">Mardhatillah Mardhatillah, Suharyadi Suharyadi · 2023 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>The issue of Differentiated Instruction (DI) has recently attracted the attention of scholars and practitioners because of its immense significance and many opportunities to enhance student learning. In this regard, the current study aims to contribute a small summary of DI in the context of EFL to provide context and illustrate the need to implement DI in the classroom to ensure that students learn languages successfully. Since differentiated instruction puts students at the center of teaching and learning, encourages equality and academic achievement, and acknowledges student diversity, it encourages teachers to be aware of individual needs, interests, skills, English proficiency levels, and students’ preferred learning strategies. Although some challenges may occur such as time-consuming and pressure on teachers in implementing DI, this approach has advantages that can affect students&#39; learning processes, future learning attitudes, and future success. So, the learning process provides many opportunities when the teacher is committed to differentiated instruction.</p></details>
+                <a href="https://doi.org/10.21462/jeltl.v8i1.1022" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>FROM AI CHATBOTS TO PEDAGOGICALLY ALIGNED AI TUTORS</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 24e5ff80568fab124392</p>
+                
+                
+                <p class="reference-note">Deniz Iren · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.21125/edulearn.2026.2481" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Leveraging LLMs for Grading and Feedback on Handwritten Math Assessment Responses</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: aa9d870cfe0c9cf7f858</p>
+                
+                
+                <p class="reference-note">Alberto Gandolfi, Jonas Saman, Eleni Tesfaye · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.59668/2340.26778" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Scaling Assessment Innovation: From Immediate Feedback MCQs to Automated Question Generation with LLMs</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 0c69d4219a58a003c042</p>
+                
+                
+                <p class="reference-note">Tony Gurney, Paul Keir · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1145/3772338.3772353" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Role of Chatbots as Virtual Tutors in LMS</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: dc45c6b65d50f81934be</p>
+                
+                
+                <p class="reference-note">Shilpi CHAKRAVARTY, Mahesh Chandra JOSHI, Iti GAUR · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1002/9781394411283.ch5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>MSA at BEA 2025 Shared Task: Disagreement-Aware Instruction Tuning for Multi-Dimensional Evaluation of LLMs as Math Tutors</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: ba1c9b53381db9cffee2</p>
+                
+                
+                <p class="reference-note">Baraa Hikal, Mohamed Basem, Islam Oshallah, Ali Hamdi · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.18653/v1/2025.bea-1.95" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>iReflect: Enhancing Reflective Learning with LLMs: A Study on Automated Feedback in Project Based Courses</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: fe0c421b864ddd5aee80</p>
+                
+                
+                <p class="reference-note">Bhojan Anand, Quek Long · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.5220/0013435800003932" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Integrating Translation Technology with LLMs: Opportunities and Challenges in Globalization</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 1335b6f1e5943ec73ea4</p>
+                
+                
+                <p class="reference-note">Abdullah Mohammed · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.63132/ati.2025.integr.61899538" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Classroom-based listening instruction</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 0f7dd730fa1d2681dd27</p>
+                
+                
+                <p class="reference-note">Naheen Madarbakus-Ring · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.4324/9781003386346-5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Challenges and Opportunities in Integrating LLMs into Continuous Integration/Continuous Deployment (CI/CD) Pipelines</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: fc9460e1ca0bb7b3df86</p>
+                
+                
+                <p class="reference-note">Tianyi Chen · 2024 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1109/ainit61980.2024.10581784" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>LLMs for Conversational AI: Enhancing Chatbots and Virtual Assistants</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 703d0699bf07a63acc4f</p>
+                
+                
+                <p class="reference-note">Sharmila Reddy Pappula, Sathwik Rao Allam · 2023 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.55248/gengpi.4.1223.123425" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>E-Learning: The Opportunities and Challenges of Online Instruction</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: cba9a5b444f296c6508b</p>
+                
+                
+                <p class="reference-note">Jonathan G. Tullis · 2022 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.4324/9781138609877-ree204-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>SAT Math in the Classroom</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: a189a7990c2a45d50337</p>
+                
+                
+                <p class="reference-note">Author not supplied · 2016 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.4324/9781315618678" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Visualizing Solutions : Apps as Cognitive SteppingStones in the Learning Process</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: e93e3c1d4285fcbc8440</p>
+                
+                
+                <p class="reference-note">M. Stevenson, J. Hedberg, Kate Highfield, M. Diao · 2015 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://www.semanticscholar.org/paper/31ada0a61a5bccafdd08b7c1d1a461543a6839aa" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Educational use cases for virtual machines</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 61661ff4a0e7cff5a129</p>
+                
+                
+                <p class="reference-note">Thomas F. Griffin, Zack Jourdan · 2012 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1145/2184512.2184607" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Chatbots as Digital Tutors: The Future of Intelligent Assistance in Virtual Classrooms</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 98669e88fe4b4539d2b7</p>
+                
+                
+                <p class="reference-note">Sita Benerjee · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.2139/ssrn.5737163" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Framework for Supporting Students Through Virtual Tutors Using Subject-Specific Llms</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 813f83b8d0a83870c26d</p>
+                
+                
+                <p class="reference-note">Alberto Fernández, Isaac Martín de Diego, Carmen Lancho, Rubén Fuentes-Fernández, Ricardo José Ruíz Gaviría · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.2139/ssrn.5269348" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Challenges and Opportunities in Integrating Socio-Emotional Values in Teaching Mathematics Instruction: Evidence from Rizal II District, Dinagat Islands</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: de739461a8ae53f87a24</p>
+                
+                
+                <p class="reference-note">Author not supplied · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.69481/vcgs4486" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Teachers’ Readiness in Integrating AI into Classroom Instruction</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 6871f32af0fe6c29c99f</p>
+                
+                
+                <p class="reference-note">Author not supplied · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.69481/nkpd4401" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: 3066549fc5c94fa49797edcba7581488 · Report ID: 50</p>
+        <p>Started: 2026-09-12 20:33:18 · Updated: 2026-09-12 20:34:30 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>5</dd><dt>Raw papers retrieved</dt><dd>70</dd><dt>Valid papers retained</dt><dd>68</dd><dt>Relevant papers retained</dt><dd>34</dd><dt>Duplicates removed</dt><dd>3</dd><dt>Noisy records removed</dt><dd>2</dd><dt>Irrelevant records removed</dt><dd>31</dd><dt>Evidence limit removed</dt><dd>24</dd><dt>Provider failures</dt><dd>1</dd><dt>Final evidence count</dt><dd>10</dd><dt>Elapsed seconds</dt><dd>71.62</dd><dt>Sources cited</dt><dd>10</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The retrieved evidence comprehensively covers diverse applications of large language models (LLMs) in education, including foreign language learning, K-12 education evaluation, adaptive learning systems, personalized tutoring, multimodal assistants, and course assessment. While some papers focus on challenges or evaluations, they still provide direct insights into practical applications. No major gaps in application domains are identified.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-12 20:33:18</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-12 20:33:22</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-12 20:33:22</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-12 20:33:56</td><td>Retrieval</td><td>provider failed</td><td>Semantic Scholar was unavailable. Continuing with available sources.</td></tr>
+            
+            <tr><td>2026-09-12 20:33:56</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-12 20:33:56</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-12 20:33:56</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-12 20:33:56</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-12 20:34:01</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:01</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-12 20:34:01</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:09</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:17</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:17</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:26</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:26</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:30</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 20:34:30</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 50</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 61</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>How does generative AI affect student learning outcomes in higher education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Generative AI (GenAI) shows mixed but notable impacts on student learning outcomes in higher education, with evidence highlighting both opportunities and challenges. Studies indicate that GenAI tools can enhance academic support through functions like grammar correction, research assistance, and instant feedback, which improve task efficiency and conceptual understanding (Alkhatib et al., 2026). For example, one study found that GenAI aids in organising ideas and strengthening problem-solving skills, though its effectiveness depends on students’ ability to engage critically with the technology (Alkhatib et al., 2026). Similarly, a systematic review noted that GenAI-based assessment systems offer adaptive, real-time feedback, potentially increasing engagement and personalising learning experiences (D, 2026). However, these benefits are contingent on factors like student engagement and AI literacy, which mediate the relationship between GenAI use and academic performance (Alkhatib et al., 2026). A framework for integrating GenAI emphasises aligning its use with pedagogical goals and institutional readiness, suggesting that strategic implementation can enhance learning outcomes while addressing gaps in technological preparedness (Riaz and Mushtaq, 2024).</p><p>The evidence also reveals variability in GenAI’s impact across disciplines and contexts. While some studies report improved engagement and performance, others highlight risks such as over-reliance on AI, which may undermine critical thinking or academic integrity (Hon, 2025). For instance, a Nigerian study found that GenAI combined with learning analytics could personalise learning but raised concerns about ethical use and academic dishonesty (Elenode, 2026). Similarly, a case study in Vietnamese higher education noted that GenAI tools like ChatGPT support language learning through grammar correction and vocabulary practice, yet challenges include skill imbalance and ethical dilemmas (&#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO VIETNAMESE UNIVERSITIES&#34;, 2025). These findings underscore the need for balanced integration, where GenAI complements rather than replaces traditional learning methods. The role of AI literacy becomes critical here, as students with higher AI literacy are better equipped to leverage GenAI for deeper learning (Alkhatib et al., 2026).</p><p>Practical implications suggest that institutions must prioritize training and policy frameworks to maximise GenAI’s benefits. A study on AI art applications in higher education found that generative tools support creative and interdisciplinary projects, but structural barriers like access disparities and pedagogical misalignment hinder their adoption (Rong et al., 2025). This aligns with broader calls for institutional support, including faculty training and ethical guidelines, to ensure GenAI is used responsibly (McKenzie and Day, 2025). Additionally, the effectiveness of GenAI varies by discipline; for example, its utility in language learning is well-documented, but its impact on technical or theoretical subjects remains less clear (&#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO VIETNAMESE UNIVERSITIES&#34;, 2025). These nuances highlight the importance of context-specific strategies, where GenAI is tailored to align with curricular goals and student needs.</p><p>Despite these insights, the evidence remains fragmented, with limited long-term data on GenAI’s sustained impact. Most studies focus on short-term engagement or specific applications, leaving gaps in understanding its broader educational outcomes (Hon, 2025). Furthermore, the reliance on self-reported data or small-scale implementations may limit generalisability (Elenode, 2026). Nevertheless, the consensus across studies is that GenAI has the potential to transform higher education when integrated thoughtfully. By addressing challenges like ethical use, faculty training, and equitable access, institutions can harness GenAI to enhance learning outcomes while fostering responsible technological literacy (Alkhatib et al., 2026).</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>Generative AI-based assessment systems provide adaptive, real-time feedback, which may enhance personalisation and engagement compared to traditional methods (D, 2026).</li><li>A quantitative study found that student engagement and AI literacy mediate the relationship between GenAI use and academic performance, with higher AI literacy correlating with better learning outcomes (Alkhatib et al., 2026).</li><li>A Nigerian study combining GenAI with learning analytics reported improved personalised learning but raised concerns about ethical use and academic integrity risks (Elenode, 2026).</li><li>In Vietnamese higher education, GenAI tools like ChatGPT support language learning through grammar correction and vocabulary practice, though challenges include skill imbalance and ethical dilemmas (&#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO VIETNAMESE UNIVERSITIES&#34;, 2025).</li><li>A systematic review highlighted conflicting evidence, with some studies reporting increased engagement and others noting over-reliance on AI undermining critical thinking (Hon, 2025).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The evidence highlights mixed findings on GenAI&#39;s impact, with some studies reporting enhanced engagement while others note risks like over-reliance or academic integrity issues (Hon, 2025). Further research comparing longitudinal outcomes across diverse institutional contexts would clarify consistent effects.</li><li>Many studies rely on self-reported data or qualitative insights (Riaz and Mushtaq, 2024), limiting objective measurement of learning gains. Empirical studies with standardised metrics could strengthen causal inferences about GenAI&#39;s role in academic performance.</li><li>Variability in institutional technological preparedness and pedagogical integration strategies (Elenode, 2026) suggests contextual factors may mediate GenAI&#39;s effectiveness. Cross-cultural comparative studies could identify scalable implementation frameworks.</li><li>Ethical considerations, such as AI literacy gaps and bias risks (Shuvo et al., 2025), are underexplored. Research examining long-term impacts on critical thinking and digital citizenship would address these gaps.</li><li>Most studies focus on tool usage rather than pedagogical design (Alkhatib et al., 2026). Investigating how GenAI integration aligns with curricular goals could reveal more actionable insights for educational outcomes.</li><li>Reporter review note: Summary contains model-generated wording requiring human review (unsupported study design). Unresolved author-year citations are not verified references; check claims against Ranked Sources.</li><li>Reporter review note: Findings contains model-generated wording requiring human review (report repetition). Unresolved author-year citations are not verified references; check claims against Ranked Sources.</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S10">
+                ‘&#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO VIETNAMESE UNIVERSITIES&#34;’ (2025), <em>International Conference on Educational Sciences and Foreign Language Teaching - Reimagining education: Inclusive education, educational collaboration, and lifelong learning in a globalized world.</em>, pp. 222-231.
+                Available at: <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">https://doi.org/10.51316/icef.hust.2025.27</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                Alkhatib, O.J. et al. (2026) ‘Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and AI Literacy in Higher Education’, <em>The Critical Review of Social Sciences Studies</em>, 4(1), pp. 6400-6424.
+                Available at: <a href="https://doi.org/10.59075/m1cm0j76" target="_blank" rel="noopener noreferrer">https://doi.org/10.59075/m1cm0j76</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S1">
+                D, R. (2026) ‘Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education’, <em>International Journal For Multidisciplinary Research</em>, 8(3), article 81825.
+                Available at: <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">https://doi.org/10.36948/ijfmr.2026.v08i03.81825</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S6">
+                Elenode, A. (2026) ‘Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Student Engagement, Learning Outcomes, and Academic Integrity’, <em>Engineering and Applied Sciences</em>, 11(1), article 1081438.
+                Available at: <a href="https://doi.org/10.11648/j.eas.20261101.11" target="_blank" rel="noopener noreferrer">https://doi.org/10.11648/j.eas.20261101.11</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S8">
+                Hon, K. (2025) ‘Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance’, <em>Journal of Educational Technology Systems</em>, 54, pp. 537 - 560.
+                Available at: <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">https://doi.org/10.1177/00472395251400089</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S7">
+                McKenzie, S. and Day, J. (2025) ‘Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes’, <em>ASCILITE Publications</em>, pp. 123-125.
+                Available at: <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">https://doi.org/10.65106/apubs.2025.2750</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Riaz, S. and Mushtaq, A. (2024) ‘Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outcomes’, <em>2024 Advances in Science and Engineering Technology International Conferences (ASET)</em>, pp. 1-6.
+                Available at: <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/ASET60340.2024.10708721</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S9">
+                Rong, W. et al. (2025) ‘Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review’, <em>Information</em>, 16(12), article 1070.
+                Available at: <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">https://doi.org/10.3390/info16121070</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S3">
+                Shuvo, T.F. et al. (2025) ‘Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awareness’, <em>The Proceedings of the International Conference on Economics, Business and Technology Management (ICEBTM 2025)</em>, pp. 142-154.
+                Available at: <a href="https://doi.org/10.67508/iub.icebtm.2025.023" target="_blank" rel="noopener noreferrer">https://doi.org/10.67508/iub.icebtm.2025.023</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education</strong><span>Relevance score: 62</span></div>
+                <p class="reference-note">Paper ID: fd22f461ff5fdae7caa2</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.696<br>Retrieved from: https://doi.org/10.36948/ijfmr.2026.v08i03.81825</li></ul></details>
+                <p class="reference-note">Rajasekaran D · 2026 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid advancement of Generative Artificial Intelligence (GAI) has significantly transformed assessment and feedback mechanisms in higher education. Traditional assessment practices often suffer from delayed feedback, limited personalization, and high faculty workload, which may negatively affect student engagement and learning outcomes. Generative AI–based assessment and feedback systems offer adaptive, real-time, and personalized evaluation models that promise enhanced learning effectiveness. This study evaluates the impact of Generative AI–driven assessment and feedback systems on student learning outcomes in higher education institutions. Using a mixed-method research design, data were collected from undergraduate and postgraduate students exposed to AI-supported assessments across multiple disciplines. Statistical tools such as simple percentage analysis, paired t-tests, and regression analysis were employed to assess improvements in academic performance, learner engagement, and self-regulated learning. The findings reveal that Generative AI–based feedback significantly improves conceptual understanding, timely error correction, and student satisfaction. However, concerns regarding academic integrity, algorithmic bias, and ethical data use remain critical challenges. The study concludes that while Generative AI can substantially enhance assessment effectiveness, its successful adoption requires ethical governance, faculty training, and transparent AI models. The paper offers practical implications for educators, policymakers, and institutional leaders aiming to integrate AI responsibly into higher education assessment frameworks.</p></details>
+                <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and AI Literacy in Higher Education</strong><span>Relevance score: 59</span></div>
+                <p class="reference-note">Paper ID: 07806393b703d7d5434a</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 4, PDF page 4 · full_text · Similarity 0.780<br>Retrieved from: https://thecrsss.com/index.php/Journal/article/download/1762/1706</li><li>Chunk 3, PDF page 3 · full_text · Similarity 0.747<br>Retrieved from: https://thecrsss.com/index.php/Journal/article/download/1762/1706</li></ul></details>
+                <p class="reference-note">Omar J. Alkhatib, Faisal Rahman, Azzah Khadim Hussain, Muhammad Siddique, Humera Omer Farooq · 2026 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Generative Artificial Intelligence (GenAI) is rapidly transforming higher education by providing personalized academic support, automated feedback, content generation, problem-solving assistance, and interactive learning opportunities. This research investigates the impact of GenAI on student learning outcomes, with particular emphasis on the mediating roles of student engagement and AI literacy. The study addresses the growing need to examine whether GenAI directly improves academic performance or whether its influence becomes stronger when students are actively engaged and possess sufficient knowledge of how to use AI tools responsibly and effectively. A quantitative research design was adopted, and data were collected through a structured questionnaire from 350 undergraduate and postgraduate students enrolled in higher education institutions. The questionnaire measured four major constructs: GenAI usage, student engagement, AI literacy, and student learning outcomes. Data were analyzed using descriptive statistics, reliability analysis, correlation analysis, and structural equation modeling. The results revealed that GenAI usage had a significant positive effect on student learning outcomes (β = 0.41, p &lt; 0.001). Student engagement significantly mediated the relationship between GenAI usage and learning outcomes (indirect effect = 0.23, p &lt; 0.01), showing that GenAI-supported learning improved student motivation, participation, classroom interaction, and self-directed learning behavior. Similarly, AI literacy also showed a strong mediating effect (indirect effect = 0.27, p &lt; 0.001), indicating that students with higher AI literacy were better able to evaluate AI-generated content, apply ethical judgment, avoid overdependence, and use AI tools for meaningful academic improvement. The model explained 62.4% of the variance in student learning outcomes, while GenAI usage improved perceived academic performance by 31.6%, student engagement by 28.4%, and AI literacy-based learning confidence by 34.2%. Overall, the findings suggest that GenAI alone is not sufficient to ensure improved learning outcomes; its effectiveness depends largely on student engagement and AI literacy competencies. The study provides practical implications for universities, teachers, and policymakers to develop AI literacy programs and student-centered GenAI learning strategies in higher education.</p></details>
+                <a href="https://doi.org/10.59075/m1cm0j76" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awareness</strong><span>Relevance score: 59</span></div>
+                <p class="reference-note">Paper ID: df5566d684035cdb1e4b</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 14, PDF page 12 · full_text · Similarity 0.648<br>Retrieved from: https://ar.iub.edu.bd/bitstream/handle/11348/1428/ICEBTM-25-1075.pdf?sequence=1</li></ul></details>
+                <p class="reference-note">Tamim Forhad Shuvo, Md Taushik Hossain, Jannatul Ferdoush Oishy, Nawreen Islam Nazat, Md Kabir Hosen · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The accelerated integration of Artificial Intelligence (AI) into higher education has introduced both transformative opportunities and complex ethical challenges across teaching, learning, and academic governance. This study explores university students’ awareness, perceptions, and usage patterns of AI technologies, particularly generative AI, and assesses their influence on academic engagement and perceived performance. Employing a structured quantitative methodology, survey data were collected from 300 students across diverse disciplines. Descriptive and inferential analyses, including multiple linear regression, were conducted to identify key predictors of AI-driven academic outcomes. Findings reveal that perceived benefits of AI and student engagement are strong positive predictors of improved academic performance, while access-related disparities emerge as significant barriers. Additionally, ethical concerns, policy awareness, and trust in AI-generated content shape students’ attitudes and behaviors, indicating that cognitive and contextual factors influence the educational impact of AI. Grounded in a theoretical framework integrating the Technology Acceptance Model (TAM) and Constructivist Learning Theory, this research highlights AI’s dual role as both an enabler and disruptor of equitable education. It calls for the implementation of transparent governance structures, equitable digital infrastructure, and ethical AI literacy within academic institutions. This study contributes to the evolving discourse on responsible AI adoption in education and offers practical guidance for policymakers, educators, and technology developers aiming to enhance academic integrity and digital inclusion in the AI age.</p></details>
+                <a href="https://doi.org/10.67508/iub.icebtm.2025.023" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outcomes</strong><span>Relevance score: 59</span></div>
+                <p class="reference-note">Paper ID: 67779b5182de3b34f1be</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.783<br>Retrieved from: https://www.semanticscholar.org/paper/0da4e2bc9fa2dd92d390a9eae6d82a896e9e2ed7</li></ul></details>
+                <p class="reference-note">Sadia Riaz, Arif Mushtaq · 2024 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>As higher education institutions adapt to changing teaching and learning, Generative Artificial Intelligence (AI) technologies may boost student engagement and learning outcomes. This study aims to help higher education institutions determine the best ways to integrate Generative AI, an urgent issue. A thorough analysis of Generative AI integration and its different effects on education underpins the research framework. This qualitative study analyses the complex relationships between Generative AI, pedagogical approaches, institutional technological preparedness, student characteristics, and educational environment mediators. This study examines Generative AI integration, pedagogical alignment, technology acceptability, and material customization. This study examines how Generative AI might boost student engagement and learning. It evaluates Generative AI&#39;s performance through pedagogical methods and relevant feedback. The study underlines the importance of technical adoption and topic matter in AI integration efficacy. This paper closes with a complete framework that gives educators, institutions, and policymakers practical advice for optimising Generative AI integration in higher education. This approach equips stakeholders with the skills and knowledge to navigate AI-enhanced education&#39;s complex landscape. It strives to establish a dynamic, student-centred learning environment. To achieve these goals, the framework uses Generative AI technology&#39;s revolutionary power.</p></details>
+                <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes in Higher Education</strong><span>Relevance score: 58</span></div>
+                <p class="reference-note">Paper ID: cfafaf2f4585a24a54ac</p>
+                <p><strong>Full-text evidence (HTML)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1, HTML section: Article body, extracted paragraph 1, anchor: content · full_text · Similarity 0.781<br>Retrieved from: https://rsisinternational.org/journals/ijrsi/articles/augmenting-learning-with-artificial-intelligence-an-empirical-examination-of-generative-ai-tools-and-student-outcomes-in-higher-education/</li></ul></details>
+                <p class="reference-note">Dr. Abhijit Das, Dr. Urvesh Chaudhery, Dr Namrata Yadav Das · 2025 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>The integration of Artificial Intelligence (AI) in higher education is reshaping traditional pedagogical models by enhancing personalization, engagement, and administrative efficiency. This study investigates the role of AI in teaching-learning processes in higher education institutions (HEIs) through a quantitative lens, focusing on faculty and student experiences with AI tools. Drawing data from a sample of 250 respondents across Indian universities, the study explores AI’s influence on academic performance, pedagogical innovation, and learner satisfaction. The findings indicate a positive correlation between AI adoption and improved teaching effectiveness, learning outcomes, and administrative convenience. This paper offers policy and practical recommendations for AI integration to support blended learning environments and faculty development. The results contribute to ongoing discussions about digital transformation in higher education.</p></details>
+                <a href="https://doi.org/10.51244/ijrsi.2025.120700041" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Student Engagement, Learning Outcomes, and Academic Integrity</strong><span>Relevance score: 56</span></div>
+                <p class="reference-note">Paper ID: 6e69f2a77e027d1fa0ca</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 2, PDF page 2 · full_text · Similarity 0.605<br>Retrieved from: https://article.sciencepg.com/pdf/j.eas.20261101.11</li></ul></details>
+                <p class="reference-note">Ayonote Elenode · 2026 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This study examines the integration of generative artificial intelligence (GenAI) and learning analytics (LA) in fostering personalized learning within Nigerian higher education institutions. Specifically, it explores how these emerging technologies influence student engagement, academic performance, and perceptions of academic integrity in digitally mediated learning environments. A mixed-method research design was adopted, involving 420 undergraduate students and 60 academic staff drawn from three Nigerian universities. Quantitative data were collected through structured questionnaires assessing GenAI usage patterns, learning analytics engagement, levels of digital literacy, and integrity perceptions, while qualitative insights were obtained from semi-structured interviews with academic staff and information and communication technology (ICT) administrators. The findings reveal that 64% of respondents actively use GenAI tools such as ChatGPT and Gemini to support learning activities, while 58% regularly access learning analytics dashboards for performance monitoring and feedback. Regression analysis indicates that GenAI-assisted learning and engagement with learning analytics jointly predict improved academic performance (β = 0.36, p &lt; 0.01) and higher levels of student engagement (β = 0.42, p &lt; 0.001). However, the study also finds that unregulated use of GenAI tools is positively associated with increased concerns about plagiarism and academic misconduct (r = 0.31, p &lt; 0.05). The study concludes that the pedagogically guided integration of GenAI and learning analytics can significantly enhance personalized learning experiences in Nigerian higher education. Nevertheless, this potential can only be realized through the development of robust governance frameworks that emphasize ethical use, digital literacy, academic integrity, and data privacy. The study therefore recommends targeted capacity-building for educators, the establishment of transparent institutional AI policies, and continuous evaluation of the pedagogical impact of GenAI technologies.</p></details>
+                <a href="https://doi.org/10.11648/j.eas.20261101.11" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes</strong><span>Relevance score: 53</span></div>
+                <p class="reference-note">Paper ID: 92dd8946b87050639400</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1, PDF page 1 · full_text · Similarity 0.763<br>Retrieved from: https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537</li><li>Chunk 2, PDF page 2 · full_text · Similarity 0.698<br>Retrieved from: https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537</li></ul></details>
+                <p class="reference-note">Stephen McKenzie, Jennifer Day · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The symposium will explore ways of better understanding, challenging and expanding the ways that its diverse users think about and use generative AI in higher education, to best respond to our emerging opportunities to achieve AI ethical and pedagogical best practice. The symposium features a discussion between a range of AI in education experts, and session attendees, guided by key questions on how to achieve the best possible use of AI in education. These questions include how to best bring together technological and human interfaces, and how to best use generative AI in education practice. This could include by strategically expanding its current uses to help it improve whole student education, as well as academic education. Student engagement, wellbeing and motivation could be strategically improved via identifying current levels of, and potential improvements in, student and staff knowledge of and attitudes towards educational uses of AI.</p></details>
+                <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance</strong><span>Relevance score: 51</span></div>
+                <p class="reference-note">Paper ID: f4bfa7f5f52813b2731e</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.757<br>Retrieved from: https://www.semanticscholar.org/paper/a57539a5937dfd3487d761ec0b3e7edad2a34208</li></ul></details>
+                <p class="reference-note">K. Hon · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The integration of Generative AI tools in higher education has sparked significant interest, yet their impact on student learning engagement and academic performance remains unclear. This SLR examines empirical studies to determine whether Generative AI enhances engagement and improves learning outcomes in higher education. Following the PRISMA framework, we analyzed peer-reviewed articles from 2018 to 2024, identifying key trends, methodologies, and conflicting findings. Results reveal mixed evidence: while some studies report increased engagement and performance, others highlight limitations, including over-reliance on AI and variable effectiveness across disciplines. The review also identifies gaps in longitudinal and large-scale studies, calling for more rigorous research to assess Generative AI&#39;s pedagogical impact. Findings provide insights for educators and policymakers on optimizing Generative AI integration while addressing potential challenges.</p></details>
+                <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review</strong><span>Relevance score: 48</span></div>
+                <p class="reference-note">Paper ID: 83a2e4706432492d23cc</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.559<br>Retrieved from: https://www.semanticscholar.org/paper/fb11e772aeec8bda112beefcb96c9d43458ec050</li></ul></details>
+                <p class="reference-note">Weihan Rong, Mengyun Xiao, Long Zhao, Xiaolong Zhou · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Generative Artificial intelligence (AI) art is increasingly integrated into higher education (HE). While its creative potential has been discussed, its actual pedagogical impact and implications for educational equity remain underexplored. This study conducts a systematic review to evaluate how AI art has been applied in HE settings, what teaching and learning outcomes it supports, and what structural barriers exist in its integration. Using the PRISMA framework, 65 peer-reviewed articles published Scopus and Web of Science. The included studies were synthesized thematically and find that generative AI tools are being used to support ideation, multimodal expression, and interdisciplinary projects. However, barriers such as limited faculty training and unclear evaluation standards may hinder equitable access and long-term integration. This review contributes a conceptual framework for understanding the integration of generative AI art, highlighting opportunities and structural limitations. It offers insights for curriculum designers, educators aiming to support responsible, creative, and inclusive uses of AI in arts education.</p></details>
+                <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE higher education</strong><span>Relevance score: 43</span></div>
+                <p class="reference-note">Paper ID: 648f320408a61e5e177c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Swapna S. Nair, Deepika Gaur, Sarwat Jahan · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative AI in student English learning in Thai higher education: More engagement, better outcomes?</strong><span>Relevance score: 43</span></div>
+                <p class="reference-note">Paper ID: 2e00b67cdf1ac04a3105</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Budi Waluyo, Sekartiyasa Kusumastuti · 2024 · Semantic Scholar</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.ssaho.2024.101146" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in Higher Education</strong><span>Relevance score: 43</span></div>
+                <p class="reference-note">Paper ID: 0a928cf94df5e5bc8532</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Irene Diao, Robert Lightfoot · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education</strong><span>Relevance score: 40</span></div>
+                <p class="reference-note">Paper ID: 5c252d9d92c6ba33b73b</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Deeksha Saraswat · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>&#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO VIETNAMESE UNIVERSITIES&#34;</strong><span>Relevance score: 36</span></div>
+                <p class="reference-note">Paper ID: 8d573a35c3539f0bcad2</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.315<br>Retrieved from: https://doi.org/10.51316/icef.hust.2025.27</li></ul></details>
+                <p class="reference-note">Author not supplied · 2025 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>GenAl tools such as ChatGPT, Gemini, and Grok are transforming language education by providing learners with instant access to grammar correction, vocabulary support, and text generation. While these technologies present new opportunities for English language learning, they also introduce challenges related to skill balance, ethical use, and academic integrity. In Vietnam, research on the educational impact of GenAl, particularly in higher education contexts, remains underexplored. This study investigates the role of GenAl in English language learning among students at Hanoi University of Science and Technology and Hanoi University. A structured survey involving 199 students examined usage patterns and perceived effects across the four core language skills: listening, speaking, reading, and writing. The results reveal that GenAl tools are predominantly used to support writing and reading, with students reporting improvements in vocabulary acquisition and writing fluency. However, the study also highlights limited engagement with GenAl for listening and speaking tasks, raising concerns about communicative skill development. Additionally, students expressed apprehension about overreliance on Al-generated content and the potential erosion of critical thinking. The findings underscore the need for structured integration of GenAl into language curricula, emphasizing Al literacy and ethical guidelines to maximize educational benefits while minimizing risks</p></details>
+                <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Students’ voices on generative AI: perceptions, benefits, and challenges in higher education</strong><span>Relevance score: 35</span></div>
+                <p class="reference-note">Paper ID: da485bac61a4e19ae935</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">C. Chan, Wenjie Hu · 2023 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>This study explores university students’ perceptions of generative AI (GenAI) technologies, such as ChatGPT, in higher education, focusing on familiarity, their willingness to engage, potential benefits and challenges, and effective integration. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Students recognized the potential for personalized learning support, writing and brainstorming assistance, and research and analysis capabilities. However, concerns about accuracy, privacy, ethical issues, and the impact on personal development, career prospects, and societal values were also expressed. According to John Biggs’ 3P model, student perceptions significantly influence learning approaches and outcomes. By understanding students’ perceptions, educators and policymakers can tailor GenAI technologies to address needs and concerns while promoting effective learning outcomes. Insights from this study can inform policy development around the integration of GenAI technologies into higher education. By understanding students’ perceptions and addressing their concerns, policymakers can create well-informed guidelines and strategies for the responsible and effective implementation of GenAI tools, ultimately enhancing teaching and learning experiences in higher education. This study focuses on the integration of generative AI (GenAI) technologies, like ChatGPT, into higher education settings. University students’ perceptions of generative AI technologies in higher education were explored, including familiarity, potential benefits, and challenges. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Insights from this study can inform policy development around the integration of GenAI technologies into higher education, helping to create well-informed guidelines and strategies for responsible and effective implementation. This study focuses on the integration of generative AI (GenAI) technologies, like ChatGPT, into higher education settings. University students’ perceptions of generative AI technologies in higher education were explored, including familiarity, potential benefits, and challenges. A survey of 399 undergraduate and postgraduate students from various disciplines in Hong Kong revealed a generally positive attitude towards GenAI in teaching and learning. Insights from this study can inform policy development around the integration of GenAI technologies into higher education, helping to create well-informed guidelines and strategies for responsible and effective implementation.</p></details>
+                <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education Online Courses</strong><span>Relevance score: 35</span></div>
+                <p class="reference-note">Paper ID: 1506d90098ce5f8d5cc2</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jeffrey L. Simmons · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>81How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environments</strong><span>Relevance score: 32</span></div>
+                <p class="reference-note">Paper ID: c2cfe37c8f10158f7d1a</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Rama Yusvana, Azli Nawawi · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Mastering knowledge: the impact of generative AI on student learning outcomes</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 998e31c15aa2ac777d1e</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jessica L. Pallant, Janneke Blijlevens, Alexander Campbell, Ryan Jopp · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>105Intelligent Learning: Generative AI in Higher Education and Authentic Learning</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 578e1d746667b6c12f69</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ivy Shen · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enhancing Personalised Learning and Student Engagement Using Generative AI</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 77fac735a1eb3b81a4b6</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Adebowale Owoseni, Oluwaseun Kolade, Abiodun Egbetokun · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reimagining Classrooms: The Impact of Generative AI on Curriculum Design</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 198e9e4471df7a7f4cf5</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Author not supplied · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.59646/708/12" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>An Introduction to Generative AI</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 83bd10ab1638ca3d336a</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0_1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Software Optimization for Generative AI</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: babf94d201c62b6d1aff</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0_4" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Hardware Optimization for Generative AI</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 77f25259e3553e295c55</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0_3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Cloud and Edge Computing for Generative AI</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 57082927659ce340cb26</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0_7" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Optimizing Generative AI Workloads for Sustainability</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 591c2492655f97e9af8c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Data Management and Preprocessing for Sustainable Generative AI</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 462c69877d136dbebf9c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0_5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Sustainable AI Lifecycle Management</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: d15d18d1ede56586a61c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0_9" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Energy-Efficient AI Deployment and Scaling</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: f71f263676445e50799a</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ishneet Kaur Dua, Parth Girish Patel · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0917-0_8" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: 8c0c2b3b805a478da7ceb6bdfde88180 · Report ID: 61</p>
+        <p>Started: 2026-09-13 23:55:22 · Updated: 2026-09-13 23:57:38 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>2</dd><dt>Raw papers retrieved</dt><dd>30</dd><dt>Valid papers retained</dt><dd>30</dd><dt>Relevant papers retained</dt><dd>20</dd><dt>Duplicates removed</dt><dd>1</dd><dt>Noisy records removed</dt><dd>0</dd><dt>Irrelevant records removed</dt><dd>9</dd><dt>Evidence limit removed</dt><dd>10</dd><dt>Provider failures</dt><dd>1</dd><dt>Final evidence count</dt><dd>10</dd><dt>Elapsed seconds</dt><dd>136.177</dd><dt>Semantic scholar requests</dt><dd>2</dd><dt>Semantic scholar disabled</dt><dd>True</dd><dt>Fulltext papers resolved</dt><dd>5</dd><dt>Abstract fallbacks</dt><dd>6</dd><dt>Metadata only papers</dt><dd>18</dd><dt>Total chunks created</dt><dd>97</dd><dt>Chunks selected</dt><dd>12</dd><dt>Pdf extraction failures</dt><dd>0</dd><dt>Fulltext access failures</dt><dd>24</dd><dt>Html papers resolved</dt><dd>1</dd><dt>Pdf papers resolved</dt><dd>4</dd><dt>Papers discovered</dt><dd>30</dd><dt>Semantic retrieval seconds</dt><dd>53.442</dd><dt>Sources cited</dt><dd>9</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The selected evidence addresses the research question by examining generative AI&#39;s impact on learning outcomes through mixed-method studies, systematic reviews, and framework analyses. Full-text sources discuss mediating factors like engagement and AI literacy, while abstracts highlight both positive effects (e.g., personalized feedback, engagement boosts) and limitations (e.g., over-reliance, disciplinary variability). However, the evidence is heterogeneous in methodology and scope, with some abstract-only sources lacking detailed findings.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        <dl class="metrics"><dt>Writing sources</dt><dd>10</dd><dt>Full text sources</dt><dd>5</dd><dt>Html sources</dt><dd>1</dd><dt>Pdf sources</dt><dd>4</dd><dt>Abstract only sources</dt><dd>5</dd><dt>Selected chunks</dt><dd>12</dd><dt>Retrieval mode</dt><dd>semantic</dd><dt>Access failures</dt><dd>24</dd><dt>Extraction failures</dt><dd>0</dd><dt>Provider failures</dt><dd>1</dd></dl>
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-13 23:55:22</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-13 23:55:26</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:26</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-13 23:55:37</td><td>Retrieval</td><td>provider paused</td><td>Semantic Scholar request limit reached or access unavailable; using other sources for the rest of this investigation.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:37</td><td>Retrieval</td><td>provider failed</td><td>Semantic Scholar: rate limit reached. Continuing with available sources. No further Semantic Scholar requests will be made in this investigation.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:37</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:37</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-13 23:55:37</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:37</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:38</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:38</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:38</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:38</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.59075/m1cm0j76" target="_blank" rel="noopener noreferrer">07806393b703d7d5434a</a> — Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and .</td></tr>
+            
+            <tr><td>2026-09-13 23:55:42</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.59075/m1cm0j76" target="_blank" rel="noopener noreferrer">07806393b703d7d5434a</a> — Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and .</td></tr>
+            
+            <tr><td>2026-09-13 23:55:44</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.59075/m1cm0j76" target="_blank" rel="noopener noreferrer">07806393b703d7d5434a</a> — Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and .</td></tr>
+            
+            <tr><td>2026-09-13 23:55:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.59075/m1cm0j76" target="_blank" rel="noopener noreferrer">07806393b703d7d5434a</a> — Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and .</td></tr>
+            
+            <tr><td>2026-09-13 23:55:44</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.67508/iub.icebtm.2025.023" target="_blank" rel="noopener noreferrer">df5566d684035cdb1e4b</a> — Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awarene.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:48</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.67508/iub.icebtm.2025.023" target="_blank" rel="noopener noreferrer">df5566d684035cdb1e4b</a> — Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awarene.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:50</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.67508/iub.icebtm.2025.023" target="_blank" rel="noopener noreferrer">df5566d684035cdb1e4b</a> — Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awarene.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:50</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.67508/iub.icebtm.2025.023" target="_blank" rel="noopener noreferrer">df5566d684035cdb1e4b</a> — Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awarene.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:50</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">67779b5182de3b34f1be</a> — Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outco.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:50</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">67779b5182de3b34f1be</a> — Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outco.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:50</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">67779b5182de3b34f1be</a> — Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outco.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:51</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">67779b5182de3b34f1be</a> — Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outco.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:51</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">67779b5182de3b34f1be</a> — Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outco.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:51</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.51244/ijrsi.2025.120700041" target="_blank" rel="noopener noreferrer">cfafaf2f4585a24a54ac</a> — Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes i.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:51</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.51244/ijrsi.2025.120700041" target="_blank" rel="noopener noreferrer">cfafaf2f4585a24a54ac</a> — Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes i.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:52</td><td>Processing</td><td>html extracted</td><td>HTML article text extracted with section and paragraph provenance. Paper <a href="https://doi.org/10.51244/ijrsi.2025.120700041" target="_blank" rel="noopener noreferrer">cfafaf2f4585a24a54ac</a> — Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes i.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:53</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.51244/ijrsi.2025.120700041" target="_blank" rel="noopener noreferrer">cfafaf2f4585a24a54ac</a> — Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes i.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:53</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.11648/j.eas.20261101.11" target="_blank" rel="noopener noreferrer">6e69f2a77e027d1fa0ca</a> — Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Stud.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:55</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.11648/j.eas.20261101.11" target="_blank" rel="noopener noreferrer">6e69f2a77e027d1fa0ca</a> — Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Stud.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:55</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.11648/j.eas.20261101.11" target="_blank" rel="noopener noreferrer">6e69f2a77e027d1fa0ca</a> — Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Stud.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:55</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.11648/j.eas.20261101.11" target="_blank" rel="noopener noreferrer">6e69f2a77e027d1fa0ca</a> — Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Stud.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:55</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">f4bfa7f5f52813b2731e</a> — Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">f4bfa7f5f52813b2731e</a> — Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">f4bfa7f5f52813b2731e</a> — Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">f4bfa7f5f52813b2731e</a> — Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:58</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">f4bfa7f5f52813b2731e</a> — Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:59</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:59</td><td>Processing</td><td>pdf failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:59</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:55:59</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:00</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1016/j.ssaho.2024.101146" target="_blank" rel="noopener noreferrer">2e00b67cdf1ac04a3105</a> — Generative AI in student English learning in Thai higher education: More engagement, better outcomes?.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:01</td><td>Processing</td><td>pdf failed</td><td>The response was not a PDF and supplied no unambiguous PDF metadata; checking abstract fallback. Paper <a href="https://doi.org/10.1016/j.ssaho.2024.101146" target="_blank" rel="noopener noreferrer">2e00b67cdf1ac04a3105</a> — Generative AI in student English learning in Thai higher education: More engagement, better outcomes?.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:01</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1016/j.ssaho.2024.101146" target="_blank" rel="noopener noreferrer">2e00b67cdf1ac04a3105</a> — Generative AI in student English learning in Thai higher education: More engagement, better outcomes?.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:02</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1016/j.ssaho.2024.101146" target="_blank" rel="noopener noreferrer">2e00b67cdf1ac04a3105</a> — Generative AI in student English learning in Thai higher education: More engagement, better outcomes?.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:02</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1016/j.ssaho.2024.101146" target="_blank" rel="noopener noreferrer">2e00b67cdf1ac04a3105</a> — Generative AI in student English learning in Thai higher education: More engagement, better outcomes?.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:02</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:02</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:03</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:03</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:03</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:04</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:04</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:04</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">8d573a35c3539f0bcad2</a> — &#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO .</td></tr>
+            
+            <tr><td>2026-09-13 23:56:04</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">8d573a35c3539f0bcad2</a> — &#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO .</td></tr>
+            
+            <tr><td>2026-09-13 23:56:05</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">8d573a35c3539f0bcad2</a> — &#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO .</td></tr>
+            
+            <tr><td>2026-09-13 23:56:05</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">8d573a35c3539f0bcad2</a> — &#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO .</td></tr>
+            
+            <tr><td>2026-09-13 23:56:05</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">8d573a35c3539f0bcad2</a> — &#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO .</td></tr>
+            
+            <tr><td>2026-09-13 23:56:05</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:05</td><td>Processing</td><td>pdf failed</td><td>The response was not a PDF and supplied no unambiguous PDF metadata; checking abstract fallback. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:05</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:06</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:06</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:06</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:06</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:06</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1186/s41239-023-00411-8" target="_blank" rel="noopener noreferrer">da485bac61a4e19ae935</a> — Students’ voices on generative AI: perceptions, benefits, and challenges in higher education.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:06</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:06</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:08</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:09</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:10</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:10</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:10</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.59646/708/12" target="_blank" rel="noopener noreferrer">198e9e4471df7a7f4cf5</a> — Reimagining Classrooms: The Impact of Generative AI on Curriculum Design.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:10</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.59646/708/12" target="_blank" rel="noopener noreferrer">198e9e4471df7a7f4cf5</a> — Reimagining Classrooms: The Impact of Generative AI on Curriculum Design.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:15</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.59646/708/12" target="_blank" rel="noopener noreferrer">198e9e4471df7a7f4cf5</a> — Reimagining Classrooms: The Impact of Generative AI on Curriculum Design.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:15</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.59646/708/12" target="_blank" rel="noopener noreferrer">198e9e4471df7a7f4cf5</a> — Reimagining Classrooms: The Impact of Generative AI on Curriculum Design.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:15</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_1" target="_blank" rel="noopener noreferrer">83bd10ab1638ca3d336a</a> — An Introduction to Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:15</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_1" target="_blank" rel="noopener noreferrer">83bd10ab1638ca3d336a</a> — An Introduction to Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:16</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_1" target="_blank" rel="noopener noreferrer">83bd10ab1638ca3d336a</a> — An Introduction to Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:16</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_1" target="_blank" rel="noopener noreferrer">83bd10ab1638ca3d336a</a> — An Introduction to Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:16</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_4" target="_blank" rel="noopener noreferrer">babf94d201c62b6d1aff</a> — Software Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:16</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_4" target="_blank" rel="noopener noreferrer">babf94d201c62b6d1aff</a> — Software Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:16</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_4" target="_blank" rel="noopener noreferrer">babf94d201c62b6d1aff</a> — Software Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:17</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_4" target="_blank" rel="noopener noreferrer">babf94d201c62b6d1aff</a> — Software Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:17</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_3" target="_blank" rel="noopener noreferrer">77f25259e3553e295c55</a> — Hardware Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:17</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_3" target="_blank" rel="noopener noreferrer">77f25259e3553e295c55</a> — Hardware Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:17</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_3" target="_blank" rel="noopener noreferrer">77f25259e3553e295c55</a> — Hardware Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:17</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_3" target="_blank" rel="noopener noreferrer">77f25259e3553e295c55</a> — Hardware Optimization for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:17</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_7" target="_blank" rel="noopener noreferrer">57082927659ce340cb26</a> — Cloud and Edge Computing for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:17</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_7" target="_blank" rel="noopener noreferrer">57082927659ce340cb26</a> — Cloud and Edge Computing for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_7" target="_blank" rel="noopener noreferrer">57082927659ce340cb26</a> — Cloud and Edge Computing for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_7" target="_blank" rel="noopener noreferrer">57082927659ce340cb26</a> — Cloud and Edge Computing for Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0" target="_blank" rel="noopener noreferrer">591c2492655f97e9af8c</a> — Optimizing Generative AI Workloads for Sustainability.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0" target="_blank" rel="noopener noreferrer">591c2492655f97e9af8c</a> — Optimizing Generative AI Workloads for Sustainability.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0" target="_blank" rel="noopener noreferrer">591c2492655f97e9af8c</a> — Optimizing Generative AI Workloads for Sustainability.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0" target="_blank" rel="noopener noreferrer">591c2492655f97e9af8c</a> — Optimizing Generative AI Workloads for Sustainability.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_5" target="_blank" rel="noopener noreferrer">462c69877d136dbebf9c</a> — Data Management and Preprocessing for Sustainable Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_5" target="_blank" rel="noopener noreferrer">462c69877d136dbebf9c</a> — Data Management and Preprocessing for Sustainable Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_5" target="_blank" rel="noopener noreferrer">462c69877d136dbebf9c</a> — Data Management and Preprocessing for Sustainable Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_5" target="_blank" rel="noopener noreferrer">462c69877d136dbebf9c</a> — Data Management and Preprocessing for Sustainable Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_9" target="_blank" rel="noopener noreferrer">d15d18d1ede56586a61c</a> — Sustainable AI Lifecycle Management.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:18</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_9" target="_blank" rel="noopener noreferrer">d15d18d1ede56586a61c</a> — Sustainable AI Lifecycle Management.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:19</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_9" target="_blank" rel="noopener noreferrer">d15d18d1ede56586a61c</a> — Sustainable AI Lifecycle Management.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:19</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_9" target="_blank" rel="noopener noreferrer">d15d18d1ede56586a61c</a> — Sustainable AI Lifecycle Management.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:19</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_8" target="_blank" rel="noopener noreferrer">f71f263676445e50799a</a> — Energy-Efficient AI Deployment and Scaling.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:19</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_8" target="_blank" rel="noopener noreferrer">f71f263676445e50799a</a> — Energy-Efficient AI Deployment and Scaling.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:19</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_8" target="_blank" rel="noopener noreferrer">f71f263676445e50799a</a> — Energy-Efficient AI Deployment and Scaling.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:19</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0917-0_8" target="_blank" rel="noopener noreferrer">f71f263676445e50799a</a> — Energy-Efficient AI Deployment and Scaling.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>DOI metadata verification unavailable; retained the original reference metadata. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.59075/m1cm0j76" target="_blank" rel="noopener noreferrer">07806393b703d7d5434a</a> — Impact of Generative Artificial Intelligence on Student Learning Outcomes: The Mediating Role of Student Engagement and .</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.67508/iub.icebtm.2025.023" target="_blank" rel="noopener noreferrer">df5566d684035cdb1e4b</a> — Generative AI in higher education: examining its influence on student engagement, learning outcomes, and ethical awarene.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>DOI metadata verification unavailable; retained the original reference metadata. Paper <a href="https://doi.org/10.1109/ASET60340.2024.10708721" target="_blank" rel="noopener noreferrer">67779b5182de3b34f1be</a> — Optimizing Generative AI Integration in Higher Education: A Framework for Enhanced Student Engagement and Learning Outco.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.51244/ijrsi.2025.120700041" target="_blank" rel="noopener noreferrer">cfafaf2f4585a24a54ac</a> — Augmenting Learning with Artificial Intelligence: An Empirical Examination of Generative‑AI Tools and Student Outcomes i.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.11648/j.eas.20261101.11" target="_blank" rel="noopener noreferrer">6e69f2a77e027d1fa0ca</a> — Adoption of Generative AI and Learning Analytics for Personalized Learning in Nigerian Higher Education: Effects on Stud.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>DOI metadata verification unavailable; retained the original reference metadata. Paper <a href="https://doi.org/10.1177/00472395251400089" target="_blank" rel="noopener noreferrer">f4bfa7f5f52813b2731e</a> — Generative AI in Higher Education: A Systematic Review of Its Effects on Learning Outcomes and Academic Performance.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.3390/info16121070" target="_blank" rel="noopener noreferrer">83a2e4706432492d23cc</a> — Empowering Student Learning in Higher Education with Generative AI Art Applications: A Systematic Review.</td></tr>
+            
+            <tr><td>2026-09-13 23:56:21</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.51316/icef.hust.2025.27" target="_blank" rel="noopener noreferrer">8d573a35c3539f0bcad2</a> — &#34;EXPLORING THE IMPACT OF GENERATIVE AI ON ENGLISH LANGUAGE LEARNING IN VIETNAMESE HIGHER EDUCATION: A CASE STUDY OF TWO .</td></tr>
+            
+            <tr><td>2026-09-13 23:57:15</td><td>Processing</td><td>chunks selected</td><td>Relevant passages selected.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:15</td><td>Processing</td><td>semantic completed</td><td>Hybrid evidence retrieval completed.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:15</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:15</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-13 23:57:19</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:19</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-13 23:57:20</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:28</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:28</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:33</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:33</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:38</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-13 23:57:38</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 61</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 48</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>What are the main uses of XGBOOST?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>XGBoost is primarily employed for predictive analytics across diverse domains, with a focus on time series forecasting, classification tasks, and handling imbalanced datasets. In healthcare, it has been applied to predict daily confirmed COVID-19 cases in Europe, leveraging its ability to optimise parameters for robust model fitting (Gopatoti, 2023). Similarly, in the telecommunications sector, XGBoost is fine-tuned to address data imbalance and overfitting challenges, enhancing accuracy in predicting customer churn through precision, recall, and accuracy metrics (P a and R B, no date). These applications highlight its adaptability to complex, real-world data scenarios where traditional methods may falter. The algorithm’s strength lies in its gradient boosting framework, which iteratively corrects errors and improves predictive performance, making it suitable for both regression and classification tasks. Its integration with feature engineering techniques, such as adjusting parameter features in pandemic prediction models (Gopatoti, 2023), further underscores its flexibility in tailoring solutions to specific problems.</p><p>Beyond these domains, XGBoost has been explored for medical diagnostics, such as detecting Parkinson’s disease through machine learning models. While the abstract for this application is truncated, the use of XGBoost in this context suggests its potential for identifying subtle patterns in clinical data (malhotra, no date). This aligns with its broader utility in scenarios requiring high-dimensional data analysis, where its ability to handle non-linear relationships and interactions between variables is advantageous. However, the absence of detailed performance metrics in the abstract limits the depth of evaluation for such applications. The algorithm’s capacity to manage imbalanced datasets, as demonstrated in customer churn prediction (P a and R B, no date), also extends to other fields, such as fraud detection or rare event forecasting, where skewed data distributions are common.</p><p>A key advantage of XGBoost is its interpretability, particularly when combined with tools like SHAP (SHapley Additive exPlanations) for explaining model predictions. While this is explicitly mentioned in the context of corporate ESG rating prediction (Zhang and Zhao, 2026), the absence of a full abstract prevents a detailed analysis of its implementation. Nevertheless, the algorithm’s integration with optimisation techniques—such as grid search for hyperparameter tuning in hybrid models like LSTM-XGBoost (Liu, 2025)—demonstrates its compatibility with advanced methodologies. These hybrid approaches often aim to leverage the strengths of multiple models, with XGBoost providing robust predictive capabilities. However, the lack of abstracts for many sources, including those involving deep learning or composite models (Islam et al., 2022), restricts the ability to assess its performance in these contexts.</p><p>Practically, XGBoost’s efficiency and scalability make it a popular choice for industries requiring rapid, accurate predictions. Its ability to handle large datasets and parallel processing capabilities further enhance its applicability in resource-constrained environments. However, the reliance on feature engineering and hyperparameter tuning, as noted in pandemic prediction studies (Gopatoti, 2023), highlights the need for domain-specific expertise to maximise its effectiveness. While the algorithm’s performance in medical diagnostics (malhotra, no date) and customer churn prediction (P a and R B, no date) is promising, the absence of comprehensive validation in these areas underscores the importance of rigorous testing. Overall, XGBoost’s versatility and performance in diverse applications position it as a valuable tool, though its implementation requires careful consideration of data characteristics and model-specific requirements.</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>XGBoost is widely used for time series forecasting, exemplified by its application in predicting daily COVID-19 cases in Europe, where it outperformed other models using RMSE and MAPE metrics (Gopatoti, 2023). Its ability to optimise parameter features for robust predictive modelling makes it suitable for complex, real-world datasets (Gopatoti, 2023). In healthcare, it has been applied to detect Parkinson’s Disease, leveraging its classification capabilities to analyse neurological data (malhotra, no date). The algorithm’s gradient boosting framework enables iterative error correction, enhancing accuracy in both regression and classification tasks. In telecommunications, XGBoost is fine-tuned to address data imbalance and overfitting, improving customer churn prediction through precision, recall, and accuracy (P a and R B, no date). These applications highlight its adaptability to diverse domains, from public health to business analytics, where traditional methods may struggle with data complexity (P a and R B, no date).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The reliance on RMSE and MAPE for evaluating XGBoost models in S1 limits generalizability, as these metrics may not capture all aspects of predictive accuracy. Further evidence on alternative evaluation methods or real-world validation would strengthen claims about its applicability beyond controlled datasets (Gopatoti, 2023).</li><li>Fine-tuning XGBoost for imbalanced datasets in S2 depends on the effectiveness of introduced feature functions, which are not explicitly validated against alternative approaches. Comparative testing with other imbalance mitigation techniques would clarify its relative advantages (P a and R B, no date).</li><li>S3’s abstract truncates details on dataset size, validation methods, or cross-domain applicability, restricting assessment of XGBoost’s robustness in Parkinson’s disease detection. Full methodology reports would address gaps in understanding its scalability to other medical conditions (malhotra, no date).</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S1">
+                Gopatoti, A. (2023) ‘A novel metaheuristic prediction approach for COVID-19 cases using XGBoost algorithm’, <em>International Journal of Scientific Methods in Intelligence Engineering Networks</em>, 01(01), pp. 85-93.
+                Available at: <a href="https://doi.org/10.58599/ijsmien.2023.1108" target="_blank" rel="noopener noreferrer">https://doi.org/10.58599/ijsmien.2023.1108</a>
+                (Accessed: 10 September 2026).
+                
+            </li>
+        
+            <li id="source-S9">
+                Islam, M.D. et al. (2022) ‘Airbnb rental price modeling based on Latent Dirichlet Allocation and MESF-XGBoost composite model’, <em>Machine Learning with Applications</em>, 7, article 100208.
+                Available at: <a href="https://doi.org/10.1016/j.mlwa.2021.100208" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.mlwa.2021.100208</a>
+                (Accessed: 10 September 2026).
+                
+            </li>
+        
+            <li id="source-S6">
+                Liu, X. (2025) ‘Enhanced prediction of karst spring discharge using a hybrid LSTM-XGBoost model optimized with grid search’, <em>Machine Learning with Applications</em>, 22, article 100740.
+                Available at: <a href="https://doi.org/10.1016/j.mlwa.2025.100740" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.mlwa.2025.100740</a>
+                (Accessed: 10 September 2026).
+                
+            </li>
+        
+            <li id="source-S3">
+                malhotra, S. (no date) ‘Python machine learning based detection of Parkinson&#39;s Disease using XGBoost’.
+                Available at: <a href="https://doi.org/10.14293/s2199-1006.1.sor-.ppwx1hp.v1" target="_blank" rel="noopener noreferrer">https://doi.org/10.14293/s2199-1006.1.sor-.ppwx1hp.v1</a>
+                (Accessed: 10 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                P a, S. and R B, D. (no date) ‘Customer churn prediction in telecommunication industry through machine learning based Fine-tuned XGBoost algorithm’.
+                Available at: <a href="https://doi.org/10.2139/ssrn.3835039" target="_blank" rel="noopener noreferrer">https://doi.org/10.2139/ssrn.3835039</a>
+                (Accessed: 10 September 2026).
+                
+            </li>
+        
+            <li id="source-S5">
+                Zhang, J. and Zhao, Z. (2026) ‘Corporate ESG rating prediction based on XGBoost-SHAP interpretable machine learning model’, <em>Expert Systems with Applications</em>, 295, article 128809.
+                Available at: <a href="https://doi.org/10.1016/j.eswa.2025.128809" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.eswa.2025.128809</a>
+                (Accessed: 10 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>A novel metaheuristic prediction approach for COVID-19 cases using XGBoost algorithm</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: 5724fd386c79c581e237</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Anandbabu Gopatoti · 2023 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>COVID-19 prediction is of great importance to build stronger government prevention and control of the global pandemic. This pandemic has a devastating impact on people and their lives. Many industries are suffering and are struggling to overcome unexpected pandemic challenges. Therefore, it is extremely important to develop up to date and practicable models for time series prediction of COVID-19 that would give promising results. In this paper, we build a model for predicting daily confirmed n w cases for the time series data of Europe by applying the Extreme Gradient Boosting (XGBoost) algorithm and using two performance parameters such as RMSE and MAPE to evaluate the effect of model fitting. Since machine learning methods (ML) have shown favorable results recently, among the tested models, XGBoost has shown to give the best results among the other models tested. Another advantage of the model is that we can use the XGBoost model to determine the robustness of the predictive model by adjusting parameter features. Our results are in line with the expectations of the performance of the model based on the available data and the variability of the data. By analyzing important features and updating the prediction for the new cases of the pandemic, the governments all around the globe could manage the situation much more effortlessly and with greater impact.</p></details>
+                <a href="https://doi.org/10.58599/ijsmien.2023.1108" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Customer churn prediction in telecommunication industry through machine learning based Fine-tuned XGBoost algorithm</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: a3116e79048738a44ab9</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Swetha P a, Dayananda R B · No date · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Telecom companies require the accurate prediction of probable churn customers to improvise the customer relationship management; this is addressed through customer churn prediction model. Customer churn is one of the major issue faced by telecommunication companies due to various competitors and this further cause’s loss of revenue. Moreover, the customer churn prediction model helps in predicting the potential churners; hence plenty of research has been carried out in past and few of them succeeded through machine learning approach. However data imbalance remains the major issue, hence in this research work we design and develop Fine-tuned XGBoost model which addresses the issue of imbalance dataset through introducing the feature function; further, it also tackles with data sparsity and overfitting problem. Finetuned XGBoost is evaluated through comparing the machine-learning algorithm in terms of performance metrics like precision, recall and accuracy and fine-tuned XGBoost outperforms the existing model.</p></details>
+                <a href="https://doi.org/10.2139/ssrn.3835039" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Python machine learning based detection of Parkinson&#39;s Disease using XGBoost</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 21f935108ca814f3bfef</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">smridhi malhotra · No date · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Parkinson&#39;s disease is a progressive central nervous syst em condition that affects movement and causes tremors and stiffness. It has 5 stages to it and affects more than 1 million people in India per year. This is chronic and still has no cure. It is a neurodegenerative disease that affects the neurons in the brain that contain dopamine.</p></details>
+                <a href="https://doi.org/10.14293/s2199-1006.1.sor-.ppwx1hp.v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Machine Learning-Based Heart Disease Prediction Using PSO-Optimized XGBoost</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 9bb0ea387b04c734b35f</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Vivek Solanki, Adarsh Kushwaha · 2026 · Crossref</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.55248/gengpi.07.0426.a902" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Corporate ESG rating prediction based on XGBoost-SHAP interpretable machine learning model</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 8b673a52cecdd7848e85</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Jianfeng Zhang, Zexin Zhao · 2026 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.eswa.2025.128809" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enhanced prediction of karst spring discharge using a hybrid LSTM-XGBoost model optimized with grid search</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 519dbaf274b57966ca2b</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Xiaomei Liu · 2025 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.mlwa.2025.100740" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enhancing IDS performance through a comparative analysis of Random Forest, XGBoost, and Deep Neural Networks</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 4fbf9cffcb5695bb2e07</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Sow Thierno Hamidou, Adda Mehdi · 2025 · Crossref</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.mlwa.2025.100738" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>An XGBoost-Based Classification Method to Classify Breast Cancer</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 51310f984c453e8d78f1</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Kishwar Sadaf, Jabeen Sultana, Nazia Ahmad · 2023 · Crossref</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003328780-5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Airbnb rental price modeling based on Latent Dirichlet Allocation and MESF-XGBoost composite model</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 626703618e9b6d1d30a3</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Md Didarul Islam, Bin Li, Kazi Saiful Islam, Rakibul Ahasan, Md. Rimu Mia, Md Emdadul Haque · 2022 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.mlwa.2021.100208" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>An investigation of XGBoost-based algorithm for breast cancer classification</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 049bf708b6fe3c7670a2</p>
+                
+                <details><summary>Selected passage provenance</summary><ul><li>No passage provenance saved for this report.</li></ul></details>
+                <p class="reference-note">Xin Yu Liew, Nazia Hameed, Jeremie Clos · 2021 · Crossref</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.mlwa.2021.100154" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>An effective adaptive customization framework for small manufacturing plants using extreme gradient boosting-XGBoost and random forest ensemble learning algorithms in an Industry 4.0 environment</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: f1ec0417d109ea01ecbc</p>
+                
+                
+                <p class="reference-note">Sonia Kahiomba Kiangala, Zenghui Wang · 2021 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.mlwa.2021.100024" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Xgboost Machine Learning Model and Bond Pricing</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: e35fcf1630d7756edb38</p>
+                
+                
+                <p class="reference-note">Qun Yan, Hongyun Hu · No date · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.2139/ssrn.4846755" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Algorithm 2: Part 2: XGBoost training and intrusion detection.</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 28044e56cb5aad648905</p>
+                
+                
+                <p class="reference-note">Author not supplied · No date · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.7717/peerj-cs.3506/table-6" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Quantum Computing and AI Applications in Industry 5.0 Use Cases</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: cb204ac9be36a82713e9</p>
+                
+                
+                <p class="reference-note">Jihane Gharib, Youssef Gahi · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1002/9781394242399.ch17" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Metaverse enabling technologies and industry use cases</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: dde3d50f5341b73f73b7</p>
+                
+                
+                <p class="reference-note">Pethuru Raj · 2024 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1049/pbpc070e_ch2" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Digital twin: The industry use cases</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 09386de241daf91b61ba</p>
+                
+                
+                <p class="reference-note">Author not supplied · 2020 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/bs.adcom.2019.09.006" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The industry use cases for the Digital Twin idea</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 128979dd9abf993cbfdd</p>
+                
+                
+                <p class="reference-note">Author not supplied · 2020 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/bs.adcom.2019.10.008" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Smart Healthcare Use Cases and Applications</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: dff1242eec95d4eff978</p>
+                
+                
+                <p class="reference-note">A. R. Charulatha, R. Sujatha · 2020 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/978-3-030-37526-3_8" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: d858c3a9638640a18b5752df0a32ceba · Report ID: 48</p>
+        <p>Started: 2026-09-10 22:49:57 · Updated: 2026-09-10 22:51:14 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>2</dd><dt>Raw papers retrieved</dt><dd>20</dd><dt>Valid papers retained</dt><dd>18</dd><dt>Relevant papers retained</dt><dd>13</dd><dt>Duplicates removed</dt><dd>0</dd><dt>Noisy records removed</dt><dd>2</dd><dt>Irrelevant records removed</dt><dd>5</dd><dt>Evidence limit removed</dt><dd>3</dd><dt>Provider failures</dt><dd>2</dd><dt>Final evidence count</dt><dd>10</dd><dt>Elapsed seconds</dt><dd>76.875</dd><dt>Sources cited</dt><dd>6</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The retrieved evidence covers diverse applications of XGBoost including healthcare (disease prediction), telecommunications (churn prediction), environmental science (discharge prediction), cybersecurity (IDS performance), and financial modeling (ESG ratings, Airbnb pricing). While some abstracts are incomplete, the overall scope demonstrates XGBoost&#39;s versatility across domains. Further refinement may benefit from targeted queries on specific industries or methodologies.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-10 22:49:57</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-10 22:50:01</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:01</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-10 22:50:09</td><td>Retrieval</td><td>provider failed</td><td>Semantic Scholar was unavailable. Continuing with available sources.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:09</td><td>Retrieval</td><td>provider failed</td><td>Semantic Scholar was unavailable. Continuing with available sources.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:09</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:09</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-10 22:50:09</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:09</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-10 22:50:12</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:12</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-10 22:50:12</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:23</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:34</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:34</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:41</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:47</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:52</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-10 22:50:52</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-10 22:51:00</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-10 22:51:08</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-10 22:51:14</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-10 22:51:14</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 48</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

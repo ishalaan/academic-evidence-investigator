@@ -271,4 +271,4 @@ tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_reje
 tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_rejected[{"summary":"one"}{"summary":"two"}] PASSED [ 99%]
 tests/unit/test_validation.py::test_paper_without_title_is_removed PASSED [100%]
 
-============================ 263 passed in 25.13s =============================
+============================ 263 passed in 11.29s =============================

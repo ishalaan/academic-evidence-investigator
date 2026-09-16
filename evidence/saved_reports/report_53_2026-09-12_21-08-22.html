@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 53</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>What are the main applications of large language models in education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Large language models (LLMs) are increasingly applied in education to enhance personalised learning, automate assessments, and support pedagogical innovation. Their use spans content creation, language learning, and task-specific support, with studies highlighting both opportunities and challenges. For instance, LLMs like ChatGPT are employed as learning aids and research assistants, aiding students in problem-solving, literature reviews, and foreign language acquisition (Čávojský et al., 2023). Similarly, tools such as ZeroGPT are developed to detect AI-generated content, addressing concerns about academic integrity and cognitive offloading (Čávojský et al., 2023). These applications demonstrate LLMs’ potential to streamline educational workflows while raising ethical questions about reliance on AI for critical thinking (Čávojský et al., 2023).</p><p>A key area of application is assessment automation, where LLMs are used to generate grading criteria, provide targeted feedback, and evaluate student work across multiple languages. However, performance in non-English languages remains uneven, correlating with the volume of training data available for those languages (Gupta et al., 2025). This highlights the need for careful implementation to avoid exacerbating educational inequalities. In Chinese education, frameworks like EduEval are introduced to rigorously evaluate LLMs through hierarchical benchmarks that align with cognitive learning objectives, ensuring alignment with educational standards (Ma et al., 2025). Such tools aim to balance innovation with accountability, addressing risks associated with untested deployments (Ma et al., 2025).</p><p>In specialised fields like programming education, LLMs are integrated into learning processes, though their impact on student outcomes is nuanced. While they can assist with code generation and debugging, over-reliance on LLMs for tasks requiring critical thinking—such as algorithm design—correlates with reduced learning gains (Jošt, Taneski and Karakatič, 2024). This underscores the importance of balancing AI support with human oversight to preserve essential skills. Similarly, in sports sciences, LLMs are used to create context-specific teaching resources and translate academic content into accessible formats, though careful validation is required to ensure accuracy and relevance (Boukari et al., 2026). These examples illustrate the dual role of LLMs as both enablers and potential disruptors of traditional pedagogical practices.</p><p>Beyond technical applications, LLMs are being explored for their capacity to address systemic issues in education. Frameworks mapping the LLM life cycle identify biases in data curation, model training, and deployment, which could perpetuate existing inequalities if left unaddressed (Lee et al., 2024). Additionally, educators are called to adopt hybrid models that integrate LLMs for administrative tasks while preserving face-to-face instruction, kinesthetic learning, and mentorship—key components of embodied education (Boukari et al., 2026). Such approaches emphasise the need for pedagogical frameworks that align AI tools with educational goals rather than replacing human expertise. Overall, the evidence suggests that LLMs’ educational applications are most effective when paired with intentional design, ethical considerations, and ongoing evaluation (Lee et al., 2024).</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>Large language models (LLMs) are increasingly used as learning aids and research assistants, supporting tasks like problem-solving, literature reviews, and foreign language acquisition. ChatGPT, for instance, is highlighted as a tool to enhance student engagement while raising concerns about cognitive offloading and academic integrity. Tools like ZeroGPT are also developed to detect AI-generated content, addressing ethical dilemmas in education (Čávojský et al., 2023).</li><li>LLMs facilitate the creation of teaching resources and translation of academic content into accessible formats, aiding educators in contextualizing findings for practitioners. This application bridges the research-practice gap in sports pedagogy by translating complex concepts into plain language summaries, though it requires careful human oversight to ensure accuracy (Boukari et al., 2026).</li><li>Personalised learning and assessment automation are key applications, with LLMs enabling tailored educational experiences. The EduEval benchmark, designed for Chinese K-12 education, evaluates LLMs across cognitive dimensions like memorization, reasoning, and ethics, ensuring alignment with educational standards (Ma et al., 2025).</li><li>Multilingual performance disparities in LLMs pose challenges for non-English language education. While models perform reasonably well in major languages, lower-resource languages like Ukrainian and Telugu show poorer task accuracy, highlighting the need for more inclusive training data to avoid exacerbating educational inequalities (Gupta et al., 2025).</li><li>In programming education, LLMs like ChatGPT and Copilot are integrated into software development courses, but their overuse correlates with reduced critical thinking skills in tasks like code generation. This suggests a need for balanced implementation to preserve foundational learning outcomes (Jošt, Taneski and Karakatič, 2024).</li><li>LLMs are employed to automate assessments and provide targeted feedback, though their deployment risks undermining traditional pedagogical practices. Studies emphasise the importance of hybrid models that combine AI-driven efficiency with human mentorship to maintain embodied learning and social interaction in education (Boukari et al., 2026).</li><li>Ethical and algorithmic bias concerns are central to LLM integration in education. Frameworks mapping the LLM life cycle identify biases in data curation, model training, and customization, urging systematic mitigation to prevent reinforcing existing educational disparities (Lee et al., 2024).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The multilingual capabilities of LLMs are constrained, with poorer performance in low-resource languages due to limited training data, raising concerns about equitable access to educational tools (Gupta et al., 2025). Further evidence on cross-linguistic task performance and resource allocation could clarify scalability.
+
+Algorithmic bias in LLMs may perpetuate educational inequalities, as seen in grading and feedback tasks, though the study notes this requires deeper analysis of training data sources (Lee et al., 2024). More granular research on bias mitigation strategies in diverse educational contexts is needed.
+
+Over-reliance on LLMs for tasks like coding or problem-solving correlates with reduced critical thinking skills, highlighting risks of cognitive offloading (Jošt, Taneski and Karakatič, 2024). Longitudinal studies tracking skill development alongside AI integration would strengthen understanding of these trade-offs.
+
+Ethical concerns around academic integrity and AI-generated content remain underexplored, with existing tools like ZeroGPT only addressing surface-level issues (Čávojský et al., 2023). Systematic investigations into pedagogical frameworks balancing AI use and human oversight are critical.</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S1">
+                Boukari, S. et al. (2026) ‘Generative Artificial Intelligence and Large Language Models in Didactics of Sports Sciences and Physical Education: A Comprehensive Review of Pedagogical Applications, Teaching Innovations, and Research Implications’, <em>International Journal of Sport Studies for Health</em>.
+                Available at: <a href="https://doi.org/10.61838/kman.intjssh.4891" target="_blank" rel="noopener noreferrer">https://doi.org/10.61838/kman.intjssh.4891</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S3">
+                Gupta, V. et al. (2025) ‘Multilingual Performance Biases of Large Language Models in Education’, <em>ArXiv</em>, abs/2504.17720.
+                Available at: <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">https://doi.org/10.48550/arXiv.2504.17720</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S6">
+                Jošt, G., Taneski, V. and Karakatič, S. (2024) ‘The Impact of Large Language Models on Programming Education and Student Learning Outcomes’, <em>Applied Sciences</em>, 14(10), p. 4115.
+                Available at: <a href="https://doi.org/10.3390/app14104115" target="_blank" rel="noopener noreferrer">https://doi.org/10.3390/app14104115</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S5">
+                Lee, J. et al. (2024) ‘The life cycle of large language models in education: A framework for understanding sources of bias’, <em>Br. J. Educ. Technol.</em>, 55, pp. 1982-2002.
+                Available at: <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">https://doi.org/10.1111/bjet.13505</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Ma, G. et al. (2025) ‘EduEval: A Hierarchical Cognitive Benchmark for Evaluating Large Language Models in Chinese Education’, <em>ArXiv</em>, abs/2512.00290.
+                Available at: <a href="https://doi.org/10.48550/arXiv.2512.00290" target="_blank" rel="noopener noreferrer">https://doi.org/10.48550/arXiv.2512.00290</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                Čávojský, M. et al. (2023) ‘Exploring the Capabilities and Possible Applications of Large Language Models for Education’, <em>2023 21st International Conference on Emerging eLearning Technologies and Applications (ICETA)</em>, pp. 91-98.
+                Available at: <a href="https://doi.org/10.1109/ICETA61311.2023.10344166" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/ICETA61311.2023.10344166</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative Artificial Intelligence and Large Language Models in Didactics of Sports Sciences and Physical Education: A Comprehensive Review of Pedagogical Applications, Teaching Innovations, and Research Implications</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 569f67a6cf4a48baeb13</p>
+                <p><strong>Full-text evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 9, PDF page 9 · full_text · Similarity 0.418<br>Retrieved from: https://journals.kmanpub.com/index.php/Intjssh/article/download/4891/11044</li><li>Chunk 2, PDF page 2 · full_text · Similarity 0.345<br>Retrieved from: https://journals.kmanpub.com/index.php/Intjssh/article/download/4891/11044</li></ul></details>
+                <p class="reference-note">Sami Boukari, Imed Chokri, Imen Samet, Mohamed Amine Dergaa, H. Ceylan, Nizar Souissi, Mortadha Razzak, Ichrak Messaoud, Sana Solmi, N. Chalghaf, Ismail Dergaa · 2026 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Objective: The global burden of physical inactivity contributes to 5.3 million deaths annually, exceeding smoking-related mortality in certain regions and contributing substantially to the 1.5 billion individuals worldwide living with chronic diseases. Physical education (PE) represents a critical intervention point, yet persistent challenges limit effectiveness including inadequate instructional time (80 minutes weekly versus recommended 150 minutes), insufficient specialized teacher preparation (42% of elementary PE teachers lack specialized training), and limited capacity for differentiated instruction in heterogeneous student populations. The emergence of Generative Artificial Intelligence (Gen AI), particularly Large Language Models (LLMs) such as ChatGPT (launched November 2022, achieving 100 million users within two months), presents unprecedented opportunities for transforming pedagogical practices in sports sciences and PE contexts while simultaneously introducing critical challenges regarding academic integrity, cognitive development, and the preservation of embodied learning central to movement education. This comprehensive review aimed to: (i) systematically examine current applications and pedagogical affordances of Gen AI and LLMs in sports sciences and PE didactics; (ii) analyze alignment with established pedagogical principles including constructivism, social constructivism, situated learning theory, and Universal Design for Learning; (iii) critically evaluate potential benefits and risks from a didactics perspective including impacts on teacher development, student learning outcomes, curriculum design, and assessment practices; and (iv) propose evidence-informed frameworks for pedagogically sound integration emphasizing human-AI collaboration rather than replacement of essential teaching functions. Methods: A systematic literature search was conducted following adapted PRISMA guidelines across seven databases (PubMed/MEDLINE, Web of Science, Scopus, IEEE Xplore, ERIC, SPORTDiscus, Google Scholar) covering January 2022 to November 2025. Search terms combined Gen AI/LLM terminology with pedagogical concepts in sports sciences contexts using Boolean operators. Inclusion criteria focused on peer-reviewed articles examining pedagogical applications, teaching innovations, learning outcomes, and didactic research methodologies. From 1,247 initial records, 858 titles and abstracts were screened after duplicate removal (n=389), with 247 undergoing full-text review. Final analysis included 78 studies meeting inclusion criteria. Data extraction utilized standardized forms capturing study characteristics, methodological approaches, AI technology examined, pedagogical context, theoretical framework, key findings, and practice implications. Thematic analysis employed a pedagogically-oriented framework organizing findings into four domains aligned with core didactic functions: teaching support, learning enhancement, assessment innovation, and didactic research. Results: Analysis of 78 studies (67% published 2023-2024) revealed significant pedagogical applications across four domains with concurrent identification of critical challenges. Teaching Support domain demonstrated lesson planning time reductions of 35% to 45%, with AI-assisted lesson plan quality rated 7.3 out of 10 (SD=1.2) for curriculum alignment compared to 7.8 out of 10 (SD=0.9) for manually created plans. Educators reported 67% satisfaction with differentiated instruction materials generated through Gen AI platforms. Learning Enhancement domain revealed improved conceptual understanding when engaging with AI tutors for anatomy and biomechanics concepts, with students valuing immediate availability and scaffolded explanations. Assessment Innovation applications showed AI-generated feedback demonstrated substantial agreement with expert teacher feedback for student assignments. Didactic Research efficiency gains included literature synthesis completion substantially faster than traditional methods and qualitative coding demonstrating substantial agreement between AI and expert human coders. However, critical challenges emerged including academic integrity violations in 23% to 43% of student work, factual inaccuracies in AI-generated specialized content, cognitive atrophy concerns (AI-Chatbot Induced Cognitive Atrophy, AICICA), reduced emphasis on embodied learning in PE contexts, and equity issues affecting students with limited digital literacy or technology access. Conclusion: Gen AI and LLMs represent transformative tools for sports sciences and PE didactics when implemented within robust pedagogical frameworks that preserve the essential embodied, social, and affective dimensions of movement education. Evidence supports specific applications including administrative efficiency, differentiated cognitive content delivery, formative assessment support, and research methodology enhancement, while simultaneously demanding critical attention to academic integrity, accuracy verification, equity considerations, and prevention of cognitive atrophy through over-reliance. A hybrid pedagogical model is recommended integrating Gen AI for cognitive content delivery, theoretical knowledge construction, and administrative tasks while rigorously preserving face-to-face instruction, kinesthetic learning experiences, immediate physical feedback, and human mentorship central to sports education. Successful integration requires comprehensive teacher professional development focusing on pedagogical decision-making rather than technical operation, explicit policies balancing academic integrity with beneficial use, critical AI literacy curriculum specific to sports sciences contexts, and ongoing empirical evaluation of long-term learning outcomes. The field requires a paradigm shift from technology-driven adoption to pedagogy-informed integration, ensuring Gen AI serves educational goals rather than dictating them.</p></details>
+                <a href="https://doi.org/10.61838/kman.intjssh.4891" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Exploring the Capabilities and Possible Applications of Large Language Models for Education</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 2e05503400581d811760</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.443<br>Retrieved from: https://www.semanticscholar.org/paper/513675975aaa831aeedad0159e56caafdcec0a4a</li></ul></details>
+                <p class="reference-note">Matúš Čávojský, Gabriel Bugár, Tomás Kormaník, M. Hasin · 2023 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This research looks into the possible applications of large language models (LLMs) in education, with a special emphasis on ChatGPT, an OpenAI-developed chat bot model. It demonstrates the usefulness of ChatGPT as a learning aid and research assistant while addressing ethical and pedagogical concerns such as cognitive offloading, academic integrity, and critical thinking. The study covers a wide range of educational settings, including content development, learning a foreign language, problem solving, and literature review assistance. Furthermore, it presents ZeroGPT, a plagiarism detection tool for recognizing GPT-generated content and summarizes the findings to highlight LLMs’ ability to improve educational experiences.</p></details>
+                <a href="https://doi.org/10.1109/ICETA61311.2023.10344166" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Multilingual Performance Biases of Large Language Models in Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 43ee383b1ecc8b4661a3</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.470<br>Retrieved from: https://www.semanticscholar.org/paper/2f6644d97226c1258d9b733a5762dde8aa27b2b5</li></ul></details>
+                <p class="reference-note">Vansh Gupta, Sankalan Pal Chowdhury, Vilém Zouhar, Donya Rooein, Mrinmaya Sachan · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are increasingly being adopted in educational settings. These applications expand beyond English, though current LLMs remain primarily English-centric. In this work, we ascertain if their use in education settings in non-English languages is warranted. We evaluated the performance of popular LLMs on four educational tasks: identifying student misconceptions, providing targeted feedback, interactive tutoring, and grading translations in eight languages (Mandarin, Hindi, Arabic, German, Farsi, Telugu, Ukrainian, Czech) in addition to English. We find that the performance on these tasks somewhat corresponds to the amount of language represented in training data, with lower-resource languages having poorer task performance. Although the models perform reasonably well in most languages, the frequent performance drop from English is significant. Thus, we recommend that practitioners first verify that the LLM works well in the target language for their educational task before deployment.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>EduEval: A Hierarchical Cognitive Benchmark for Evaluating Large Language Models in Chinese Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 2f7249a88428bc1757bb</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.489<br>Retrieved from: https://www.semanticscholar.org/paper/ed8704abb19318657507897e5ebc48cb50a78f0d</li></ul></details>
+                <p class="reference-note">Guoqing Ma, Jia Zhu, Hanghui Guo, Weijie Shi, Yue Cui, Jiawei Shen, Zilong Li, Yidan Liang · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) demonstrate significant potential for educational applications. However, their unscrutinized deployment poses risks to educational standards, underscoring the need for rigorous evaluation. We introduce EduEval, a comprehensive hierarchical benchmark for evaluating LLMs in Chinese K-12 education. This benchmark makes three key contributions: (1) Cognitive Framework: We propose the EduAbility Taxonomy, which unifies Bloom&#39;s Taxonomy and Webb&#39;s Depth of Knowledge to organize tasks across six cognitive dimensions including Memorization, Understanding, Application, Reasoning, Creativity, and Ethics. (2) Authenticity: Our benchmark integrates real exam questions, classroom conversation, student essays, and expert-designed prompts to reflect genuine educational challenges; (3) Scale: EduEval comprises 24 distinct task types with over 11,000 questions spanning primary to high school levels. We evaluate 14 leading LLMs under both zero-shot and few-shot settings, revealing that while models perform well on factual tasks, they struggle with classroom dialogue classification and exhibit inconsistent results in creative content generation. Interestingly, several open source models outperform proprietary systems on complex educational reasoning. Few-shot prompting shows varying effectiveness across cognitive dimensions, suggesting that different educational objectives require tailored approaches. These findings provide targeted benchmarking metrics for developing LLMs specifically optimized for diverse Chinese educational tasks.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2512.00290" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The life cycle of large language models in education: A framework for understanding sources of bias</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: d2f6998a4632765d090d</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.452<br>Retrieved from: https://www.semanticscholar.org/paper/3d60d8273cea724226d4dd62f469bc77374d3656</li></ul></details>
+                <p class="reference-note">Jinsook Lee, Yann Hicke, Renzhe Yu, Christopher Brooks, René F. Kizilcec · 2024 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are increasingly adopted in educational contexts to provide personalized support to students and teachers. The unprecedented capacity of LLM‐based applications to understand and generate natural language can potentially improve instructional effectiveness and learning outcomes, but the integration of LLMs in education technology has renewed concerns over algorithmic bias, which may exacerbate educational inequalities. Building on prior work that mapped the traditional machine learning life cycle, we provide a framework of the LLM life cycle from the initial development of LLMs to customizing pre‐trained models for various applications in educational settings. We explain each step in the LLM life cycle and identify potential sources of bias that may arise in the context of education. We discuss why current measures of bias from traditional machine learning fail to transfer to LLM‐generated text (eg, tutoring conversations) because text encodings are high‐dimensional, there can be multiple correct responses, and tailoring responses may be pedagogically desirable rather than unfair. The proposed framework clarifies the complex nature of bias in LLM applications and provides practical guidance for their evaluation to promote educational equity. What is already known about this topic The life cycle of traditional machine learning (ML) applications which focus on predicting labels is well understood. Biases are known to enter in traditional ML applications at various points in the life cycle, and methods to measure and mitigate these biases have been developed and tested. Large language models (LLMs) and other forms of generative artificial intelligence (GenAI) are increasingly adopted in education technologies (EdTech), but current evaluation approaches are not specific to the domain of education. What this paper adds A holistic perspective of the LLM life cycle with domain‐specific examples in education to highlight opportunities and challenges for incorporating natural language understanding (NLU) and natural language generation (NLG) into EdTech. Potential sources of bias are identified in each step of the LLM life cycle and discussed in the context of education. A framework for understanding where to expect potential harms of LLMs for students, teachers, and other users of GenAI technology in education, which can guide approaches to bias measurement and mitigation. Implications for practice and/or policy Education practitioners and policymakers should be aware that biases can originate from a multitude of steps in the LLM life cycle, and the life cycle perspective offers them a heuristic for asking technology developers to explain each step to assess the risk of bias. Measuring the biases of systems that use LLMs in education is more complex than with traditional ML, in large part because the evaluation of natural language generation is highly context‐dependent (eg, what counts as good feedback on an assignment varies). EdTech developers can play an important role in collecting and curating datasets for the evaluation and benchmarking of LLM applications moving forward.</p></details>
+                <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Impact of Large Language Models on Programming Education and Student Learning Outcomes</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 578668c12112eba899db</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.333<br>Retrieved from: https://doi.org/10.3390/app14104115</li></ul></details>
+                <p class="reference-note">Gregor Jošt, Viktor Taneski, Sašo Karakatič · 2024 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Recent advancements in Large Language Models (LLMs) like ChatGPT and Copilot have led to their integration into various educational domains, including software development education. Regular use of LLMs in the learning process is still not well-researched; thus, this paper intends to fill this gap. The paper explores the nuanced impact of informal LLM usage on undergraduate students’ learning outcomes in software development education, focusing on React applications. We carefully designed an experiment involving thirty-two participants over ten weeks where we examined unrestricted but not specifically encouraged LLM use and their correlation with student performance. Our results reveal a significant negative correlation between increased LLM reliance for critical thinking-intensive tasks such as code generation and debugging and lower final grades. Furthermore, a downward trend in final grades is observed with increased average LLM use across all tasks. However, the correlation between the use of LLMs for seeking additional explanations and final grades was not as strong, indicating that LLMs may serve better as a supplementary learning tool. These findings highlight the importance of balancing LLM integration with the cultivation of independent problem-solving skills in programming education.</p></details>
+                <a href="https://doi.org/10.3390/app14104115" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Unlocking the Potential of Large Language Models in Education: Factors Influencing Adoption by Instructional Designers and Academics</strong><span>Relevance score: 23</span></div>
+                <p class="reference-note">Paper ID: 369f0b91ce4d3a2ae97d</p>
+                <p><strong>Full-text evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 24, PDF page 24 · full_text · Similarity 0.687<br>Retrieved from: https://www.jite.org/documents/Vol25/JITE-Rv25Art02Fourie10632.pdf</li><li>Chunk 16, PDF page 16 · full_text · Similarity 0.425<br>Retrieved from: https://www.jite.org/documents/Vol25/JITE-Rv25Art02Fourie10632.pdf</li></ul></details>
+                <p class="reference-note">Katherine L. Fourie, Jameson Goto, Geoff Lautenbach · 2026 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>Aim/Purpose: The study investigates the factors influencing the acceptance and utilisation of large language models (LLMs) (predictor variables of LLM usage), such as ChatGPT, in Learning design by instructional designers and university-teaching academics from various countries. Background: Large language models (LLMs) have exploded onto the scene, transforming the landscape of learning design. Instructional designers and university teaching academics have been overburdened with content creation for their teaching programmes, and the arrival of LLM models will help in this regard by developing more interactive content that drives student engagement and, in turn, contributes to student success. Since LLMs are a relatively new phenomenon, little is known about the factors influencing their acceptance in learning design; therefore, this research is needed, as learning design principles are the bedrock of student engagement and success. Methodology: A cross-sectional correlational quantitative study was employed. Data was collected using an online questionnaire posted on social media, including LinkedIn, from 203 instructional designers and university teaching academics. Purposive and snowball sampling methods were used to target instructional designers and university teaching academics at colleges and universities worldwide. Participants were asked to share the survey link with fellow instructional designers and university-teaching academics in their communities. The factor structure of the data was determined using exploratory factor analysis. Nonetheless, the factor structure derived from the LLMs did not entirely reflect the original configuration of the Unified Theory of Acceptance and Use of Technology (UTAUT3), as certain predictors appeared to coalesce, indicating LLMs’ unique nature in learning design. Confirmatory factor analysis was used to verify the fit of the data on the measurement model. First-order and second-order structural modelling were used to identify the structural relationships among the variables. Contribution: The study determines significant factors for the acceptance of LLMs by instructional designers and academic teaching staff in learning design, enabling possible opportunities for best practices in the field through interventions to optimize LLM usage. The study applies the technology acceptance model to the emerging LLM technology and extends the technology acceptance model by adding the trust construct as a predictor variable. Findings: The structural analysis results indicated that the ingrained LLM practices, LLM peer-driven expectations, innovative propensity towards LLM adoption, reliability and provider trust in LLMs, and ease of use and support influenced perceived LLM benefits and usage, but community standards and infrastructure had no influence. The second-order structural equation modelling indicated that perceived LLM benefits and usage and ingrained LLM habits contributed most to the learning design. Recommendations for Practitioners: Teaching academics and instructional designers must use LLMs in designing content, assessments, and interactive learning activities, and attend LLM training workshops on prompting and best practices in integrating LLMs into learning and teaching to see their benefits; hence, regular use of LLMs will then lead to trust and innovation in LLMs usage, enhancing learning design and improving student learning outcomes. Recommendation for Researchers: Researchers must use mixed methods approaches to have a deeper understanding of the factors influencing LLMs. Since habit and perceived LLM benefits and usage contributed the most variance to learning design, researchers must investigate strategies that optimise these factors in learning design, such as effective intervention strategies that can help form positive LLM habits. In addition, the findings provide researchers with a starting point for future research. Further researchers must investigate interventions that optimise the influence of personal innovativeness and trust that contributed the least variance to learning design, hence unlocking the potential of LLMs in learning design through innovation, responsible, and ethical use. Impact on Society: The use of LLMs in learning design has a high possibility of transforming education, specifically the learning design landscape. Using LLMs will free up more time for teaching academics and instructional designers so that they spend more time on higher-order thinking skill demands. Consequently, the students will be exposed to more engaging and interactive content, resulting in improved learning outcomes. Future Research: Future research must include context-derived external variables in technology acceptance models, such as levels of prompting competencies, to provide a deeper understanding of LLMs. In addition, future research must be based on the application and impact of LLMs on student engagement and success, and their attainment of 21st-century skills.</p></details>
+                <a href="https://doi.org/10.28945/5693" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large language models in medicine: A systematic review of applications in medical, healthcare, and educational contexts</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 2f44cb7392ee6f1a9ff8</p>
+                <p><strong>Full-text evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 3, PDF page 3 · full_text · Similarity 0.442<br>Retrieved from: https://pen.ius.edu.ba/index.php/pen/article/download/460/705</li></ul></details>
+                <p class="reference-note">Humberto J. Navarro, Camilo L. Sandoval, I. Galpin · 2025 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models have emerged as transformative tools in medicine and medical education, offering applications in aided diagnosis, automation of clinical assessments, and optimization of healthcare workflows. This article critically reviews 112 relevant publications analyzing the use of LLMs in these fields. It explores their applications in specific tasks such as biomedical classification, automated clinical assessment, medical question answering, medical report generation, and enhancement in medical education through exam simulation and personalized tutoring. Despite their advances, LLMs continue to face significant challenges, including data privacy issues, clinical validation, and algorithmic biases. However, their integration into clinical and educational settings demonstrates considerable potential to improve efficiency, accuracy, and accessibility in health care, provided these models adhere to technical and ethical rigor. This article offers a comprehensive overview for healthcare professionals and researchers who aim to adopt these models responsibly.</p></details>
+                <a href="https://doi.org/10.21533/pen.v13.i3.460" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Embracing the Extend Platform in Postgraduate Education: Unveiling Student Perspectives on Technological Trends in Course Delivery</strong><span>Relevance score: 16</span></div>
+                <p class="reference-note">Paper ID: 06327ab990839b18ec6e</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.255<br>Retrieved from: https://www.semanticscholar.org/paper/ce9b41cc1303efe8e81d8ce59546ec30e76f0ec2</li></ul></details>
+                <p class="reference-note">Hao Tran, Annita Stell, Noriko Iwashita · 2023 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>Recent global events have made it crucial for higher education to continuously update course content with digital alternatives to meet evolving student expectations and enhance their learning experience. The extent of course redevelopment varies widely, depending on the specific learning outcomes. While numerous studies investigate the impact of digitally revitalized course materials on tertiary students, less is known about the user experiences of international postgraduate students in the context of a second language teaching methodology course using different delivery modes. Our study examined postgraduate students’ perceptions of Extend using the Technology Acceptance Model 2 (TAM 2). Extend is an online platform implemented as the main course delivery platform in two postgraduate courses at a large urban Australian university. The results from mid-term evaluation surveys and end-of-semester course evaluations indicated that most students had positive attitudes towards Extend, finding it beneficial for content inclusivity and course objective transparency. The findings highlight both the perceived usefulness and ease of use for building their independent learning journey. However, for a long-term successful learning outcome in delivering this platform across various class deliveries, other aspects related to individual differences need to be taken into consideration.</p></details>
+                <a href="https://doi.org/10.3390/higheredu2040040" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Impact of Large Language Models on Personalized Learning, Assessment Automation, and Student Outcomes in Higher Learning Institution</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 535a32e405fae92a227d</p>
+                <p><strong>Full-text evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1, PDF page 1 · full_text · Similarity 0.446<br>Retrieved from: https://spm-online.com/jtal/index.php/journal/article/download/22/23</li></ul></details>
+                <p class="reference-note">Onesme Niyibizi · 2026 · Crossref</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>This study investigated the multifaceted influence of Large Language Models (LLMs) on teaching and learning within a private higher education institution in Rwanda during the 2024–2025 academic year. A total of 658 students and 28 lecturers participated, providing a comprehensive perspective on both user experiences and professional concerns. Using a quantitative approach, the study employed Multivariate Analysis of Variance (MANOVA) to examine how the use of LLMs relates to students’ perceptions of personalized learning effectiveness, academic performance improvement, online engagement, satisfaction with assessment feedback, and motivation for lifelong learning. Findings from the student indicated that LLMs are widely perceived as beneficial across multiple dimensions of the learning process. Students reported that LLMs enhance personalized learning by providing adaptive guidance, improving academic performance through instant clarification and practice support, and increasing online engagement by offering interactive and accessible learning assistance. The results further showed that LLMs contribute to greater satisfaction with feedback mechanisms and stimulate motivation for continuous and self-directed learning. These statistically significant associations point to the strong potential of LLMs to enrich higher education outcomes. In contrast, the lecturers’ data revealed notable concerns related to data privacy, ethical use, and algorithmic bias. Lecturers expressed significant apprehension regarding students’ overreliance on LLMs, the risks associated with inaccurate or biased outputs, and the potential erosion of academic integrity. Their perceptions underscore the need for safeguards that ensure responsible and ethical use of AI in academic settings. Overall, the findings highlighted a dual reality: while LLMs hold transformative potential for improving learning experiences, their integration must be supported by robust institutional policies, targeted capacity-building initiatives, and ongoing research. Such measures are essential to promote equitable, ethical, and effective adoption of LLMs in higher education.</p></details>
+                <a href="https://doi.org/10.70232/jtal.v2i1.22" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>A Systematic Review of Large Language Models in Programming Learning: Applications, Effects, and Future Directions</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 7d9664688f7af07e760c</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Qiqi Ru, Yuxuan Wang, Chenxi Huang, Heng Luo · 2025 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This study provides a systematic review of 3 years of empirical research on the use of Large Language Models (LLMs) in programming learning. Following the PRISMA methodology, we conducted a comprehensive search of open-access studies in the Web of Science and Scopus databases. Ultimately, a total of 45 empirical studies were selected for analysis. The review focuses on three key aspects: study and sample characteristics, the technical features of LLMs, and instructional design in LLM-based programming learning in educational settings. The findings first indicate trends in existing research and then outline the technical features of LLMs. It also examines how students use LLMs in programming, the learning environments, and their impact on learning outcomes. Finally, the study proposes new directions for future research in LLM-based programming learning.</p></details>
+                <a href="https://doi.org/10.1109/CSTE64638.2025.11092232" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Building Student Module For Large Language Models</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 5a6c46ca83ce0ff66a74</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Tong Guo · No date · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The current large language models (LLMs) mainly lacks this capability: autonomous learning capability. Also, we can not prepare all the data/knowledge in the world for LLMs. We propose Learning In Conversation (LIC) to solve the problem to let human teach machine to refresh/expand its data/knowledge automatically by natural language conversation. LIC system is an AI system that contains many deep learning tasks. LIC system provide the natural language interface to let machine to learn new data/knowledge in conversation interacting with human automatically. It is critical, but except for the developers of the AI system, others have no natural language interface to do this education for machine. Based on large language models (LLMs) conversation ability, we train an additional intent recognition model to determine when the AI system need to learn new data/knowledge. We add a module for editing the training dataset of LLMs. We propose the methods to implement our idea and discuss the reasons why we design these methods.</p></details>
+                <a href="https://doi.org/10.36227/techrxiv.24638814" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Building Student Module For Large Language Models</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 28c19862eb034dd8a684</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Tong Guo · No date · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The current large language models (LLMs) mainly lacks this capability: autonomous learning capability. Also, we can not prepare all the data/knowledge in the world for LLMs. We propose Learning In Conversation (LIC) to solve the problem to let human teach machine to refresh/expand its data/knowledge automatically by natural language conversation. LIC system is an AI system that contains many deep learning tasks. LIC system provide the natural language interface to let machine to learn new data/knowledge in conversation interacting with human automatically. It is critical, but except for the developers of the AI system, others have no natural language interface to do this education for machine. Based on large language models (LLMs) conversation ability, we train an additional intent recognition model to determine when the AI system need to learn new data/knowledge. We add a module for editing the training dataset of LLMs. We propose the methods to implement our idea and discuss the reasons why we design these methods.</p></details>
+                <a href="https://doi.org/10.36227/techrxiv.24638814.v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>On Using Programming-RAG to Improve Learning Outcomes in Programming Education</strong><span>Relevance score: 14</span></div>
+                <p class="reference-note">Paper ID: 51e96cc626560e8e2340</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Bjørn Klefstad, Grethe Sandstrak, Arne Styve, Kiran Raja · 2026 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The integration of generative artificial intelligence (AI), particularly large language models (LLMs), is reshaping educational practices across disciplines. In computer science education, these models offer new avenues to support novice learners beyond traditional resources. This study investigates the pedagogical impact of Retrieval-Augmented Generation (RAG) agents in introductory programming courses. The RAG-agent is combining generative capabilities with real-time access to documentation, examples, and community-driven knowledge. Specifically a customized Programming-RAG-agent (PRAG-agent) offer adaptive, context-sensitive tutoring aligned with learners’ immediate needs. Using a mixed-methods research design, we analyze solutions for programming tasks from students across two settings: with and without the use of a PRAG-agent. Quantitative metrics include low coupling and high cohesion, robust code (fail-safe code), defensive programming, documentation according to JavaDoc standards and Web-compatible documentation. Qualitative data encompasses student reflections on the usefulness of the PRAG-agent, and how the PRAG-agent should be developed for future use. A scaffolding model guides the evaluation of the PRAG-agent support across stages of learning: initial understanding, guided practice, and independent problem-solving. Findings suggest that the PRAG-agent enhances learning outcomes, fosters self-directed learning, and supports practices for good code quality; however, students did not perceive these improvements, revealing a contradiction between measured results and self-reported experiences. For educators, PRAG-agents facilitate a shift from content delivery to AI-supported guidance, offering insights into redefined teaching methodologies.</p></details>
+                <a href="https://doi.org/10.1109/EDUCON67543.2026.11574292" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Benchmarking In-Context Learning Strategies of Large Language Models for Math Reasoning Tasks</strong><span>Relevance score: 13</span></div>
+                <p class="reference-note">Paper ID: 8d0a2d52884e7fb513f6</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Yao Rong, Kathrin Seßler, Emek Gözlüklü, Enkelejda Kasneci · 2025 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>The use of large language models (LLMs) in mathematical reasoning has become a cornerstone of related research, demonstrating the intelligence of these models and enabling potential practical applications through their advanced performance, such as in educational settings. Despite the variety of datasets and in-context learning algorithms designed to improve the ability of LLMs to automate mathematical problem solving, the lack of comprehensive benchmarking across different datasets makes it difficult to determine which in-context algorithms are effective, efficient, and suitable for specific educational applications. In this project, we present a benchmark that fairly compares seven state-of-the-art in-context learning algorithms for mathematical problem solving across five widely used mathematical datasets on four powerful foundation models. Beyond accuracy, we explore the tradeoff between efficiency and performance, highlighting the practical applications of LLMs for mathematical reasoning. Our results indicate that larger foundation models, such as GPT-4o and LLaMA 3-70B, can solve mathematical reasoning independently from the concrete prompting strategy, while for smaller models, the in-context learning approach significantly influences the performance. Moreover, the optimal prompt depends on the chosen foundation model. We open source our benchmark code to support the integration of additional models in future research.</p></details>
+                <a href="https://doi.org/10.1109/TLT.2025.3630117" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>MathRobust-LV: Evaluation of Large Language Models&#39; Robustness to Linguistic Variations in Mathematical Reasoning</strong><span>Relevance score: 13</span></div>
+                <p class="reference-note">Paper ID: f227ccda5d9e913bd964</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Neeraja Kirtane, Yuvraj Khanna, Peter Relan · 2025 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models excel on math benchmarks, but their math reasoning robustness to linguistic variation is underexplored. While recent work increasingly treats high-difficulty competitions like the IMO as the gold standard for evaluating reasoning, we believe in comprehensive benchmarking of high school-level math problems in real educational settings. We introduce MathRobust-LV, a test set and evaluation methodology that mirrors how instructors rephrase problems across assessments while keeping difficulty constant: we change surface details (names, contexts, variables) while preserving numerical structure and answers. In contrast to prior efforts that alter problem content or emphasize IMO-level tasks, we focus on high-school-level dataset problems at the difficulty level where models are currently deployed in educational settings: tutoring and assessment systems. In these applications, instructors rephrase identical concepts in varied ways, making linguistic robustness essential for reliable deployment. Although MATH data benchmarking is often regarded as saturated, our experiment on 34 models reveals that accuracy declines when moving from the baseline to the variants. These drops are severe for smaller models (9-11%) while stronger models also show measurable degradation. Frontier models like GPT-5, Gemini-2.5pro remain comparatively stable. Our results highlight that robustness to linguistic variation is a fundamental challenge, exposing reasoning vulnerabilities in models.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2510.06430" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enhancing Quantitative Analysis in Social Sciences With Large Language Models (LLMs): A Methodological Case Study in Educational Research</strong><span>Relevance score: 13</span></div>
+                <p class="reference-note">Paper ID: 2f0f70a74f31b9f2693d</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">James Sebastian, Jeong-Mi Moon, Eric M. Camburn · 2025 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This paper explores the potential of Large Language Models (LLMs) for assisting with quantitative data analysis in social science research. Specifically, it introduces key concepts to help researchers effectively integrate LLMs into their workflows. For this purpose, we replicate a research paper in educational leadership on the relationship between school program coherence and student achievement. By leveraging LLMs to generate code for statistical tools like Mplus and R, researchers can streamline their data analysis, potentially saving time and effort. The quality of analytical code generated by LLMs can be influenced by the researcher’s understanding and application of concepts like context windows, LLM training data and training cut-off, model parameter settings like temperature, zero- and few-shot learning, and Retrieval-Augmented Generation (RAG). By describing and demonstrating the applications of these concepts, we aim to equip researchers with a basic toolset to leverage LLMs effectively to assist with coding for quantitative analysis.</p></details>
+                <a href="https://doi.org/10.1177/23328584251389621" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The impact of digital teaching materials on educational engagement and outcomes in science education: The mediating role of technology integration an empirical analysis of private universities in Jordan</strong><span>Relevance score: 13</span></div>
+                <p class="reference-note">Paper ID: 0c7508b7e32355b3b757</p>
+                <p><strong>Full-text evidence</strong></p>
+                
+                <p class="reference-note">Ayat Mohammad Al-Mughrabi · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>This study aims to evaluate an intervention that moved beyond the dimensions of digital information application (DTMs) in science education in higher education. Using an integrated methodology, there is a large and growing body of evidence for the prominence placed on both perceived experience and quality tutors in science courses in educating institutions with broader ambivalence toward limited Digital Literacy. The model and Hypotheses were tested with data collected from 158 participants. Our results suggest that user perceptions about the value of DIE may be contingent on several factors beyond any intrinsic greater experience in learning and teaching Science. The quality of tutors may lead to a greater perceived usefulness regarding the technology. Also, the level of communication flow can affect how much science students are willing to use technology. Academic institutions will have to reassess the utility of digital information technology as an instrument for improving science education. This research focused on educational contexts where DIE profoundly influences teaching and learning science. Further research could focus on other educational fields, math, or language to broaden the understanding of technology&#39;s role in diverse educational contexts.</p></details>
+                <a href="https://doi.org/10.5267/j.ijdns.2024.8.020" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Advanced Methodologies for Medical Procedure Coding Using Large Language Models (LLMs)</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: 907d80fda33a65ad965d</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Armando Vieira · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Coding of medical procedures according to the norms ICD10-PCS is a critical component of healthcare administration, enabling the transformation of patient data into standardized codes for billing, insurance claims, and medical record management. However, the process is laborintensive and prone to errors due to the complexity of clinical terminology. Large language models (LLMs) such as GPT-4 have shown significant potential in automating and improving the accuracy of medical coding. This paper explores the capabilities of LLMs in PCS medical coding across four specialties: Cardiology, General Medicine and Neurology. Our models is based on advanced prompting techniques combined with Agents with access to Retrieval-Augmented Generation (RAG) can achieve an F1 score of 0.87. We compare LLM models like GPT-4, o1-mini and Claude Sonnet 3.5.</p></details>
+                <a href="https://doi.org/10.2139/ssrn.6594399" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>CULTURAL IDENTITY IN LARGE LANGUAGE MODELS: IMPLICATIONS FOR EDUCATIONAL APPLICATIONS</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: 98b01fbc848d0bd84bba</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Michael Wagner · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.21125/edulearn.2025.1292" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Mitigating students’ reliance on generative AI in computer engineering education: a case study</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: d6b4480d8e83d0f70c4e</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Tee Hui Teo, Maoyang Xiang · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid evolution of artificial intelligence (AI) has a significant impact on teaching and learning, particularly with large language models (LLMs). LLMs were developed in the electronics and computer engineering sector, complicating the delivery of related courses such as coding and circuit design, as teaching AI is part of the lessons. While LLMs offer learning opportunities, they may lead to overreliance on automation, undermining traditional teaching methods. To address this, we implemented mitigation strategies in the curriculum to reduce dependence on LLMs, based on the “attack-defence” principle from game theory and hands-on problem-solving. Action research methodology is adopted to support iterative curriculum development and real-world experimentation in this study. These strategies were tested in a practical course. A three-phase survey, involving pre-course, on-course, and post-course assessments, was conducted to investigate student engagement and learning experiences. Survey results from 32 participants, with a full response rate in all three phases, indicate that learning experiences improved by 90.6% compared to pre-LLM scenarios, while mitigation strategies led to 84.4% better learning outcomes than unregulated LLM usage.</p></details>
+                <a href="https://doi.org/10.1007/s44217-025-01057-6" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Methodologies and models in the teaching of Spanish as a foreign language</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: 0e006b3ec6a9179eaae4</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Mónica Belda-Torrijos, Linda Palfreeman · 2024 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>In this paper, the evolution of the main language teaching methods and their treatment of learning difficulties is succinctly presented. The different methodologies that have been tested throughout the history of the teaching of a second language (L2) are supported by different theoretical principles and hypotheses. The different theoretical linguistic models have presented, each one from their particular methodology, their approaches on how to develop such a process.</p></details>
+                <a href="https://doi.org/10.7764/onomazein.65.10" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Efficacy of Flipped Classroom Models in English Language Teaching: Investigating the Impact of Flipped Classroom Strategies on Student Motivation, Engagement, and Learning Outcomes</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: c77911342b2b06124cc1</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Rowena Maeve O&#39;Malley, William Blakeley-Jones, Isadora Grace Vasquez, Samuelson Osei · 2023 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>This quantitative research paper demonstrates the potential of flipped classroom models as an effective approach in English language teaching. The study&#39;s findings highlight the significant impact of flipped classroom strategies on student motivation, engagement, and the development of crucial language skills, including critical thinking, reading, and writing. By fostering an environment that encourages autonomy, self-directed learning, collaboration, and active learning, flipped classrooms can greatly enhance the overall learning experience and outcomes for English language learners. The comparison between the experimental and control groups reveals the advantages of implementing flipped classroom models over traditional lecture-based approaches. These advantages not only contribute to academic success but also facilitate effective communication in various contexts. As a result, educators and institutions should consider adopting flipped classroom strategies to optimize English language teaching and learning. However, it is important to recognize the need for further research to explore the long-term effects and applicability of flipped classrooms across diverse learning environments and subject areas, ensuring the continued improvement and evolution of education.</p></details>
+                <a href="https://doi.org/10.62583/rseltl.v1i2.10" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reasoning Settings Attenuate Preference-Reversal-Style Inconsistency in Large Language Models</strong><span>Relevance score: 11</span></div>
+                <p class="reference-note">Paper ID: 98ce20343d5e4f8f585a</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Jonathan Dang · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>When a language model is asked to choose between two gambles, does that choice match the ranking implied by its dollar valuations? In the classical human case of Lichtenstein-Slovic preference reversal, the answer is no. The same participant often chooses one gamble but prices the other higher. For language models, a same-session paired design would introduce concerns about elicitation order, memory, and paradigm recognition. This study therefore estimates a weak-form analog for API-based language models, closer to batch or across-session uses where models are asked ranking and valuation questions separately: how often do choice and valuation draws from the same model and gamble pair imply conflicting rankings? In a preregistered study of 25,920 API calls across Anthropic Claude Opus 4.7, DeepSeek V4-Pro, Google Gemini 3 Flash Preview, and OpenAI GPT-5.5, all models exhibited choice-valuation inconsistency. Under the primary prompt format, relative to the lowest provider-exposed reasoning settings, the highest reasoning settings reduced the estimated mean inconsistency rate from 0.484 to 0.307 (β =-0.853, HC3 SE = 0.120, one-sided p &amp;lt; .001, n = 224 Lichtenstein-Slovic cells), with all 4 within-model contrasts moving in the same direction. The design used 3 prompt formats, 28 risky-choice items, 8 dominance-check items, 3 elicitations, the lowest and highest settings for each model, and 10 samples per cell. Although the highest settings attenuated the inconsistency rate, they also produced much longer visible outputs, so the study does not isolate the contrast in settings from accompanying changes in output length and response structure.</p></details>
+                <a href="https://doi.org/10.2139/ssrn.6670260" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Better Understanding Peoples&#39; Experiences with Technologically Mediated Learning, What Works, for Whom, and within What Situations: Large-Scale Analytics of Learning Experiences and Outcomes to Inform Practice</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 2eb84b456ace49b160ce</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Philip G. Neufeld, Sarojani S. Mohammed, Chad Vidden · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Aim/Purpose: This study sought to understand variations in student experiences of technologically mediated learning in the Fresno Unified School District, facilitated by its personalized learning and innovations program (PLI) and large-scale data models. Background: While evidence supports the intentional use of information and communication technology (ICT) in learning, the focus often neglects students’ social conditions, situatedness, and self-determination. Methodology: A growth mixture model explored students’ learning and revealed four distinct learning patterns: accelerating, decelerating, languishing, and thriving. Contribution: During pandemic-era remote and hybrid teaching, this study applied Growth Mixture Modeling to identify learning trajectories among 15,135 Grade 4–6 students in a large urban school district. The research revealed how social conditions, situatedness, and self-determination shaped learning outcomes by integrating real-time digital engagement data, assessment results, and student demographics. The findings offer practical insights for educators to personalize instruction using timely data signals and highlight how educational systems can build analytics capacity to understand better what works, for whom, and in which contexts. This work advances both research and practice by combining rigorous methodology with actionable strategies for equity-focused teaching and future-ready learning. Findings: Data suggest the shift to remote teaching was harder for those most adept with blended instructional models, while increased support for special education and English language learners facilitated learning. Recommendations for Practitioners: Educators can use near-real-time data to inform teaching practices that personalize student support and learning experiences while cultivating students’ self-determination. Such data includes formative assessments, checks for understanding, observing writing in process, and real-time signals from interactive learning platforms, allowing students, their peers, and educators to provide appropriate and effective supports. Educational leaders can determine what interventions work better for various student groups and focus investments on high-impact programmatic interventions. Recommendation for Researchers: Leverage the use of traditional data combined with novel signals of students’ learning experiences to explore what works better for various student groups, social conditions, and situatedness. “Situatedness” reflects how technological acceptance and use are situated within the social context, social interactions, across academic content areas, and grounded in space. “Social conditions” include socio-economic status, family systems, neighborhoods, as well as classroom and school cultures. Impact on Society: The use of near-real-time data signals from students’ learning experiences supports differentiated and engaging instruction, personalized learning, and enables educators to better support students’ growth in self-determination. These teacher practices better prepare students with the knowledge, skills, values, and attitudes to be ready for their futures. As demonstrated herein, education analytics can support faster improvement cycles within educational systems. Future Research: Future research might include: (1) qualitative methods to gather students’ perspectives on their learning experiences, and (2) exploration of the relationship between the quality of students’ internet access and its effects on student learning experiences.</p></details>
+                <a href="https://doi.org/10.28945/5580" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Introduction to Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 654c73ab606269e96c13</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ajay Rawat, Vardan Pathak · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-2733-4_1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Trustworthiness of large language models: hallucinations</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: a2c8cec18d608e3181fa</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Nicolò Brunello · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/b978-0-443-33592-1.00007-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Ethical issues with large language models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: f3e11594d15c1e47c672</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Roberto Tedesco · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/b978-0-443-33592-1.00003-6" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Different Models, Different Values: Educational Preference Structures across Alignment Methodologies in Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 47e9bf29a3ddfec7a00a</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Daniel Autenrieth · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.5220/0014949500004021" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models in Chemistry</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: ef44bd2e7ec08757d5ed</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Zhiling Zheng · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003669012-4" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: df76897b989ae7327bc2</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">John Atkinson-Abutridy · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003517245-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Introduction to Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 73d929f3310f0b251b66</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Bhawna Singh · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0569-1_1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large language models in medicine</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: b8f00788240f957ea0e5</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">A. Thirunavukarasu, D. S. J. Ting, K. Elangovan, Laura Gutierrez, T. Tan, D. Ting · 2023 · Semantic Scholar</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1038/s41591-023-02448-8" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reasoning in Large Language Models Across Multilingual, Long-Context, and Symbolic Settings</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: badc7cb2d6c5244f19c9</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Sina Bagheri Nezhad · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.15760/etd.4098" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Impact of Indonesian Language Teaching Material Development on Student Learning Outcomes: A Meta-Analysis</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: eece1e22a73a4d996982</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Kadek Wirahyuni, Ida Bagus Putrayasa, Made Sutama, Wayan Rasna, Nengah Martha, Nyoman Yasa · 2025 · Crossref</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The Indonesian Language course plays a strategic role in developing students’ critical thinking, academic writing, and scholarly communication skills. However, empirical findings on the effectiveness of Indonesian language instructional materials remain mixed and inconsistent. This study aims to synthesize empirical evidence on the effects of instructional material development on students’ learning outcomes, estimate effect sizes, and identify study characteristics influencing its effectiveness. The subjects of this study consist of 22 empirical studies conducted at higher education institutions in Indonesia and published during the 2015–2024 period. This study employs a quantitative approach using a meta-analysis method. Data were collected through a systematic literature search, study selection, and data extraction from relevant journal articles and research reports. Data analysis techniques include effect size calculation using Hedges’ g, heterogeneity testing with Cochran’s Q and the I² statistic, selection of a random-effects model, moderator analysis, and publication bias testing using funnel plots, Egger’s test, and Begg’s test. The results of the meta-analysis indicate that the development of Indonesian language teaching materials has a positive and significant effect on student learning outcomes, with a moderate-to-large effect size. Digital teaching materials, particularly e-modules, show higher effectiveness compared to printed teaching materials, and the impact of teaching material development is strongest in the cognitive learning outcome domain. These findings imply the importance of developing innovative, technology-based Indonesian language teaching materials that are integrated with active pedagogical approaches as a strategy to improve learning quality and graduate competence in higher education.</p></details>
+                <a href="https://doi.org/10.23887/jlls.v8i3.103451" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Application of deep machine learning in dental education: a systematic review of effectiveness in dental students&#39; teaching learning outcomes.</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: f7ba49fe6828fdaecadf</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Kirti Buva, A. Deshmukh, Mrinal V Shete, A. Shete, Parag V Gangurde · 2026 · Semantic Scholar</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1038/s41432-026-01226-y" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Artificial Intelligence in Physics Courses to Support Active Learning</strong><span>Relevance score: 6</span></div>
+                <p class="reference-note">Paper ID: 47197097a87aeea1a8cc</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Víctor Robledo-Rella, Bee-Yen Toh · 2024 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>The integration of generative artificial intelligence (AI), particularly Large Language Models (LLMs) like OpenAI&#39;s ChatGPT and Microsoft&#39;s Copilot, is transforming educational methodologies, including undergraduate physics courses for engineering students. Despite their potential, these LLMs typically rely on statistical learning methods and often exhibit algebraic inaccuracies in solving standard university-level physics problems. This study explores the use of LLMs in physics courses for N = 91 freshman engineering students over two academic terms (Spring and Fall 2023). Students engaged in AI-assisted activities to solve physics problems and were asked to identify and correct the errors made by the chatbot. The outcomes were compared with those from traditional teaching methods without AI involvement, and no significant difference in student learning gains was found. To assess the impact of AI tools in education, a more detailed approach using pre-test and post-test instruments with control and experimental groups is necessary. Survey results revealed, however, that AI-assisted sessions enhanced student engagement, problem-solving skills, and understanding of physics concepts. Students also indicated a strong preference for AI-assisted activities, citing increased motivation and a firm belief in the educational benefits of using these tools. Our findings suggest that well-designed AI interventions can effectively complement traditional instructional methods, especially when the LLMs are integrated with symbolic computational tools like WolframAlpha to improve their accuracy.</p></details>
+                <a href="https://doi.org/10.1145/3678610.3678631" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Investigating the utilization and impact of large language model-based intelligent teaching assistants in flipped classrooms</strong><span>Relevance score: 6</span></div>
+                <p class="reference-note">Paper ID: 1f9d925e38c0529ae01c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Da Teng, Xiangyang Wang, Yanwei Xia, Yue Zhang, Lulu Tang, Qi Chen, Ruobing Zhang, Sujin Xie, Weiyong Yu · 2024 · Semantic Scholar</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/s10639-024-13264-z" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Impact of Standardized Teaching Methodologies on Student Learning and Teacher Autonomy in Ghanaian Schools</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: aaa16552206652db1e8f</p>
+                <p><strong>Full-text evidence</strong></p>
+                
+                <p class="reference-note">Samson Dodzi Fenuku, Ernest Akpaku · 2024 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This study examines the impact of standardized teaching methodologies on student learning and teacher autonomy within the Ghanaian educational context. A mixed-methods approach was employed, integrating quantitative analysis of student performance data from standardized tests with qualitative insights gleaned from semi-structured interviews and classroom observations of teachers and administrators, alongside a broader survey of teacher perceptions. Quantitative findings indicated that standardized teaching methodologies were associated with improved student performance on standardized assessments. However, qualitative data revealed a complex landscape where teacher autonomy and the ability to provide culturally relevant instruction were seen as potentially compromised by the structure of standardized curricula. The study&#39;s qualitative themes highlighted the dual-edged nature of standardization, with teachers expressing a need for both the guidance and constraints that standards provide. Professional development emerged as a critical factor, with teachers seeking ongoing support to effectively implement standardized teaching methodologies. The research underscores the importance of balancing the clarity and structure of standardized teaching with the flexibility necessary for teachers to meet the diverse needs of their students. It also emphasizes the need for culturally responsive teaching practices and the provision of continuous professional development opportunities for teachers. It suggests that while standardized teaching can enhance student performance, it must be implemented in a manner that supports teacher autonomy, adaptability, and professional growth to achieve the best outcomes for all students.</p></details>
+                <a href="https://doi.org/10.37249/jlllt.v3i2.774" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: cfa137b78abc4d809dfc6410b099a39f · Report ID: 53</p>
+        <p>Started: 2026-09-12 21:06:28 · Updated: 2026-09-12 21:08:22 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>2</dd><dt>Raw papers retrieved</dt><dd>40</dd><dt>Valid papers retained</dt><dd>40</dd><dt>Relevant papers retained</dt><dd>21</dd><dt>Duplicates removed</dt><dd>1</dd><dt>Noisy records removed</dt><dd>0</dd><dt>Irrelevant records removed</dt><dd>18</dd><dt>Evidence limit removed</dt><dd>11</dd><dt>Provider failures</dt><dd>0</dd><dt>Final evidence count</dt><dd>10</dd><dt>Elapsed seconds</dt><dd>114.305</dd><dt>Semantic scholar requests</dt><dd>2</dd><dt>Semantic scholar disabled</dt><dd>False</dd><dt>Fulltext papers resolved</dt><dd>6</dd><dt>Abstract fallbacks</dt><dd>21</dd><dt>Metadata only papers</dt><dd>12</dd><dt>Total chunks created</dt><dd>161</dd><dt>Chunks selected</dt><dd>12</dd><dt>Pdf extraction failures</dt><dd>7</dd><dt>Fulltext access failures</dt><dd>1</dd><dt>Papers discovered</dt><dd>40</dd><dt>Semantic retrieval seconds</dt><dd>33.09</dd><dt>Sources cited</dt><dd>6</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The selected evidence covers diverse applications of LLMs in education including personalised learning, assessment automation, teaching resource creation, multilingual support, programming education, and pedagogical frameworks. Full-text sources provide detailed examples like EduEval benchmarking and sports science applications, while abstracts highlight key areas such as cognitive bias mitigation and ethical considerations. The evidence spans K-12 to higher education contexts.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        <dl class="metrics"><dt>Writing sources</dt><dd>10</dd><dt>Full text sources</dt><dd>4</dd><dt>Abstract only sources</dt><dd>6</dd><dt>Selected chunks</dt><dd>12</dd><dt>Retrieval mode</dt><dd>semantic</dd><dt>Access failures</dt><dd>1</dd><dt>Extraction failures</dt><dd>7</dd><dt>Provider failures</dt><dd>0</dd></dl>
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-12 21:06:28</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-12 21:06:32</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:32</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-12 21:06:42</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:42</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-12 21:06:43</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.61838/kman.intjssh.4891" target="_blank" rel="noopener noreferrer">569f67a6cf4a48baeb13</a> — Generative Artificial Intelligence and Large Language Models in Didactics of Sports Sciences and Physical Education: A C.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.61838/kman.intjssh.4891" target="_blank" rel="noopener noreferrer">569f67a6cf4a48baeb13</a> — Generative Artificial Intelligence and Large Language Models in Didactics of Sports Sciences and Physical Education: A C.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.61838/kman.intjssh.4891" target="_blank" rel="noopener noreferrer">569f67a6cf4a48baeb13</a> — Generative Artificial Intelligence and Large Language Models in Didactics of Sports Sciences and Physical Education: A C.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1109/ICETA61311.2023.10344166" target="_blank" rel="noopener noreferrer">2e05503400581d811760</a> — Exploring the Capabilities and Possible Applications of Large Language Models for Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1109/ICETA61311.2023.10344166" target="_blank" rel="noopener noreferrer">2e05503400581d811760</a> — Exploring the Capabilities and Possible Applications of Large Language Models for Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/ICETA61311.2023.10344166" target="_blank" rel="noopener noreferrer">2e05503400581d811760</a> — Exploring the Capabilities and Possible Applications of Large Language Models for Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">43ee383b1ecc8b4661a3</a> — Multilingual Performance Biases of Large Language Models in Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">43ee383b1ecc8b4661a3</a> — Multilingual Performance Biases of Large Language Models in Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">43ee383b1ecc8b4661a3</a> — Multilingual Performance Biases of Large Language Models in Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2512.00290" target="_blank" rel="noopener noreferrer">2f7249a88428bc1757bb</a> — EduEval: A Hierarchical Cognitive Benchmark for Evaluating Large Language Models in Chinese Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2512.00290" target="_blank" rel="noopener noreferrer">2f7249a88428bc1757bb</a> — EduEval: A Hierarchical Cognitive Benchmark for Evaluating Large Language Models in Chinese Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2512.00290" target="_blank" rel="noopener noreferrer">2f7249a88428bc1757bb</a> — EduEval: A Hierarchical Cognitive Benchmark for Evaluating Large Language Models in Chinese Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">d2f6998a4632765d090d</a> — The life cycle of large language models in education: A framework for understanding sources of bias.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">d2f6998a4632765d090d</a> — The life cycle of large language models in education: A framework for understanding sources of bias.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">d2f6998a4632765d090d</a> — The life cycle of large language models in education: A framework for understanding sources of bias.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.3390/app14104115" target="_blank" rel="noopener noreferrer">578668c12112eba899db</a> — The Impact of Large Language Models on Programming Education and Student Learning Outcomes.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.3390/app14104115" target="_blank" rel="noopener noreferrer">578668c12112eba899db</a> — The Impact of Large Language Models on Programming Education and Student Learning Outcomes.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:45</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.3390/app14104115" target="_blank" rel="noopener noreferrer">578668c12112eba899db</a> — The Impact of Large Language Models on Programming Education and Student Learning Outcomes.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:46</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.28945/5693" target="_blank" rel="noopener noreferrer">369f0b91ce4d3a2ae97d</a> — Unlocking the Potential of Large Language Models in Education: Factors Influencing Adoption by Instructional Designers a.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:49</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.28945/5693" target="_blank" rel="noopener noreferrer">369f0b91ce4d3a2ae97d</a> — Unlocking the Potential of Large Language Models in Education: Factors Influencing Adoption by Instructional Designers a.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.28945/5693" target="_blank" rel="noopener noreferrer">369f0b91ce4d3a2ae97d</a> — Unlocking the Potential of Large Language Models in Education: Factors Influencing Adoption by Instructional Designers a.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:49</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.21533/pen.v13.i3.460" target="_blank" rel="noopener noreferrer">2f44cb7392ee6f1a9ff8</a> — Large language models in medicine: A systematic review of applications in medical, healthcare, and educational contexts.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:53</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.21533/pen.v13.i3.460" target="_blank" rel="noopener noreferrer">2f44cb7392ee6f1a9ff8</a> — Large language models in medicine: A systematic review of applications in medical, healthcare, and educational contexts.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:53</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.21533/pen.v13.i3.460" target="_blank" rel="noopener noreferrer">2f44cb7392ee6f1a9ff8</a> — Large language models in medicine: A systematic review of applications in medical, healthcare, and educational contexts.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:53</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.3390/higheredu2040040" target="_blank" rel="noopener noreferrer">06327ab990839b18ec6e</a> — Embracing the Extend Platform in Postgraduate Education: Unveiling Student Perspectives on Technological Trends in Cours.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:53</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.3390/higheredu2040040" target="_blank" rel="noopener noreferrer">06327ab990839b18ec6e</a> — Embracing the Extend Platform in Postgraduate Education: Unveiling Student Perspectives on Technological Trends in Cours.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:53</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.3390/higheredu2040040" target="_blank" rel="noopener noreferrer">06327ab990839b18ec6e</a> — Embracing the Extend Platform in Postgraduate Education: Unveiling Student Perspectives on Technological Trends in Cours.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:53</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.3390/higheredu2040040" target="_blank" rel="noopener noreferrer">06327ab990839b18ec6e</a> — Embracing the Extend Platform in Postgraduate Education: Unveiling Student Perspectives on Technological Trends in Cours.</td></tr>
+            
+            <tr><td>2026-09-12 21:06:53</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.70232/jtal.v2i1.22" target="_blank" rel="noopener noreferrer">535a32e405fae92a227d</a> — Impact of Large Language Models on Personalized Learning, Assessment Automation, and Student Outcomes in Higher Learning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.70232/jtal.v2i1.22" target="_blank" rel="noopener noreferrer">535a32e405fae92a227d</a> — Impact of Large Language Models on Personalized Learning, Assessment Automation, and Student Outcomes in Higher Learning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.70232/jtal.v2i1.22" target="_blank" rel="noopener noreferrer">535a32e405fae92a227d</a> — Impact of Large Language Models on Personalized Learning, Assessment Automation, and Student Outcomes in Higher Learning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1109/CSTE64638.2025.11092232" target="_blank" rel="noopener noreferrer">7d9664688f7af07e760c</a> — A Systematic Review of Large Language Models in Programming Learning: Applications, Effects, and Future Directions.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1109/CSTE64638.2025.11092232" target="_blank" rel="noopener noreferrer">7d9664688f7af07e760c</a> — A Systematic Review of Large Language Models in Programming Learning: Applications, Effects, and Future Directions.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/CSTE64638.2025.11092232" target="_blank" rel="noopener noreferrer">7d9664688f7af07e760c</a> — A Systematic Review of Large Language Models in Programming Learning: Applications, Effects, and Future Directions.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.36227/techrxiv.24638814" target="_blank" rel="noopener noreferrer">5a6c46ca83ce0ff66a74</a> — Building Student Module For Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.36227/techrxiv.24638814" target="_blank" rel="noopener noreferrer">5a6c46ca83ce0ff66a74</a> — Building Student Module For Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.36227/techrxiv.24638814" target="_blank" rel="noopener noreferrer">5a6c46ca83ce0ff66a74</a> — Building Student Module For Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.36227/techrxiv.24638814.v1" target="_blank" rel="noopener noreferrer">28c19862eb034dd8a684</a> — Building Student Module For Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.36227/techrxiv.24638814.v1" target="_blank" rel="noopener noreferrer">28c19862eb034dd8a684</a> — Building Student Module For Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.36227/techrxiv.24638814.v1" target="_blank" rel="noopener noreferrer">28c19862eb034dd8a684</a> — Building Student Module For Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1109/EDUCON67543.2026.11574292" target="_blank" rel="noopener noreferrer">51e96cc626560e8e2340</a> — On Using Programming-RAG to Improve Learning Outcomes in Programming Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1109/EDUCON67543.2026.11574292" target="_blank" rel="noopener noreferrer">51e96cc626560e8e2340</a> — On Using Programming-RAG to Improve Learning Outcomes in Programming Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/EDUCON67543.2026.11574292" target="_blank" rel="noopener noreferrer">51e96cc626560e8e2340</a> — On Using Programming-RAG to Improve Learning Outcomes in Programming Education.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1109/TLT.2025.3630117" target="_blank" rel="noopener noreferrer">8d0a2d52884e7fb513f6</a> — Benchmarking In-Context Learning Strategies of Large Language Models for Math Reasoning Tasks.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1109/TLT.2025.3630117" target="_blank" rel="noopener noreferrer">8d0a2d52884e7fb513f6</a> — Benchmarking In-Context Learning Strategies of Large Language Models for Math Reasoning Tasks.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1109/TLT.2025.3630117" target="_blank" rel="noopener noreferrer">8d0a2d52884e7fb513f6</a> — Benchmarking In-Context Learning Strategies of Large Language Models for Math Reasoning Tasks.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/TLT.2025.3630117" target="_blank" rel="noopener noreferrer">8d0a2d52884e7fb513f6</a> — Benchmarking In-Context Learning Strategies of Large Language Models for Math Reasoning Tasks.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2510.06430" target="_blank" rel="noopener noreferrer">f227ccda5d9e913bd964</a> — MathRobust-LV: Evaluation of Large Language Models&#39; Robustness to Linguistic Variations in Mathematical Reasoning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2510.06430" target="_blank" rel="noopener noreferrer">f227ccda5d9e913bd964</a> — MathRobust-LV: Evaluation of Large Language Models&#39; Robustness to Linguistic Variations in Mathematical Reasoning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2510.06430" target="_blank" rel="noopener noreferrer">f227ccda5d9e913bd964</a> — MathRobust-LV: Evaluation of Large Language Models&#39; Robustness to Linguistic Variations in Mathematical Reasoning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1177/23328584251389621" target="_blank" rel="noopener noreferrer">2f0f70a74f31b9f2693d</a> — Enhancing Quantitative Analysis in Social Sciences With Large Language Models (LLMs): A Methodological Case Study in Edu.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1177/23328584251389621" target="_blank" rel="noopener noreferrer">2f0f70a74f31b9f2693d</a> — Enhancing Quantitative Analysis in Social Sciences With Large Language Models (LLMs): A Methodological Case Study in Edu.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1177/23328584251389621" target="_blank" rel="noopener noreferrer">2f0f70a74f31b9f2693d</a> — Enhancing Quantitative Analysis in Social Sciences With Large Language Models (LLMs): A Methodological Case Study in Edu.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1177/23328584251389621" target="_blank" rel="noopener noreferrer">2f0f70a74f31b9f2693d</a> — Enhancing Quantitative Analysis in Social Sciences With Large Language Models (LLMs): A Methodological Case Study in Edu.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:03</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.5267/j.ijdns.2024.8.020" target="_blank" rel="noopener noreferrer">0c7508b7e32355b3b757</a> — The impact of digital teaching materials on educational engagement and outcomes in science education: The mediating role.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.5267/j.ijdns.2024.8.020" target="_blank" rel="noopener noreferrer">0c7508b7e32355b3b757</a> — The impact of digital teaching materials on educational engagement and outcomes in science education: The mediating role.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.5267/j.ijdns.2024.8.020" target="_blank" rel="noopener noreferrer">0c7508b7e32355b3b757</a> — The impact of digital teaching materials on educational engagement and outcomes in science education: The mediating role.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.2139/ssrn.6594399" target="_blank" rel="noopener noreferrer">907d80fda33a65ad965d</a> — Advanced Methodologies for Medical Procedure Coding Using Large Language Models (LLMs).</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.2139/ssrn.6594399" target="_blank" rel="noopener noreferrer">907d80fda33a65ad965d</a> — Advanced Methodologies for Medical Procedure Coding Using Large Language Models (LLMs).</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.2139/ssrn.6594399" target="_blank" rel="noopener noreferrer">907d80fda33a65ad965d</a> — Advanced Methodologies for Medical Procedure Coding Using Large Language Models (LLMs).</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.21125/edulearn.2025.1292" target="_blank" rel="noopener noreferrer">98b01fbc848d0bd84bba</a> — CULTURAL IDENTITY IN LARGE LANGUAGE MODELS: IMPLICATIONS FOR EDUCATIONAL APPLICATIONS.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.21125/edulearn.2025.1292" target="_blank" rel="noopener noreferrer">98b01fbc848d0bd84bba</a> — CULTURAL IDENTITY IN LARGE LANGUAGE MODELS: IMPLICATIONS FOR EDUCATIONAL APPLICATIONS.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:06</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1007/s44217-025-01057-6" target="_blank" rel="noopener noreferrer">d6b4480d8e83d0f70c4e</a> — Mitigating students’ reliance on generative AI in computer engineering education: a case study.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1007/s44217-025-01057-6" target="_blank" rel="noopener noreferrer">d6b4480d8e83d0f70c4e</a> — Mitigating students’ reliance on generative AI in computer engineering education: a case study.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1007/s44217-025-01057-6" target="_blank" rel="noopener noreferrer">d6b4480d8e83d0f70c4e</a> — Mitigating students’ reliance on generative AI in computer engineering education: a case study.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/s44217-025-01057-6" target="_blank" rel="noopener noreferrer">d6b4480d8e83d0f70c4e</a> — Mitigating students’ reliance on generative AI in computer engineering education: a case study.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.7764/onomazein.65.10" target="_blank" rel="noopener noreferrer">0e006b3ec6a9179eaae4</a> — Methodologies and models in the teaching of Spanish as a foreign language.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.7764/onomazein.65.10" target="_blank" rel="noopener noreferrer">0e006b3ec6a9179eaae4</a> — Methodologies and models in the teaching of Spanish as a foreign language.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.7764/onomazein.65.10" target="_blank" rel="noopener noreferrer">0e006b3ec6a9179eaae4</a> — Methodologies and models in the teaching of Spanish as a foreign language.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.7764/onomazein.65.10" target="_blank" rel="noopener noreferrer">0e006b3ec6a9179eaae4</a> — Methodologies and models in the teaching of Spanish as a foreign language.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.62583/rseltl.v1i2.10" target="_blank" rel="noopener noreferrer">c77911342b2b06124cc1</a> — Efficacy of Flipped Classroom Models in English Language Teaching: Investigating the Impact of Flipped Classroom Strateg.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.62583/rseltl.v1i2.10" target="_blank" rel="noopener noreferrer">c77911342b2b06124cc1</a> — Efficacy of Flipped Classroom Models in English Language Teaching: Investigating the Impact of Flipped Classroom Strateg.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.62583/rseltl.v1i2.10" target="_blank" rel="noopener noreferrer">c77911342b2b06124cc1</a> — Efficacy of Flipped Classroom Models in English Language Teaching: Investigating the Impact of Flipped Classroom Strateg.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.2139/ssrn.6670260" target="_blank" rel="noopener noreferrer">98ce20343d5e4f8f585a</a> — Reasoning Settings Attenuate Preference-Reversal-Style Inconsistency in Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.2139/ssrn.6670260" target="_blank" rel="noopener noreferrer">98ce20343d5e4f8f585a</a> — Reasoning Settings Attenuate Preference-Reversal-Style Inconsistency in Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.2139/ssrn.6670260" target="_blank" rel="noopener noreferrer">98ce20343d5e4f8f585a</a> — Reasoning Settings Attenuate Preference-Reversal-Style Inconsistency in Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.28945/5580" target="_blank" rel="noopener noreferrer">2eb84b456ace49b160ce</a> — Better Understanding Peoples&#39; Experiences with Technologically Mediated Learning, What Works, for Whom, and within What .</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.28945/5580" target="_blank" rel="noopener noreferrer">2eb84b456ace49b160ce</a> — Better Understanding Peoples&#39; Experiences with Technologically Mediated Learning, What Works, for Whom, and within What .</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.28945/5580" target="_blank" rel="noopener noreferrer">2eb84b456ace49b160ce</a> — Better Understanding Peoples&#39; Experiences with Technologically Mediated Learning, What Works, for Whom, and within What .</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-2733-4_1" target="_blank" rel="noopener noreferrer">654c73ab606269e96c13</a> — Introduction to Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-2733-4_1" target="_blank" rel="noopener noreferrer">654c73ab606269e96c13</a> — Introduction to Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1016/b978-0-443-33592-1.00007-3" target="_blank" rel="noopener noreferrer">a2c8cec18d608e3181fa</a> — Trustworthiness of large language models: hallucinations.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1016/b978-0-443-33592-1.00007-3" target="_blank" rel="noopener noreferrer">a2c8cec18d608e3181fa</a> — Trustworthiness of large language models: hallucinations.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1016/b978-0-443-33592-1.00003-6" target="_blank" rel="noopener noreferrer">f3e11594d15c1e47c672</a> — Ethical issues with large language models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1016/b978-0-443-33592-1.00003-6" target="_blank" rel="noopener noreferrer">f3e11594d15c1e47c672</a> — Ethical issues with large language models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.5220/0014949500004021" target="_blank" rel="noopener noreferrer">47e9bf29a3ddfec7a00a</a> — Different Models, Different Values: Educational Preference Structures across Alignment Methodologies in Large Language M.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.5220/0014949500004021" target="_blank" rel="noopener noreferrer">47e9bf29a3ddfec7a00a</a> — Different Models, Different Values: Educational Preference Structures across Alignment Methodologies in Large Language M.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1201/9781003669012-4" target="_blank" rel="noopener noreferrer">ef44bd2e7ec08757d5ed</a> — Large Language Models in Chemistry.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1201/9781003669012-4" target="_blank" rel="noopener noreferrer">ef44bd2e7ec08757d5ed</a> — Large Language Models in Chemistry.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1201/9781003517245-3" target="_blank" rel="noopener noreferrer">df76897b989ae7327bc2</a> — Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1201/9781003517245-3" target="_blank" rel="noopener noreferrer">df76897b989ae7327bc2</a> — Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0569-1_1" target="_blank" rel="noopener noreferrer">73d929f3310f0b251b66</a> — Introduction to Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0569-1_1" target="_blank" rel="noopener noreferrer">73d929f3310f0b251b66</a> — Introduction to Large Language Models.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1038/s41591-023-02448-8" target="_blank" rel="noopener noreferrer">b8f00788240f957ea0e5</a> — Large language models in medicine.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1038/s41591-023-02448-8" target="_blank" rel="noopener noreferrer">b8f00788240f957ea0e5</a> — Large language models in medicine.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.15760/etd.4098" target="_blank" rel="noopener noreferrer">badc7cb2d6c5244f19c9</a> — Reasoning in Large Language Models Across Multilingual, Long-Context, and Symbolic Settings.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.15760/etd.4098" target="_blank" rel="noopener noreferrer">badc7cb2d6c5244f19c9</a> — Reasoning in Large Language Models Across Multilingual, Long-Context, and Symbolic Settings.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.23887/jlls.v8i3.103451" target="_blank" rel="noopener noreferrer">eece1e22a73a4d996982</a> — The Impact of Indonesian Language Teaching Material Development on Student Learning Outcomes: A Meta-Analysis.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.23887/jlls.v8i3.103451" target="_blank" rel="noopener noreferrer">eece1e22a73a4d996982</a> — The Impact of Indonesian Language Teaching Material Development on Student Learning Outcomes: A Meta-Analysis.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.23887/jlls.v8i3.103451" target="_blank" rel="noopener noreferrer">eece1e22a73a4d996982</a> — The Impact of Indonesian Language Teaching Material Development on Student Learning Outcomes: A Meta-Analysis.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.23887/jlls.v8i3.103451" target="_blank" rel="noopener noreferrer">eece1e22a73a4d996982</a> — The Impact of Indonesian Language Teaching Material Development on Student Learning Outcomes: A Meta-Analysis.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1038/s41432-026-01226-y" target="_blank" rel="noopener noreferrer">f7ba49fe6828fdaecadf</a> — Application of deep machine learning in dental education: a systematic review of effectiveness in dental students&#39; teach.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1038/s41432-026-01226-y" target="_blank" rel="noopener noreferrer">f7ba49fe6828fdaecadf</a> — Application of deep machine learning in dental education: a systematic review of effectiveness in dental students&#39; teach.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:07</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1145/3678610.3678631" target="_blank" rel="noopener noreferrer">47197097a87aeea1a8cc</a> — Artificial Intelligence in Physics Courses to Support Active Learning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:08</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1145/3678610.3678631" target="_blank" rel="noopener noreferrer">47197097a87aeea1a8cc</a> — Artificial Intelligence in Physics Courses to Support Active Learning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:08</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1145/3678610.3678631" target="_blank" rel="noopener noreferrer">47197097a87aeea1a8cc</a> — Artificial Intelligence in Physics Courses to Support Active Learning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:08</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1145/3678610.3678631" target="_blank" rel="noopener noreferrer">47197097a87aeea1a8cc</a> — Artificial Intelligence in Physics Courses to Support Active Learning.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:08</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/s10639-024-13264-z" target="_blank" rel="noopener noreferrer">1f9d925e38c0529ae01c</a> — Investigating the utilization and impact of large language model-based intelligent teaching assistants in flipped classr.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:08</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/s10639-024-13264-z" target="_blank" rel="noopener noreferrer">1f9d925e38c0529ae01c</a> — Investigating the utilization and impact of large language model-based intelligent teaching assistants in flipped classr.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:08</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.37249/jlllt.v3i2.774" target="_blank" rel="noopener noreferrer">aaa16552206652db1e8f</a> — The Impact of Standardized Teaching Methodologies on Student Learning and Teacher Autonomy in Ghanaian Schools.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:11</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.37249/jlllt.v3i2.774" target="_blank" rel="noopener noreferrer">aaa16552206652db1e8f</a> — The Impact of Standardized Teaching Methodologies on Student Learning and Teacher Autonomy in Ghanaian Schools.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:11</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.37249/jlllt.v3i2.774" target="_blank" rel="noopener noreferrer">aaa16552206652db1e8f</a> — The Impact of Standardized Teaching Methodologies on Student Learning and Teacher Autonomy in Ghanaian Schools.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:44</td><td>Processing</td><td>chunks selected</td><td>Relevant passages selected.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:44</td><td>Processing</td><td>semantic completed</td><td>Hybrid evidence retrieval completed.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:44</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:44</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-12 21:07:48</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:48</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-12 21:07:48</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-12 21:07:57</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-12 21:08:05</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-12 21:08:05</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-12 21:08:16</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-12 21:08:16</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 21:08:22</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 21:08:22</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 53</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

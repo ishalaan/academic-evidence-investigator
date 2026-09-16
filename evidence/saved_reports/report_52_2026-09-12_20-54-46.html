@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 52</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>What are the main applications of large language models in education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Large language models (LLMs) are increasingly applied in education to enhance personalization, engagement, and instructional effectiveness. A key application is the generation of educational content, such as course syllabi, practice problems, and quizzes, which supports tailored learning experiences (Kasneci et al., 2023). These models can also create interactive tools that encourage critical thinking by prompting students to engage with diverse perspectives and problem-solving scenarios (Kasneci et al., 2023). Personalized learning is further advanced through adaptive systems that adjust content to individual knowledge levels, as noted in studies emphasizing their role in addressing varied student needs (Delikoura, Fung and Hui, 2025). Additionally, LLMs are used to generate targeted feedback and tutoring support, particularly in multilingual contexts, though performance varies with language resource availability (Gupta et al., 2025).</p><p>Beyond content creation, LLMs are integrated into specialized educational domains. In dental education, they assist with clinical scenario simulations and knowledge retrieval, while in industrial settings, they support training for smart manufacturing through datasets and predictive analytics (Kong, Fok and Yiu, 2025; Imani et al., 2025). These applications highlight their versatility in both traditional and technical fields. However, challenges persist, including algorithmic bias in generated content and the need for educators to develop digital literacy to guide students in navigating LLM outputs (Lee et al., 2024). The potential for misuse, such as reliance on biased or inaccurate information, underscores the importance of human oversight in educational implementation (Kasneci et al., 2023).</p><p>The integration of LLMs also raises concerns about equitable access and quality. While they offer scalable solutions for personalized learning, disparities in language data representation may disadvantage lower-resource languages, limiting their utility in global education (Gupta et al., 2025). Studies emphasize that effective deployment requires balancing innovation with pedagogical strategies to ensure alignment with learning objectives (Sain et al., 2024). For instance, models like ChatGPT are being adapted for collaborative problem-solving tasks, fostering analytical thinking through step-by-step explanations and real-world examples (Kasneci et al., 2023). Such approaches demonstrate how LLMs can complement rather than replace traditional teaching methods.</p><p>Practically, the applications of LLMs in education suggest opportunities for enhancing accessibility and efficiency. Their ability to automate routine tasks, such as grading or content curation, allows educators to focus on higher-order instruction (Sain et al., 2024). However, the evidence highlights the need for careful implementation to mitigate risks, such as over-reliance on automated systems or the perpetuation of biases in training data (Lee et al., 2024). Future research should prioritize strategies to address these challenges, ensuring that LLMs support inclusive, equitable, and pedagogically sound educational practices. By combining technological innovation with critical engagement, educators can harness LLMs to enrich learning experiences while safeguarding against unintended consequences.</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>Large language models (LLMs) are widely used to generate educational content, such as course syllabi, practice problems, and quizzes, enabling personalized learning experiences. This approach supports tailored instruction by adapting materials to individual student needs, as demonstrated in studies highlighting their role in addressing diverse knowledge levels and fostering critical thinking (Sain et al., 2024).</li><li>Interactive tools powered by LLMs encourage collaborative problem-solving and critical analysis by prompting students to engage with complex scenarios and diverse perspectives. For example, models can generate step-by-step explanations and targeted questions, enhancing analytical skills and deepening conceptual understanding (Kasneci et al., 2023).</li><li>Multilingual applications of LLMs expand access to education but face performance disparities in low-resource languages. While models excel in English-centric tasks, their effectiveness in languages like Arabic or Telugu is limited by training data biases, underscoring the need for improved linguistic inclusivity (Gupta et al., 2025).</li><li>LLMs are integrated into specialized fields like dental education, where they support curriculum development and clinical scenario simulations. This application streamlines resource creation but requires careful validation to ensure accuracy and alignment with professional standards (Kong, Fok and Yiu, 2025).</li><li>The use of LLMs in industrial education, such as IIoT training, combines real-time data analysis with adaptive learning frameworks. By simulating smart factory environments, these models bridge theoretical knowledge and practical skills, though reliance on industry-specific datasets remains a challenge (Imani et al., 2025).</li><li>Ethical concerns around algorithmic bias in LLMs highlight risks of perpetuating educational inequalities. Frameworks mapping the LLM life cycle identify biases in data curation and model customization, emphasizing the need for transparent oversight to mitigate discriminatory outcomes (Lee et al., 2024).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The evidence predominantly focuses on general education applications, with limited exploration of sector-specific uses like dental education (Kong, Fok and Yiu, 2025) or industrial IoT training (Imani et al., 2025). Further studies in niche fields would clarify broader applicability.</li><li>Bias mitigation strategies are mentioned but not detailed, particularly in low-resource languages (Gupta et al., 2025). More research on practical solutions for algorithmic bias in educational contexts is needed.</li><li>Long-term impacts on learning outcomes and student dependency on LLMs remain underexplored. Longitudinal studies could address these gaps.</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S3">
+                Delikoura, I., Fung, Y.R. and Hui, P. (2025) ‘From Superficial Outputs to Superficial Learning: Risks of Large Language Models in Education’, <em>ArXiv</em>, abs/2509.21972.
+                Available at: <a href="https://doi.org/10.48550/arXiv.2509.21972" target="_blank" rel="noopener noreferrer">https://doi.org/10.48550/arXiv.2509.21972</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Gupta, V. et al. (2025) ‘Multilingual Performance Biases of Large Language Models in Education’, <em>ArXiv</em>, abs/2504.17720.
+                Available at: <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">https://doi.org/10.48550/arXiv.2504.17720</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                Imani, M. et al. (2025) ‘Applications of Large Language Models in Industrial Internet of Things Education’, <em>2025 11th International Conference on Web Research (ICWR)</em>, pp. 257-263.
+                Available at: <a href="https://doi.org/10.1109/ICWR65219.2025.11006194" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/ICWR65219.2025.11006194</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S8">
+                Kasneci, E. et al. (2023) ‘ChatGPT for good? On opportunities and challenges of large language models for education’, <em>Learning and Individual Differences</em>.
+                Available at: <a href="https://doi.org/10.1016/j.lindif.2023.102274" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.lindif.2023.102274</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S1">
+                Kong, M., Fok, E.H.W. and Yiu, C. (2025) ‘A Scoping Review of Large Language Models in Dental Education: Applications, Challenges, and Prospects’, <em>International Dental Journal</em>, 75.
+                Available at: <a href="https://doi.org/10.1016/j.identj.2025.103854" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.identj.2025.103854</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S5">
+                Lee, J. et al. (2024) ‘The life cycle of large language models in education: A framework for understanding sources of bias’, <em>Br. J. Educ. Technol.</em>, 55, pp. 1982-2002.
+                Available at: <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">https://doi.org/10.1111/bjet.13505</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        
+            <li id="source-S7">
+                Sain, Z. et al. (2024) ‘ChatGPT For Positive Impact? Examining the Opportunities and Challenges of Large Language Models in Education’, <em>International Journal of Educational Development</em>.
+                Available at: <a href="https://doi.org/10.61132/ijed.v1i3.75" target="_blank" rel="noopener noreferrer">https://doi.org/10.61132/ijed.v1i3.75</a>
+                (Accessed: 12 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>A Scoping Review of Large Language Models in Dental Education: Applications, Challenges, and Prospects</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: f0b6f0236fdb727d4c1b</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.324<br>Retrieved from: https://www.semanticscholar.org/paper/eeeb196ea74a9d89ec9f403f66f068d1f93fcae9</li></ul></details>
+                <p class="reference-note">Mengjie Kong, Elise Hoi Wan Fok, C. Yiu · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Introduction and aims With the rapid development of large language models (LLMs), their potential in dental clinical healthcare and education has become increasingly evident. However, the application of this emerging technology within dental education has not yet been systematically reviewed. This scoping review aims to summarize current applications, identify challenges encountered in the implementation process, and outline future prospects. Methods A comprehensive literature search was conducted in the PubMed, Web of Science, and Embase databases to identify studies related to LLMs and dental education. Relevant studies were screened, selected, and subjected to data extraction to collate information pertinent to the research questions. Results A total of 37 studies were included. LLMs have been applied across seven distinct domains in dental education, notably in dental examinations (n = 24), educational information resources (n = 5), and assessment of students’ assignments (n = 3). These applications have introduced several challenges, including technical issues (ie, inaccurate information, inability in image analysis, inaccessibility, and high cost) and application aspects (ie, ethical issues, absence of usage guidelines, potential harm to students’ knowledge and skills, and cautious attitudes towards LLMs). Addressing these challenges requires coordinated efforts from students, educators, curriculum administrators, and technical developers. Conclusions The application of LLMs in dental education remains in its early stage. Future research should focus on expanding the range of applications and establishing standardized, ethically satisfying, and technically sound guidelines for integrating LLMs into dental education.</p></details>
+                <a href="https://doi.org/10.1016/j.identj.2025.103854" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Applications of Large Language Models in Industrial Internet of Things Education</strong><span>Relevance score: 26</span></div>
+                <p class="reference-note">Paper ID: 0d6ce54aa193581bad9d</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.242<br>Retrieved from: https://www.semanticscholar.org/paper/97eef4be854a0f3e3bb5699812b184433ce1d1a9</li></ul></details>
+                <p class="reference-note">Mehdi Imani, Ali Imanifard, Babak Majidi, Abdolah Shamisa · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This paper explores the potential of Large Language Models (LLMs) to enhance educational experiences in the Industrial Internet of Things (IIoT), focusing on the domain of smart steel manufacturing. We address the critical shortage of authentic industrial datasets for academic research by presenting an industry-validated IIoT educational dataset derived from three months of operational data from a steel plant, enriched with domain-specific annotations. We propose a comprehensive IIoT framework specifically designed for smart steel manufacturing, integrating LLMs with IIoT infrastructure. This novel architecture unifies real-time process monitoring, predictive analytics, and adaptive learning, simulating a smart factory ecosystem. It facilitates humanmachine collaboration and replicates quality control workflows, thereby bridging the gap between educational theory and industrial practice. A key component of our framework is an interactive decision-making dashboard powered by LLMs. This AI-driven tool contextualizes IIoT data, offering dynamic visualizations of critical parameters such as metallization levels and H2/CO ratios. It further enables scenario-based simulations for energy optimization in a risk-free environment, empowering learners to experiment and understand complex industrial processes. Our study demonstrates the transformative potential of LLMs in HoT education, offering a practical and engaging learning environment that directly aligns with industrial realities.</p></details>
+                <a href="https://doi.org/10.1109/ICWR65219.2025.11006194" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>From Superficial Outputs to Superficial Learning: Risks of Large Language Models in Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 667c4618ccaf897f9d77</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.432<br>Retrieved from: https://www.semanticscholar.org/paper/9f2ebd5d7d33a0afba331e60a3de61d8385f0bce</li></ul></details>
+                <p class="reference-note">Iris Delikoura, Yi R. Fung, Pan Hui · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large Language Models (LLMs) are transforming education by enabling personalization, feedback, and knowledge access, while also raising concerns about risks to students and learning systems. Yet empirical evidence on these risks remains fragmented. This paper presents a systematic review of 70 empirical studies across computer science, education, and psychology. Guided by four research questions, we examine: (i) which applications of LLMs in education have been most frequently explored; (ii) how researchers have measured their impact; (iii) which risks stem from such applications; and (iv) what mitigation strategies have been proposed. We find that research on LLMs clusters around three domains: operational effectiveness, personalized applications, and interactive learning tools. Across these, model-level risks include superficial understanding, bias, limited robustness, anthropomorphism, hallucinations, privacy concerns, and knowledge constraints. When learners interact with LLMs, these risks extend to cognitive and behavioural outcomes, including reduced neural activity, over-reliance, diminished independent learning skills, and a loss of student agency. To capture this progression, we propose an LLM-Risk Adapted Learning Model that illustrates how technical risks cascade through interaction and interpretation to shape educational outcomes. As the first synthesis of empirically assessed risks, this review provides a foundation for responsible, human-centred integration of LLMs in education.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2509.21972" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Multilingual Performance Biases of Large Language Models in Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 43ee383b1ecc8b4661a3</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.470<br>Retrieved from: https://www.semanticscholar.org/paper/2f6644d97226c1258d9b733a5762dde8aa27b2b5</li></ul></details>
+                <p class="reference-note">Vansh Gupta, Sankalan Pal Chowdhury, Vilém Zouhar, Donya Rooein, Mrinmaya Sachan · 2025 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are increasingly being adopted in educational settings. These applications expand beyond English, though current LLMs remain primarily English-centric. In this work, we ascertain if their use in education settings in non-English languages is warranted. We evaluated the performance of popular LLMs on four educational tasks: identifying student misconceptions, providing targeted feedback, interactive tutoring, and grading translations in eight languages (Mandarin, Hindi, Arabic, German, Farsi, Telugu, Ukrainian, Czech) in addition to English. We find that the performance on these tasks somewhat corresponds to the amount of language represented in training data, with lower-resource languages having poorer task performance. Although the models perform reasonably well in most languages, the frequent performance drop from English is significant. Thus, we recommend that practitioners first verify that the LLM works well in the target language for their educational task before deployment.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The life cycle of large language models in education: A framework for understanding sources of bias</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: d2f6998a4632765d090d</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.452<br>Retrieved from: https://www.semanticscholar.org/paper/3d60d8273cea724226d4dd62f469bc77374d3656</li></ul></details>
+                <p class="reference-note">Jinsook Lee, Yann Hicke, Renzhe Yu, Christopher Brooks, René F. Kizilcec · 2024 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are increasingly adopted in educational contexts to provide personalized support to students and teachers. The unprecedented capacity of LLM‐based applications to understand and generate natural language can potentially improve instructional effectiveness and learning outcomes, but the integration of LLMs in education technology has renewed concerns over algorithmic bias, which may exacerbate educational inequalities. Building on prior work that mapped the traditional machine learning life cycle, we provide a framework of the LLM life cycle from the initial development of LLMs to customizing pre‐trained models for various applications in educational settings. We explain each step in the LLM life cycle and identify potential sources of bias that may arise in the context of education. We discuss why current measures of bias from traditional machine learning fail to transfer to LLM‐generated text (eg, tutoring conversations) because text encodings are high‐dimensional, there can be multiple correct responses, and tailoring responses may be pedagogically desirable rather than unfair. The proposed framework clarifies the complex nature of bias in LLM applications and provides practical guidance for their evaluation to promote educational equity. What is already known about this topic The life cycle of traditional machine learning (ML) applications which focus on predicting labels is well understood. Biases are known to enter in traditional ML applications at various points in the life cycle, and methods to measure and mitigate these biases have been developed and tested. Large language models (LLMs) and other forms of generative artificial intelligence (GenAI) are increasingly adopted in education technologies (EdTech), but current evaluation approaches are not specific to the domain of education. What this paper adds A holistic perspective of the LLM life cycle with domain‐specific examples in education to highlight opportunities and challenges for incorporating natural language understanding (NLU) and natural language generation (NLG) into EdTech. Potential sources of bias are identified in each step of the LLM life cycle and discussed in the context of education. A framework for understanding where to expect potential harms of LLMs for students, teachers, and other users of GenAI technology in education, which can guide approaches to bias measurement and mitigation. Implications for practice and/or policy Education practitioners and policymakers should be aware that biases can originate from a multitude of steps in the LLM life cycle, and the life cycle perspective offers them a heuristic for asking technology developers to explain each step to assess the risk of bias. Measuring the biases of systems that use LLMs in education is more complex than with traditional ML, in large part because the evaluation of natural language generation is highly context‐dependent (eg, what counts as good feedback on an assignment varies). EdTech developers can play an important role in collecting and curating datasets for the evaluation and benchmarking of LLM applications moving forward.</p></details>
+                <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The impact of large language models on higher education: exploring the connection between AI and Education 4.0</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: fc544f061534a630bb5e</p>
+                <p><strong>Full-text evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 4, PDF page 3 · full_text · Similarity 0.520<br>Retrieved from: https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1392091/pdf</li><li>Chunk 26, PDF page 19 · full_text · Similarity 0.499<br>Retrieved from: https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1392091/pdf</li></ul></details>
+                <p class="reference-note">Iris Cristina Peláez-Sánchez, Davis Velarde-Camaqui, L. Glasserman-Morales · 2024 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>The digital transformation has profoundly affected every facet of human life, with technological advancements potentially reshaping the economy, society, and our daily living and working modalities. Artificial Intelligence (AI), particularly Generative AI (GAI), has emerged as a pivotal disruption in education, showcasing the capability to produce diverse and context-relevant content. Generative Artificial Intelligence (GAI) has revolutionized natural language processing, computer vision, and creative arts. Large language models (LLMs) like GPT-4 and Open Assistant and tools like DALL-E and Midjourney for the visual and creative domain are increasingly used for various tasks by students and others with critical information needs. AI presents novel avenues for crafting effective learning activities and developing enhanced technology-driven learning applications in the educational sector. However, integrating AI with a pedagogical focus pose challenge. Education 4.0, which integrates emerging technologies and innovative strategies, aims to prepare new generations for a technologically fluid world. This systematic literature review aims to analyze the use of LLMs in higher education within the context of Education 4.0’s pedagogical approaches, identifying trends and challenges from a selection of 83 relevant articles out of an initial set of 841 papers. The findings underscore the significant potential of LLMs to enrich higher education, aligning with Education 4.0 by fostering more autonomous, collaborative, and interactive learning. It highlights the necessity for human oversight to ensure the quality and accuracy of AI-generated content. It addresses ethical and legal challenges to ensure equitable implementation, suggesting an exploration of LLM integration that complements human interaction while maintaining academic integrity and pedagogical foundation.</p></details>
+                <a href="https://doi.org/10.3389/feduc.2024.1392091" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>ChatGPT For Positive Impact? Examining the Opportunities and Challenges of Large Language Models in Education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: ffa7677da29eabf2fa23</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.609<br>Retrieved from: https://www.semanticscholar.org/paper/419d4b8288a25352ccf40be50552cf9a0058eff3</li></ul></details>
+                <p class="reference-note">Z. Sain, Chanda Chansa, Hasan Baharun, Agatha Cryssandra Pigesia · 2024 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Researchers argues that large language models are critical to the advancement of artificial intelligence and will play a vital role in future progress. Despite criticism and occasional bans, these models are persistent and poised to continue. This analysis delves into the potential benefits and challenges of utilising extensive language models in education, considering perspectives from both students and educators. These models&#39; current status and applications are briefly reviewed, emphasising their use in generating educational material, increasing student engagement, and personalising learning experiences. The discussed challenges include the need for educators and students to develop skills and literacies to understand and navigate the technology and its limitations. Employing a strategic and pedagogical approach that stresses critical thinking and fact-checking is a crucial component of effectively integrating these models into educational institutions. AI applications in education often encounter additional challenges, including potential biases, the necessity for ongoing human oversight, and the risks of misuse. However, these challenges may present educational opportunities for students to become familiar with social biases, complexities, and risks associated with AI. The essay presents solutions for effectively addressing these challenges to ensure the responsible and ethical use of large language models in education.</p></details>
+                <a href="https://doi.org/10.61132/ijed.v1i3.75" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>ChatGPT for good? On opportunities and challenges of large language models for education</strong><span>Relevance score: 24</span></div>
+                <p class="reference-note">Paper ID: 06372867271a6588c2ab</p>
+                <p><strong>Full-text evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 5, PDF page 3 · full_text · Similarity 0.753<br>Retrieved from: https://epub.ub.uni-muenchen.de/125071/1/ChatGPT_for_Good_v3.pdf</li><li>Chunk 2, PDF page 2 · full_text · Similarity 0.659<br>Retrieved from: https://epub.ub.uni-muenchen.de/125071/1/ChatGPT_for_Good_v3.pdf</li></ul></details>
+                <p class="reference-note">Enkelejda Kasneci, Kathrin Seßler, S. Küchemann, M. Bannert, Daryna Dementieva, F. Fischer, Urs Gasser, G. Groh, Stephan Günnemann, Eyke Hüllermeier, Stephan Krusche, Gitta Kutyniok, Tilman Michaeli, Claudia Nerdel, J. Pfeffer, Oleksandra Poquet, Michael Sailer, Albrecht Schmidt, Tina Seidel, Matthias Stadler, J. Weller, Jochen Kuhn, Gjergji Kasneci · 2023 · Semantic Scholar</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models represent a significant advancement in the field of AI. The underlying technology is key to further innovations and, despite critical views and even bans within communities and regions, large language models are here to stay. This position paper presents the potential benefits and challenges of educational applications of large language models, from student and teacher perspectives. We briefly discuss the current state of large language models and their applications. We then highlight how these models can be used to create educational content, improve student engagement and interaction, and personalize learning experiences. With regard to challenges, we argue that large language models in education require teachers and learners to develop sets of competencies and literacies necessary to both understand the technology as well as their limitations and unexpected brittleness of such systems. In addition, a clear strategy within educational systems and a clear pedagogical approach with a strong focus on critical thinking and strategies for fact checking are required to integrate and take full advantage of large language models in learning settings and teaching curricula. Other challenges such as the potential bias in the output, the need for continuous human oversight, and the potential for misuse are not unique to the application of AI in education. But we believe that, if handled sensibly, these challenges can offer insights and opportunities in education scenarios to acquaint students early on with potential societal biases, criticalities, and risks of AI applications. We conclude with recommendations for how to address these challenges and ensure that such models are used in a responsible and ethical manner in education.</p></details>
+                <a href="https://doi.org/10.1016/j.lindif.2023.102274" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Exploring the Impact of Large Language Models on Efficiency and Innovation across Education and Industries: Applications, Challenges, and Ethical Considerations</strong><span>Relevance score: 20</span></div>
+                <p class="reference-note">Paper ID: ee80696206406217be32</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Li-Shiue Gau · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.33552/ijer.2024.03.000573" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Industrial applications of large language models</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 79c0a272730fa318ec30</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.294<br>Retrieved from: https://www.semanticscholar.org/paper/65c30f44a31378c971b12462139050d05e0d4c0c</li></ul></details>
+                <p class="reference-note">Mubashar Raza, Zarmina Jahangir, Muhammad Bilal Riaz, Muhammad Jasim Saeed, Muhammad Awais Sattar · 2025 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are artificial intelligence (AI) based computational models designed to understand and generate human like text. With billions of training parameters, LLMs excel in identifying intricate language patterns, enabling remarkable performance across a variety of natural language processing (NLP) tasks. After the introduction of transformer architectures, they are impacting the industry with their text generation capabilities. LLMs play an innovative role across various industries by automating NLP tasks. In healthcare, they assist in diagnosing diseases, personalizing treatment plans, and managing patient data. LLMs provide predictive maintenance in automotive industry. LLMs provide recommendation systems, and consumer behavior analyzers. LLMs facilitates researchers and offer personalized learning experiences in education. In finance and banking, LLMs are used for fraud detection, customer service automation, and risk management. LLMs are driving significant advancements across the industries by automating tasks, improving accuracy, and providing deeper insights. Despite these advancements, LLMs face challenges such as ethical concerns, biases in training data, and significant computational resource requirements, which must be addressed to ensure impartial and sustainable deployment. This study provides a comprehensive analysis of LLMs, their evolution, and their diverse applications across industries, offering researchers valuable insights into their transformative potential and the accompanying limitations.</p></details>
+                <a href="https://doi.org/10.1038/s41598-025-98483-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Applications of large language models in cardiovascular disease: a systematic review</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 6918d225e7bdbbe277f9</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.291<br>Retrieved from: https://www.semanticscholar.org/paper/519b747a411e228614010ef0386f13622c96ed5a</li></ul></details>
+                <p class="reference-note">José Ferreira Santos, R. Ladeiras-Lopes, F. Leite, H. Dores · 2025 · Semantic Scholar</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>Abstract Cardiovascular disease (CVD) remains the leading cause of morbidity and mortality worldwide. Large language models (LLMs) offer potential solutions for enhancing patient education and supporting clinical decision-making. This study aimed to evaluate LLMs’ applications in CVD and explore their current implementation, from prevention to treatment. Following the Preferred Reporting Items for Systematic Reviews and Meta-Analyses guidelines, this systematic review assessed LLM applications in CVD. A comprehensive PubMed search identified relevant studies. The review prioritized pragmatic and practical applications of LLMs. Key applications, benefits, and limitations of LLMs in CVD prevention were summarized. Thirty-five observational studies met the eligibility criteria. Of these, 54% addressed primary prevention and risk factor management, while 46% focused on established CVD. Commercial LLMs were evaluated in all but one study, with 91% (32 studies) assessing ChatGPT. The LLM applications were categorized as follows: 72% addressed patient education, 17% clinical decision support, and 11% both. In 68% of studies, the primary objective was to evaluate LLMs’ performance in answering frequently asked patient questions, with results indicating accurate, comprehensive, and generally safe responses. However, occasional misinformation and hallucinated references were noted. Additional applications included patient guidance on CVD, first aid, and lifestyle recommendations. Large language models were assessed for medical questions, diagnostic support, and treatment recommendations in clinical decision support. Large language models hold significant potential in CVD prevention and treatment. Evidence supports their potential as an alternative source of information for addressing patients’ questions about common CVD. However, further validation is needed for their application in individualized care, from diagnosis to treatment.</p></details>
+                <a href="https://doi.org/10.1093/ehjdh/ztaf028" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>CodeEduBench: A Multidimensional Benchmark for Evaluating AI-Driven Code Generation Models in C Programming Education</strong><span>Relevance score: 18</span></div>
+                <p class="reference-note">Paper ID: f13bb7f4f6b8b18b7e34</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Yi Zhou, Zhenyu Shan, Z. Dai, Zhao Zhang · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are a core technology that can facilitate change in programming education. However, the educational applications and impact of LLMs have not yet been thoroughly evaluated. In this research, we develop the CodeEduBench three-dimensional evaluation framework, which assesses the applicability of LLMs for C programming instruction across three aspects: test case creation, code synthesis, and bug fixing. Five widely-used open-source models are chosen for comparative study. The results of this study show that Qwen2.5-coder-32b has excellent overall performance, although its shortcomings in code generation accuracy and error correction. In addition, this study proposes model selection strategies and optimization pathways to provide methodological support for the scientific application of LLM in programming education.</p></details>
+                <a href="https://doi.org/10.1145/3744367.3744402" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>From Algorithms to Classrooms: The Future of Education with Large Language Models</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: 59d51e20990c81a2ff35</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Myint Swe Khine, Ernest Afari · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003567257-12" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large language models in education: A focus on the complementary relationship between human teachers and ChatGPT</strong><span>Relevance score: 17</span></div>
+                <p class="reference-note">Paper ID: 207bc24df676813bbc0f</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jae-Bong Jeon, Seongyong Lee · 2023 · Semantic Scholar</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/s10639-023-11834-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>A Survey on Evaluation of Large Language Models</strong><span>Relevance score: 16</span></div>
+                <p class="reference-note">Paper ID: 57565e57b2b43529adf3</p>
+                <p><strong>Full-text evidence</strong></p>
+                
+                <p class="reference-note">Yu-Chu Chang, Xu Wang, Jindong Wang, Yuan Wu, Kaijie Zhu, Hao Chen, Linyi Yang, Xiaoyuan Yi, Cunxiang Wang, Yidong Wang, Weirong Ye, Yue Zhang, Yi Chang, Philip S. Yu, Qian Yang, Xingxu Xie · 2023 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Large language models (LLMs) are gaining increasing popularity in both academia and industry, owing to their unprecedented performance in various applications. As LLMs continue to play a vital role in both research and daily use, their evaluation becomes increasingly critical, not only at the task level, but also at the society level for better understanding of their potential risks. Over the past years, significant efforts have been made to examine LLMs from various perspectives. This paper presents a comprehensive review of these evaluation methods for LLMs, focusing on three key dimensions: what to evaluate, where to evaluate, and how to evaluate. Firstly, we provide an overview from the perspective of evaluation tasks, encompassing general natural language processing tasks, reasoning, medical usage, ethics, education, natural and social sciences, agent applications, and other areas. Secondly, we answer the ‘where’ and ‘how’ questions by diving into the evaluation methods and benchmarks, which serve as crucial components in assessing the performance of LLMs. Then, we summarize the success and failure cases of LLMs in different tasks. Finally, we shed light on several future challenges that lie ahead in LLMs evaluation. Our aim is to offer invaluable insights to researchers in the realm of LLMs evaluation, thereby aiding the development of more proficient LLMs. Our key point is that evaluation should be treated as an essential discipline to better assist the development of LLMs. We consistently maintain the related open-source materials at: https://github.com/MLGroupJLU/LLM-eval-survey</p></details>
+                <a href="https://doi.org/10.1145/3641289" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Value-sensitive design of chatbots in environmental education: Supporting identity, connectedness, well-being and sustainability</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: 90b40c3f5030c7c4e9cb</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Ha Nguyen, Victoria Nguyen, Sara Ludovise, R. Santagata · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>While offering the potential to support learning interactions, emerging AI applications like Large Language Models (LLMs) come with ethical concerns. Grounding technology design in human values can address AI ethics and ensure adoption. To this end, we apply Value‐Sensitive Design—involving empirical, conceptual and technical investigations—to centre human values in the development and evaluation of LLM‐based chatbots within a high school environmental science curriculum. Representing multiple perspectives and expertise, the chatbots help students refine their causal models of climate change&#39;s impact on local marine ecosystems, communities and individuals. We first perform an empirical investigation leveraging participatory design to explore the values that motivate students and educators to engage with the chatbots. Then, we conceptualize the values that emerge from the empirical investigation by grounding them in research in ethical AI design, human values, human‐AI interactions and environmental education. Findings illuminate considerations for the chatbots to support students&#39; identity development, well‐being, human–chatbot relationships and environmental sustainability. We further map the values onto design principles and illustrate how these principles can guide the development and evaluation of the chatbots. Our research demonstrates how to conduct contextual, value‐sensitive inquiries of emergent AI technologies in educational settings. What is already known about this topic Generative artificial intelligence (GenAI) technologies like Large Language Models (LLMs) can not only support learning, but also raise ethical concerns such as transparency, trust and accountability. Value‐sensitive design (VSD) presents a systematic approach to centring human values in technology design. What this paper adds We apply VSD to design LLM‐based chatbots in environmental education and identify values central to supporting students&#39; learning. We map the values emerging from the VSD investigations to several stages of GenAI technology development: conceptualization, development and evaluation. Implications for practice and/or policy Identity development, well‐being, human–AI relationships and environmental sustainability are key values for designing LLM‐based chatbots in environmental education. Using educational stakeholders&#39; values to generate design principles and evaluation metrics for learning technologies can promote technology adoption and engagement.</p></details>
+                <a href="https://doi.org/10.1111/bjet.13568" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Adoption of Chatbots in Higher Education: Global Insights and Recommendations for Iran</strong><span>Relevance score: 15</span></div>
+                <p class="reference-note">Paper ID: ee810b7f258bf0b646d1</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Kamand Kalashi, G. Montazer, Sajjad Saed, Sajedeh Olyaee · 2025 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Advancements in Artificial Intelligence have led to the rise of chatbots as transformative tools in higher education, enhancing teaching and learning through interactive environments. The adoption of large language models, like GPT-4, has significantly expanded their use globally. This paper examines chatbot applications in universities worldwide, focusing on their benefits and challenges, and provides recommendations for integrating this technology into Iran’s education system. To this end, we analyze fundamental AI mechanisms and examine their role in shaping chatbot performance. Case studies from universities across regions including North America, Europe, Asia, and Africa highlight the global impact of chatbots in academic advising, personalized learning, research support, and administrative automation. Finally, by analyzing the strengths and weaknesses of chatbot applications in universities worldwide, the paper offers specific recommendations for Iranian universities to adopt this technology in educational processes, alongside considerations for addressing concerns related to data privacy, academic integrity, and equitable access.</p></details>
+                <a href="https://doi.org/10.1109/ICeLeT66022.2025.11025265" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Improving Large Foundation Models in Education for Multicultural Understanding</strong><span>Relevance score: 14</span></div>
+                <p class="reference-note">Paper ID: a8bbc56cedd5fe92a23c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jindong Wang, Shudong Liu · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003567257-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The impact of large language models on computer science student writing</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: df9a194550b614dc065b</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Katerina Zdravkova, Bojan Ilijoski · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Abstract The new version of ACM and IEEE-CS Computer Science Curricula envisages the preparation of a dozen white papers within more than a third of the Body of Knowledge courses. Lack of experience in conducting research, insufficient ability to articulate thoughts, non-observance of defined recommendations, as well as forgotten verification of what has been done are key challenges in the implementation of these recommendations. Large language models (LLMs) can significantly support the creation of anticipated white papers, encouraging initial directions and inspiration for research, as well as a focused presentation of key elements of the work. Unfortunately, they can also hinder the creation of expected academic texts, promoting the superficiality of research and the presentation of unverified information. In order to facilitate progress in acquiring the necessary writing skills without discriminating against those students who have already acquired them and prefer traditional writing, we have defined a series of strict rules and strategies for preparing the briefing reports with complete, partial, or no reliance on the LLM. They were embedded into the faculty learning management system, implemented, and evaluated twice with more than 150 students during the academic year 2023/24. This paper presents a new approach along with the lessons learned from the first attempt and the changes incorporated into the second. Based on these two carefully designed, conducted and analyzed studies, teachers and students gained a very positive opinion about the impact of LLM on the creation of quality student reports. The effectiveness of the new approach is a guarantee that optimization of the integration of AI-generated content can become a benchmark for the successful preparation of student reports that can be recommended to the wider academic community.</p></details>
+                <a href="https://doi.org/10.1186/s41239-025-00525-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>CULTURAL IDENTITY IN LARGE LANGUAGE MODELS: IMPLICATIONS FOR EDUCATIONAL APPLICATIONS</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: 98b01fbc848d0bd84bba</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Michael Wagner · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.21125/edulearn.2025.1292" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Business Applications of Large Language Models under Web3 Architecture: Technology Fusion and Market Opportunities</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: 148e72e1dedbdf5d5ca7</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Author not supplied · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.38007/978-1-80053-611-1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Assessing The Impact of Enhancing AI-Driven Educational Applications Using Emotional Blackmail Prompts in Large Language Models</strong><span>Relevance score: 12</span></div>
+                <p class="reference-note">Paper ID: 4d563509320223c8ac82</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Wang Sheng-Ming, Chen Chuding · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1109/ictc62082.2024.10827352" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Introduction to Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 654c73ab606269e96c13</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ajay Rawat, Vardan Pathak · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-2733-4_1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Trustworthiness of large language models: hallucinations</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: a2c8cec18d608e3181fa</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Nicolò Brunello · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/b978-0-443-33592-1.00007-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>From Large Language Models to Retrieval-Augmented Generation: A Systematic Review of AI-Powered Educational Systems 	From Large Language Models to Retrieval-Augmented Generation: A Systematic Review of AI-Powered Educational Systems</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 37b6841914619859a6ff</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Author not supplied · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.32622/ijrat.1401202613" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Foundatıons of Large Language Models and Theır Educatıonal Potentıal</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 6bcdb19b4a4bdddd8026</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">ÜMİT MURAT AKKAYA · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.70269/10.70269/9697784831" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models in Chemistry</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: ef44bd2e7ec08757d5ed</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Zhiling Zheng · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003669012-4" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: df76897b989ae7327bc2</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">John Atkinson-Abutridy · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1201/9781003517245-3" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Introduction to Large Language Models</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 73d929f3310f0b251b66</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Bhawna Singh · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/979-8-8688-0569-1_1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Unseen A+ Student: Navigating the Impact of Large Language Models in the Classroom</strong><span>Relevance score: 9</span></div>
+                <p class="reference-note">Paper ID: 22d2de9ec157f4201c7d</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Maty´aˇs Boh´aˇcek · 2023 · Semantic Scholar</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://www.semanticscholar.org/paper/e1768eccbdb54f1143d463c82ced6c720f732849" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative AI and Its Impact on Personalized Intelligent Tutoring Systems</strong><span>Relevance score: 7</span></div>
+                <p class="reference-note">Paper ID: 3033d159aca4835955f3</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Subhankar Maity, A. Deroy · 2024 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Generative Artificial Intelligence (AI) is revolutionizing educational technology by enabling highly personalized and adaptive learning environments within Intelligent Tutoring Systems (ITS). This report delves into the integration of Generative AI, particularly large language models (LLMs) like GPT-4, into ITS to enhance personalized education through dynamic content generation, real-time feedback, and adaptive learning pathways. We explore key applications such as automated question generation, customized feedback mechanisms, and interactive dialogue systems that respond to individual learner needs. The report also addresses significant challenges, including ensuring pedagogical accuracy, mitigating inherent biases in AI models, and maintaining learner engagement. Future directions highlight the potential advancements in multimodal AI integration, emotional intelligence in tutoring systems, and the ethical implications of AI-driven education. By synthesizing current research and practical implementations, this report underscores the transformative potential of Generative AI in creating more effective, equitable, and engaging educational experiences.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2410.10650" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>CSEPrompts: A Benchmark of Introductory Computer Science Prompts</strong><span>Relevance score: 7</span></div>
+                <p class="reference-note">Paper ID: 0a3030d885e7c9454ed1</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Nishat Raihan, Dhiman Goswami, Sadiya Sayara Chowdhury Puspo, Christian D. Newman, Tharindu Ranasinghe, Marcos Zampieri · 2024 · Semantic Scholar</p>
+                <p><strong>Outside the 10-paper writing evidence set</strong></p>
+                <details><summary>Read abstract</summary><p>Recent advances in AI, machine learning, and NLP have led to the development of a new generation of Large Language Models (LLMs) that are trained on massive amounts of data and often have trillions of parameters. Commercial applications (e.g., ChatGPT) have made this technology available to the general public, thus making it possible to use LLMs to produce high-quality texts for academic and professional purposes. Schools and universities are aware of the increasing use of AI-generated content by students and they have been researching the impact of this new technology and its potential misuse. Educational programs in Computer Science (CS) and related fields are particularly affected because LLMs are also capable of generating programming code in various programming languages. To help understand the potential impact of publicly available LLMs in CS education, we introduce CSEPrompts, a framework with hundreds of programming exercise prompts and multiple-choice questions retrieved from introductory CS and programming courses. We also provide experimental results on CSEPrompts to evaluate the performance of several LLMs with respect to generating Python code and answering basic computer science and programming questions.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2404.02540" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Beyond Pipelines: A Fundamental Study on the Rise of Generative-Retrieval Architectures in Web Research</strong><span>Relevance score: 4</span></div>
+                <p class="reference-note">Paper ID: cbd792ced6c0ada0b036</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">A. Abbasi, Mohsen Hooshmand · 2026 · Semantic Scholar</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Web research and practices have evolved significantly over time, offering users diverse and accessible solutions across a wide range of tasks. While advanced concepts such as Web 4.0 have emerged from mature technologies, the introduction of large language models (LLMs) has profoundly influenced both the field and its applications. This wave of LLMs has permeated science and technology so deeply that no area remains untouched. Consequently, LLMs are reshaping web research and development, transforming traditional pipelines into generative solutions for tasks like information retrieval, question answering, recommendation systems, and web analytics. They have also enabled new applications such as web-based summarization and educational tools. This survey explores recent advances in the impact of LLMs-particularly through the use of retrieval-augmented generation (RAG)-on web research and industry. It discusses key developments, open challenges, and future directions for enhancing web solutions with LLMs.</p></details>
+                <a href="https://doi.org/10.48550/arXiv.2602.17450" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>GenDetect-GAN: generative adversarial network model for machine-generated text detection</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 965f14a03975a918eafa</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Bin Xu, Wenjun Yu, Qingsong Wen, Qiulan Cui, Jin Qi · 2025 · Semantic Scholar</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/s10489-025-06898-0" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: f1344c2795934b48b492ca5998c1e83e · Report ID: 52</p>
+        <p>Started: 2026-09-12 20:53:25 · Updated: 2026-09-12 20:54:46 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>2</dd><dt>Raw papers retrieved</dt><dd>40</dd><dt>Valid papers retained</dt><dd>38</dd><dt>Relevant papers retained</dt><dd>20</dd><dt>Duplicates removed</dt><dd>4</dd><dt>Noisy records removed</dt><dd>2</dd><dt>Irrelevant records removed</dt><dd>14</dd><dt>Evidence limit removed</dt><dd>10</dd><dt>Provider failures</dt><dd>0</dd><dt>Final evidence count</dt><dd>10</dd><dt>Elapsed seconds</dt><dd>81.487</dd><dt>Fulltext papers resolved</dt><dd>3</dd><dt>Abstract fallbacks</dt><dd>15</dd><dt>Metadata only papers</dt><dd>16</dd><dt>Total chunks created</dt><dd>118</dd><dt>Chunks selected</dt><dd>12</dd><dt>Pdf extraction failures</dt><dd>6</dd><dt>Fulltext access failures</dt><dd>0</dd><dt>Papers discovered</dt><dd>40</dd><dt>Semantic retrieval seconds</dt><dd>26.279</dd><dt>Sources cited</dt><dd>7</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The selected evidence covers key applications of large language models in education, including content generation, personalized learning, interactive tools, feedback mechanisms, and multilingual support. Full-text sources provide specific examples like syllabus creation and tutoring, while abstracts highlight broader educational uses. However, some abstract-only sources focus on challenges or non-education contexts, which may limit depth on specific applications.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        <dl class="metrics"><dt>Writing sources</dt><dd>10</dd><dt>Full text sources</dt><dd>2</dd><dt>Abstract only sources</dt><dd>8</dd><dt>Selected chunks</dt><dd>12</dd><dt>Retrieval mode</dt><dd>semantic</dd><dt>Access failures</dt><dd>0</dd><dt>Extraction failures</dt><dd>6</dd><dt>Provider failures</dt><dd>0</dd></dl>
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-12 20:53:25</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-12 20:53:28</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:28</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1016/j.identj.2025.103854" target="_blank" rel="noopener noreferrer">f0b6f0236fdb727d4c1b</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1016/j.identj.2025.103854" target="_blank" rel="noopener noreferrer">f0b6f0236fdb727d4c1b</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1016/j.identj.2025.103854" target="_blank" rel="noopener noreferrer">f0b6f0236fdb727d4c1b</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1109/ICWR65219.2025.11006194" target="_blank" rel="noopener noreferrer">0d6ce54aa193581bad9d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1109/ICWR65219.2025.11006194" target="_blank" rel="noopener noreferrer">0d6ce54aa193581bad9d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/ICWR65219.2025.11006194" target="_blank" rel="noopener noreferrer">0d6ce54aa193581bad9d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2509.21972" target="_blank" rel="noopener noreferrer">667c4618ccaf897f9d77</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2509.21972" target="_blank" rel="noopener noreferrer">667c4618ccaf897f9d77</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2509.21972" target="_blank" rel="noopener noreferrer">667c4618ccaf897f9d77</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">43ee383b1ecc8b4661a3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">43ee383b1ecc8b4661a3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2504.17720" target="_blank" rel="noopener noreferrer">43ee383b1ecc8b4661a3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">d2f6998a4632765d090d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">d2f6998a4632765d090d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:37</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1111/bjet.13505" target="_blank" rel="noopener noreferrer">d2f6998a4632765d090d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:38</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.3389/feduc.2024.1392091" target="_blank" rel="noopener noreferrer">fc544f061534a630bb5e</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:41</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.3389/feduc.2024.1392091" target="_blank" rel="noopener noreferrer">fc544f061534a630bb5e</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:41</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.3389/feduc.2024.1392091" target="_blank" rel="noopener noreferrer">fc544f061534a630bb5e</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:41</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.61132/ijed.v1i3.75" target="_blank" rel="noopener noreferrer">ffa7677da29eabf2fa23</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:42</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.61132/ijed.v1i3.75" target="_blank" rel="noopener noreferrer">ffa7677da29eabf2fa23</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:42</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.61132/ijed.v1i3.75" target="_blank" rel="noopener noreferrer">ffa7677da29eabf2fa23</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:42</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.61132/ijed.v1i3.75" target="_blank" rel="noopener noreferrer">ffa7677da29eabf2fa23</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:42</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1016/j.lindif.2023.102274" target="_blank" rel="noopener noreferrer">06372867271a6588c2ab</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.1016/j.lindif.2023.102274" target="_blank" rel="noopener noreferrer">06372867271a6588c2ab</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1016/j.lindif.2023.102274" target="_blank" rel="noopener noreferrer">06372867271a6588c2ab</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.33552/ijer.2024.03.000573" target="_blank" rel="noopener noreferrer">ee80696206406217be32</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.33552/ijer.2024.03.000573" target="_blank" rel="noopener noreferrer">ee80696206406217be32</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1038/s41598-025-98483-1" target="_blank" rel="noopener noreferrer">79c0a272730fa318ec30</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1038/s41598-025-98483-1" target="_blank" rel="noopener noreferrer">79c0a272730fa318ec30</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1038/s41598-025-98483-1" target="_blank" rel="noopener noreferrer">79c0a272730fa318ec30</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1038/s41598-025-98483-1" target="_blank" rel="noopener noreferrer">79c0a272730fa318ec30</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1093/ehjdh/ztaf028" target="_blank" rel="noopener noreferrer">6918d225e7bdbbe277f9</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1093/ehjdh/ztaf028" target="_blank" rel="noopener noreferrer">6918d225e7bdbbe277f9</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1093/ehjdh/ztaf028" target="_blank" rel="noopener noreferrer">6918d225e7bdbbe277f9</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1093/ehjdh/ztaf028" target="_blank" rel="noopener noreferrer">6918d225e7bdbbe277f9</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1145/3744367.3744402" target="_blank" rel="noopener noreferrer">f13bb7f4f6b8b18b7e34</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1145/3744367.3744402" target="_blank" rel="noopener noreferrer">f13bb7f4f6b8b18b7e34</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1145/3744367.3744402" target="_blank" rel="noopener noreferrer">f13bb7f4f6b8b18b7e34</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1145/3744367.3744402" target="_blank" rel="noopener noreferrer">f13bb7f4f6b8b18b7e34</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1201/9781003567257-12" target="_blank" rel="noopener noreferrer">59d51e20990c81a2ff35</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1201/9781003567257-12" target="_blank" rel="noopener noreferrer">59d51e20990c81a2ff35</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/s10639-023-11834-1" target="_blank" rel="noopener noreferrer">207bc24df676813bbc0f</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/s10639-023-11834-1" target="_blank" rel="noopener noreferrer">207bc24df676813bbc0f</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:45</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1145/3641289" target="_blank" rel="noopener noreferrer">57565e57b2b43529adf3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.1145/3641289" target="_blank" rel="noopener noreferrer">57565e57b2b43529adf3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1145/3641289" target="_blank" rel="noopener noreferrer">57565e57b2b43529adf3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1111/bjet.13568" target="_blank" rel="noopener noreferrer">90b40c3f5030c7c4e9cb</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1111/bjet.13568" target="_blank" rel="noopener noreferrer">90b40c3f5030c7c4e9cb</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1111/bjet.13568" target="_blank" rel="noopener noreferrer">90b40c3f5030c7c4e9cb</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1111/bjet.13568" target="_blank" rel="noopener noreferrer">90b40c3f5030c7c4e9cb</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1109/ICeLeT66022.2025.11025265" target="_blank" rel="noopener noreferrer">ee810b7f258bf0b646d1</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1109/ICeLeT66022.2025.11025265" target="_blank" rel="noopener noreferrer">ee810b7f258bf0b646d1</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/ICeLeT66022.2025.11025265" target="_blank" rel="noopener noreferrer">ee810b7f258bf0b646d1</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1201/9781003567257-3" target="_blank" rel="noopener noreferrer">a8bbc56cedd5fe92a23c</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1201/9781003567257-3" target="_blank" rel="noopener noreferrer">a8bbc56cedd5fe92a23c</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.1186/s41239-025-00525-1" target="_blank" rel="noopener noreferrer">df9a194550b614dc065b</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>pdf failed</td><td>PDF access or extraction failed; checking abstract fallback. Paper <a href="https://doi.org/10.1186/s41239-025-00525-1" target="_blank" rel="noopener noreferrer">df9a194550b614dc065b</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.1186/s41239-025-00525-1" target="_blank" rel="noopener noreferrer">df9a194550b614dc065b</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1186/s41239-025-00525-1" target="_blank" rel="noopener noreferrer">df9a194550b614dc065b</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.21125/edulearn.2025.1292" target="_blank" rel="noopener noreferrer">98b01fbc848d0bd84bba</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.21125/edulearn.2025.1292" target="_blank" rel="noopener noreferrer">98b01fbc848d0bd84bba</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.38007/978-1-80053-611-1" target="_blank" rel="noopener noreferrer">148e72e1dedbdf5d5ca7</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.38007/978-1-80053-611-1" target="_blank" rel="noopener noreferrer">148e72e1dedbdf5d5ca7</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1109/ictc62082.2024.10827352" target="_blank" rel="noopener noreferrer">4d563509320223c8ac82</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1109/ictc62082.2024.10827352" target="_blank" rel="noopener noreferrer">4d563509320223c8ac82</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-2733-4_1" target="_blank" rel="noopener noreferrer">654c73ab606269e96c13</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-2733-4_1" target="_blank" rel="noopener noreferrer">654c73ab606269e96c13</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1016/b978-0-443-33592-1.00007-3" target="_blank" rel="noopener noreferrer">a2c8cec18d608e3181fa</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1016/b978-0-443-33592-1.00007-3" target="_blank" rel="noopener noreferrer">a2c8cec18d608e3181fa</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.32622/ijrat.1401202613" target="_blank" rel="noopener noreferrer">37b6841914619859a6ff</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.32622/ijrat.1401202613" target="_blank" rel="noopener noreferrer">37b6841914619859a6ff</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.70269/10.70269/9697784831" target="_blank" rel="noopener noreferrer">6bcdb19b4a4bdddd8026</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.70269/10.70269/9697784831" target="_blank" rel="noopener noreferrer">6bcdb19b4a4bdddd8026</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1201/9781003669012-4" target="_blank" rel="noopener noreferrer">ef44bd2e7ec08757d5ed</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1201/9781003669012-4" target="_blank" rel="noopener noreferrer">ef44bd2e7ec08757d5ed</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1201/9781003517245-3" target="_blank" rel="noopener noreferrer">df76897b989ae7327bc2</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1201/9781003517245-3" target="_blank" rel="noopener noreferrer">df76897b989ae7327bc2</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/979-8-8688-0569-1_1" target="_blank" rel="noopener noreferrer">73d929f3310f0b251b66</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/979-8-8688-0569-1_1" target="_blank" rel="noopener noreferrer">73d929f3310f0b251b66</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://www.semanticscholar.org/paper/e1768eccbdb54f1143d463c82ced6c720f732849" target="_blank" rel="noopener noreferrer">22d2de9ec157f4201c7d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://www.semanticscholar.org/paper/e1768eccbdb54f1143d463c82ced6c720f732849" target="_blank" rel="noopener noreferrer">22d2de9ec157f4201c7d</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2410.10650" target="_blank" rel="noopener noreferrer">3033d159aca4835955f3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2410.10650" target="_blank" rel="noopener noreferrer">3033d159aca4835955f3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2410.10650" target="_blank" rel="noopener noreferrer">3033d159aca4835955f3</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2404.02540" target="_blank" rel="noopener noreferrer">0a3030d885e7c9454ed1</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2404.02540" target="_blank" rel="noopener noreferrer">0a3030d885e7c9454ed1</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2404.02540" target="_blank" rel="noopener noreferrer">0a3030d885e7c9454ed1</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.48550/arXiv.2602.17450" target="_blank" rel="noopener noreferrer">cbd792ced6c0ada0b036</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.48550/arXiv.2602.17450" target="_blank" rel="noopener noreferrer">cbd792ced6c0ada0b036</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.48550/arXiv.2602.17450" target="_blank" rel="noopener noreferrer">cbd792ced6c0ada0b036</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/s10489-025-06898-0" target="_blank" rel="noopener noreferrer">965f14a03975a918eafa</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:53:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/s10489-025-06898-0" target="_blank" rel="noopener noreferrer">965f14a03975a918eafa</a>.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:15</td><td>Processing</td><td>chunks selected</td><td>Relevant passages selected.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:15</td><td>Processing</td><td>semantic completed</td><td>Hybrid evidence retrieval completed.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:15</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:15</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-12 20:54:20</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:20</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-12 20:54:20</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:28</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:28</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:34</td><td>Reporter</td><td>retrying</td><td>Checking report formatting and citations; generating a corrected report.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:41</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:41</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:46</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-12 20:54:46</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 52</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>

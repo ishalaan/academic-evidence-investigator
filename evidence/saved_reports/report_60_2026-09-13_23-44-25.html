@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    margin-top: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    cursor: pointer;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+.error {
+    font-weight: bold;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.visible {
+    display: flex;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 420px;
+    padding: 2rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #ddd;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+[hidden] { display: none !important; }
+[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+[role="tab"][aria-selected="true"] { background: #213f55; color: white; }
+button:focus-visible { outline: 3px solid #326f9c; outline-offset: 3px; }
+.metrics { display: grid; grid-template-columns: minmax(0, 2fr) 1fr; gap: 0.4rem 1rem; }
+.metrics dd { margin: 0; font-weight: bold; }
+.reference-list { list-style: none; padding-left: 1.5rem; }
+.reference-list li { padding-left: 1.5rem; text-indent: -1.5rem; overflow-wrap: anywhere; }
+.reference-note { color: #526476; }
+.report-prose { font-size: 1.06rem; line-height: 1.85; }
+.report-prose h2 { padding-top: 0.7rem; border-top: 1px solid #dce3eb; color: #213f55; }
+.developed-findings li { padding-left: 0.4rem; margin-bottom: 1.5rem; }
+.ranked-sources { padding-left: 1.7rem; }
+.ranked-sources > li { border-bottom: 1px solid #dce3eb; padding: 0.8rem 0.3rem 1.2rem; }
+.ranked-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; }
+.ranked-heading span { font-size: 0.85rem; color: #526476; width:100%;}
+.ranked-sources summary { cursor: pointer; color: #213f55; }
+.audit-table { overflow-x: auto; }
+.audit-table table { border-collapse: collapse; width: 100%; }
+.audit-table th, .audit-table td { border: 1px solid #ddd; padding: 0.6rem; text-align: left; vertical-align: top; }
+.audit-table pre { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 180px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.loading-overlay { background: #f5f7fa; }
+.loading-overlay.visible { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(360px, 480px); }
+.loading-box { justify-self: center; }
+.activity-pane { box-sizing: border-box; height: 100dvh; padding: 2rem; background: white; border-left: 1px solid #dce3eb; display: flex; flex-direction: column; min-height: 0; }
+.activity-pane header h2 { margin: 0; color: #213f55; }
+.activity-pane header > p { color: #526476; }
+.activity-eyebrow { font-size: 0.75rem; font-weight: bold; letter-spacing: 0.1em; }
+#activity-list { overflow-y: auto; min-height: 0; padding: 0 0.5rem 0 0; margin: 1rem 0 0; list-style: none; }
+.activity-step { padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #dce3eb; border-left: 3px solid #bac7d4; border-radius: 8px; }
+.activity-step.started { border-left-color: #326f9c; background: #eff6fc; }
+.activity-step.completed { border-left-color: #33806b; }
+.activity-step.failed, .activity-step.provider_failed { border-left-color: #9a6220; }
+.activity-step-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.activity-badge { font-size: 0.75rem; color: #526476; }
+.activity-step p { margin: 0.4rem 0; }
+.activity-step time { font-size: 0.75rem; color: #526476; }
+@media (max-width: 760px) {
+    .loading-overlay.visible { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    .loading-box { padding: 1rem; }
+    .loading-box h2 { margin: 0; font-size: 1.15rem; }
+    .loading-box .spinner { width: 24px; height: 24px; margin-bottom: 0.5rem; }
+    .loading-box > p:last-child { display: none; }
+    .activity-pane { height: auto; max-height: 100%; padding: 1rem; border-left: 0; border-top: 1px solid #dce3eb; }
+    .activity-pane header > p:not(.activity-eyebrow) { margin-bottom: 0; font-size: 0.85rem; }
+}
+
+</style>
+    <title>Research Report 60</title>
+</head>
+<body>
+    <header class="report-header">
+        <p class="activity-eyebrow">ACADEMIC EVIDENCE INVESTIGATOR</p>
+        <h1>Research Report</h1>
+        <h2>Research Question</h2>
+        <p>How does generative AI affect student learning outcomes in higher education?</p>
+    </header>
+    <div role="tablist" aria-label="Report sections" id="report-tabs" hidden>
+        <button type="button" role="tab" id="overview-tab" aria-controls="overview-panel" aria-selected="true">Overview</button>
+        <button type="button" role="tab" id="ranked-tab" aria-controls="ranked-panel" aria-selected="false" tabindex="-1">Ranked Sources</button>
+        <button type="button" role="tab" id="activity-tab" aria-controls="activity-panel" aria-selected="false" tabindex="-1">Audit</button>
+        <button type="button" role="tab" id="log-tab" aria-controls="log-panel" aria-selected="false" tabindex="-1">Activity Log</button>
+    </div>
+    <section id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" class="report-prose">
+        <h2>Summary</h2>
+        <p>Generative AI has demonstrated both potential benefits and challenges for student learning outcomes in higher education. Studies indicate that AI-driven assessment systems can enhance conceptual understanding, error correction, and student satisfaction through real-time, personalised feedback (D, 2026). For example, mixed-method research found statistically significant improvements in academic performance and self-regulated learning when students used AI-supported assessments, though concerns about academic integrity and algorithmic bias persist. These findings highlight the dual role of generative AI as a tool for educational enhancement and a source of ethical complexity. However, the effectiveness of such systems depends on factors like faculty training and transparent AI design, which are critical for mitigating risks (D, 2026).</p><p>A separate body of evidence focuses on the limitations of AI detection tools, which are often used to address concerns about academic dishonesty. While platforms like Turnitin and GPTZero are widely adopted, systematic reviews reveal their susceptibility to false positives, particularly when detecting content from multilingual or non-native English writers (Akram, 2026). This raises questions about the fairness and reliability of these tools, as their accuracy varies with text type and writing conditions. The study underscores that automated detection systems alone cannot resolve integrity issues, emphasising the need for complementary pedagogical strategies and ethical frameworks to address the root causes of academic misconduct.</p><p>The perception of AI-generated content also plays a pivotal role in shaping its educational impact. Research on social media environments shows that explicit labels significantly reduce perceived authenticity of AI-generated images, with a 0.27 standard deviation decrease in authenticity ratings (Pawelczyk, Dimmery and Yan, no datea). This &#39;implied authenticity effect&#39; suggests that labeling strategies influence not only direct interactions with AI content but also broader attitudes toward its use. However, the study also notes that factors like internet literacy and age moderate these effects, indicating that the societal and individual contexts of AI adoption are complex. These findings align with calls for transparent AI labeling, particularly in educational settings where trust in digital tools is paramount (Pawelczyk, Dimmery and Yan, no datea).</p><p>Beyond technical and ethical considerations, generative AI is increasingly framed as a means to enhance pedagogical practices and student engagement. A symposium on AI in higher education highlights strategic opportunities to integrate AI into teaching, such as using it to improve student wellbeing, motivation, and employability (McKenzie and Day, 2025). For instance, a curriculum redesign at a health science program embedded generative AI in assessments to build educator and student capabilities, positioning AI as a collaborative tool rather than a replacement for human expertise. Such approaches suggest that AI’s value lies in its ability to augment learning experiences, provided it is implemented with clear ethical guidelines and aligned with institutional goals.</p><p>The evidence collectively suggests that generative AI’s impact on learning outcomes is mediated by its design, implementation, and the broader educational context. While AI can enhance assessment efficiency and personalisation, its integration requires careful governance to address integrity risks and ensure equitable access. The studies also highlight the importance of fostering digital literacy and critical engagement with AI tools, as students and educators navigate the evolving landscape of technology-enhanced learning. Future research should explore longitudinal effects of AI adoption and its role in diverse educational settings, particularly in regions with varying regulatory frameworks and cultural attitudes toward technology.</p>
+        <h2>Findings</h2>
+        <ol class="developed-findings">
+        <li>A mixed-method study involving undergraduate and postgraduate students found statistically significant improvements in academic performance, conceptual understanding, and self-regulated learning when using AI-supported assessments, though concerns about academic integrity and algorithmic bias were noted (D, 2026).</li><li>A systematic review of AI detection tools revealed variability in their effectiveness, with platforms like Turnitin and GPTZero showing susceptibility to false positives, particularly for multilingual or non-native English content, highlighting reliability and fairness challenges (Akram, 2026).</li><li>A survey experiment with 877 participants demonstrated that explicit labels on AI-generated content reduced perceived authenticity by 0.27 standard deviations, while an &#39;implied authenticity effect&#39; showed labeled content slightly increased perceived authenticity in unlabeled images, influenced by factors like internet literacy and age (Pawelczyk, Dimmery and Yan, no datea).</li>
+        </ol>
+        <h2>Limitations</h2>
+        <ul><li>The studies primarily focus on short-term outcomes, lacking longitudinal data on sustained learning impacts (D, 2026). Further evidence on long-term academic trajectories and skill retention is needed to assess generative AI&#39;s enduring effects.
+
+AI detection tools&#39; effectiveness varies across text types and writing conditions (Akram, 2026), but few studies explore their performance with non-native English writers or multilingual contexts. More research is required to evaluate fairness and equity in diverse educational settings.
+
+Perceived authenticity of AI-generated content depends on user characteristics like age and digital literacy (Pawelczyk, Dimmery and Yan, no datea), yet most studies assume homogeneous user groups. Future research should investigate how demographic and cultural factors moderate these effects.
+
+Few studies address faculty training and institutional support as critical factors for ethical AI integration (D, 2026). Evidence on how professional development influences AI adoption and student outcomes remains underexplored.
+
+The ethical governance of AI systems is discussed but rarely quantified (D, 2026). Further analysis of institutional policies and their alignment with pedagogical goals would clarify practical implementation challenges.</li><li>Reporter review note: Summary contains model-generated wording requiring human review (missing citation). Unresolved author-year citations are not verified references; check claims against Ranked Sources.</li></ul>
+        
+        <h2>References</h2>
+        <p class="reference-note">Sources cited in this overview, in Harvard Cite Them Right format using available metadata. Access dates refer to retrieval of metadata and abstracts.</p>
+        
+        <ul class="reference-list">
+        
+            <li id="source-S3">
+                Akram, A. (2026) ‘AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings’, <em>Advances in Machine Learning &amp; Artificial Intelligence</em>, 01(06), pp. 01-12.
+                Available at: <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">https://doi.org/10.33140/amlai.07.03.02</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S1">
+                D, R. (2026) ‘Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education’, <em>International Journal For Multidisciplinary Research</em>, 8(3), article 81825.
+                Available at: <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">https://doi.org/10.36948/ijfmr.2026.v08i03.81825</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S2">
+                McKenzie, S. and Day, J. (2025) ‘Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes’, <em>ASCILITE Publications</em>, pp. 123-125.
+                Available at: <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">https://doi.org/10.65106/apubs.2025.2750</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        
+            <li id="source-S4">
+                Pawelczyk, F., Dimmery, D. and Yan, P. (no date a) ‘Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content’.
+                Available at: <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">https://doi.org/10.31235/osf.io/b3wp5_v2</a>
+                (Accessed: 13 September 2026).
+                
+            </li>
+        </ul>
+    </section>
+
+    <section id="ranked-panel" role="tabpanel" aria-labelledby="ranked-tab">
+        <h2>Ranked Sources</h2>
+        
+        <p>All valid, unique source records, ordered from most to least relevant. Scores measure matches to the research question, not scientific quality. Invalid records and duplicate copies are removed before ranking.</p>
+        <p>The writing evidence set uses relevant full-text passages where available, with abstract fallback. The selection status below explains which records were available to the Reporter; References contains only those it cited.</p>
+        <ol class="ranked-sources">
+        
+            <li>
+                <div class="ranked-heading"><strong>Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Education</strong><span>Relevance score: 62</span></div>
+                <p class="reference-note">Paper ID: fd22f461ff5fdae7caa2</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.696<br>Retrieved from: https://doi.org/10.36948/ijfmr.2026.v08i03.81825</li></ul></details>
+                <p class="reference-note">Rajasekaran D · 2026 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid advancement of Generative Artificial Intelligence (GAI) has significantly transformed assessment and feedback mechanisms in higher education. Traditional assessment practices often suffer from delayed feedback, limited personalization, and high faculty workload, which may negatively affect student engagement and learning outcomes. Generative AI–based assessment and feedback systems offer adaptive, real-time, and personalized evaluation models that promise enhanced learning effectiveness. This study evaluates the impact of Generative AI–driven assessment and feedback systems on student learning outcomes in higher education institutions. Using a mixed-method research design, data were collected from undergraduate and postgraduate students exposed to AI-supported assessments across multiple disciplines. Statistical tools such as simple percentage analysis, paired t-tests, and regression analysis were employed to assess improvements in academic performance, learner engagement, and self-regulated learning. The findings reveal that Generative AI–based feedback significantly improves conceptual understanding, timely error correction, and student satisfaction. However, concerns regarding academic integrity, algorithmic bias, and ethical data use remain critical challenges. The study concludes that while Generative AI can substantially enhance assessment effectiveness, its successful adoption requires ethical governance, faculty training, and transparent AI models. The paper offers practical implications for educators, policymakers, and institutional leaders aiming to integrate AI responsibly into higher education assessment frameworks.</p></details>
+                <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes</strong><span>Relevance score: 53</span></div>
+                <p class="reference-note">Paper ID: 92dd8946b87050639400</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1, PDF page 1 · full_text · Similarity 0.763<br>Retrieved from: https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537</li><li>Chunk 2, PDF page 2 · full_text · Similarity 0.698<br>Retrieved from: https://open-publishing.org/publications/index.php/APUB/article/download/2750/2537</li></ul></details>
+                <p class="reference-note">Stephen McKenzie, Jennifer Day · 2025 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The symposium will explore ways of better understanding, challenging and expanding the ways that its diverse users think about and use generative AI in higher education, to best respond to our emerging opportunities to achieve AI ethical and pedagogical best practice. The symposium features a discussion between a range of AI in education experts, and session attendees, guided by key questions on how to achieve the best possible use of AI in education. These questions include how to best bring together technological and human interfaces, and how to best use generative AI in education practice. This could include by strategically expanding its current uses to help it improve whole student education, as well as academic education. Student engagement, wellbeing and motivation could be strategically improved via identifying current levels of, and potential improvements in, student and staff knowledge of and attitudes towards educational uses of AI.</p></details>
+                <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE higher education</strong><span>Relevance score: 43</span></div>
+                <p class="reference-note">Paper ID: 648f320408a61e5e177c</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Swapna S. Nair, Deepika Gaur, Sarwat Jahan · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in Higher Education</strong><span>Relevance score: 43</span></div>
+                <p class="reference-note">Paper ID: 0a928cf94df5e5bc8532</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Irene Diao, Robert Lightfoot · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education</strong><span>Relevance score: 40</span></div>
+                <p class="reference-note">Paper ID: 5c252d9d92c6ba33b73b</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Deeksha Saraswat · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education Online Courses</strong><span>Relevance score: 35</span></div>
+                <p class="reference-note">Paper ID: 1506d90098ce5f8d5cc2</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jeffrey L. Simmons · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>81How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environments</strong><span>Relevance score: 32</span></div>
+                <p class="reference-note">Paper ID: c2cfe37c8f10158f7d1a</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Rama Yusvana, Azli Nawawi · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Mastering knowledge: the impact of generative AI on student learning outcomes</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 998e31c15aa2ac777d1e</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Jessica L. Pallant, Janneke Blijlevens, Alexander Campbell, Ryan Jopp · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>105Intelligent Learning: Generative AI in Higher Education and Authentic Learning</strong><span>Relevance score: 27</span></div>
+                <p class="reference-note">Paper ID: 578e1d746667b6c12f69</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Ivy Shen · 2025 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Enhancing Personalised Learning and Student Engagement Using Generative AI</strong><span>Relevance score: 19</span></div>
+                <p class="reference-note">Paper ID: 77fac735a1eb3b81a4b6</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Adebowale Owoseni, Oluwaseun Kolade, Abiodun Egbetokun · 2024 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review and Research Framework</strong><span>Relevance score: 8</span></div>
+                <p class="reference-note">Paper ID: 2f9cc1e9ab917178941e</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Dhananjaya Lahiru Bandara · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings</strong><span>Relevance score: 7</span></div>
+                <p class="reference-note">Paper ID: 674419ea1d211adca404</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.439<br>Retrieved from: https://doi.org/10.33140/amlai.07.03.02</li></ul></details>
+                <p class="reference-note">Arslan Akram · 2026 · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid expansion of generative artificial intelligence and large language models has dramatically altered the creation of written material. While these technologies can enhance the learning process, but, as well, they have created significant concerns regarding academic integrity, authorship and the fair assessment of students. In response, numerous institutions have already implemented AI-detection software that aims at determining whether some text was authored by a human or generated by AI systems. But there are concerns about the validity, correctness and equity of such tools in the actual fields of education. This paper gives a systematic review of empirical studies concerning AI text detection tools in learning institutions. In order to identify literature published between 2022 and 2026, it was thoroughly searched in large academic databases such as Scopus, Web of Science, and ScienceDirect, following the PRISMA 2020 guidelines. Through the use of rigorous inclusion/exclusion criteria, a total of 17 empirical studies were selected for in-depth analysis. In the review, the researchers examine the different types of research methodologies used to evaluate the performance of AI detection tools, the accuracy of these tools in identifying AI-generated content, and the effectiveness, fairness, and usability of these tools. The results show that the tools, including Turnitin, GPTZero, Copyleaks, ZeroGPT, and Originality.ai, are frequently used, but their effectiveness varies depending on the type of text and writing conditions. It is often mentioned in the literature that such systems become quite easily affected by paraphrasing, translation or writing style, and that they can falsely categorize the texts written by multilingual or nonnative writers of English. The review also presents a number of technical, ethical and pedagogical difficulties with the continuation of the use of automated detection systems only. Upon the evidence synthesized, the study elucidates the importance of careful and open usage of AI detection technologies in learning and suggests the directions of future research to enhance its consistency and at the same time encourages ethical academic procedures.</p></details>
+                <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content</strong><span>Relevance score: 6</span></div>
+                <p class="reference-note">Paper ID: f2f9d4687e8658ad2f92</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.188<br>Retrieved from: https://doi.org/10.31235/osf.io/b3wp5_v2</li></ul></details>
+                <p class="reference-note">Fabian Pawelczyk, Drew Dimmery, Pu Yan · No date · Crossref</p>
+                <p><strong>Cited in Overview</strong></p>
+                <details><summary>Read abstract</summary><p>This study investigates how labeling AI-generated content (AIGC) influences users’ perceptions of authenticity in social media environments. Motivated by emerging global regulations mandating the disclosure of AI-generated media, we designed a pre-registered survey experiment to test two main questions: (1) Do AI labels reduce the perceived authenticity of AI-generated images? (2) Does exposure to labeled content affect perceived authenticity in unlabeled images (a potential spillover effect)? The pre-analysis plan and materials are available on OSF (see link below). We conducted a survey experiment with a German sample (N = 877) in which participants were randomly assigned to one of three groups: a control group without labels, a process-based label group (“AI-generated”), or a harm-based label group (“Misleading”). Participants viewed twelve Instagram-style posts, six of which contained AI-generated or AI-altered content. Perceived authenticity was measured by asking whether the depicted events actually occurred. Our results show that both labeling strategies significantly reduced perceived authenticity of AI-generated images, with average reductions of about 0.27 standard deviations. We also find evidence of an implied authenticity effect: exposure to labeled content slightly increased perceived authenticity in unlabeled images (about one-fifth the size of the direct labeling effect). Exploratory analyses indicate that internet skills and age are associated with perceived authenticity differences. By embedding labels in Instagram-style posts, our study increases ecological validity compared to earlier work focused on headlines or generic stimuli. Situated in Germany, a frontrunner in digital platform regulation, the findings provide rare non-U.S. evidence on AI labeling and contribute directly to ongoing policy debates.</p></details>
+                <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content</strong><span>Relevance score: 6</span></div>
+                <p class="reference-note">Paper ID: 84342b6a1f1e186aab53</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                <details><summary>Selected passage provenance</summary><ul><li>Chunk 1 · abstract · Similarity 0.188<br>Retrieved from: https://doi.org/10.31235/osf.io/b3wp5_v1</li></ul></details>
+                <p class="reference-note">Fabian Pawelczyk, Drew Dimmery, Pu Yan · No date · Crossref</p>
+                <p><strong>Available to Reporter; not cited</strong></p>
+                <details><summary>Read abstract</summary><p>This study investigates how labeling AI-generated content (AIGC) influences users’ perceptions of authenticity in social media environments. Motivated by emerging global regulations mandating the disclosure of AI-generated media, we designed a pre-registered survey experiment to test two main questions: (1) Do AI labels reduce the perceived authenticity of AI-generated images? (2) Does exposure to labeled content affect perceived authenticity in unlabeled images (a potential spillover effect)? The pre-analysis plan and materials are available on OSF (see link below). We conducted a survey experiment with a German sample (N = 877) in which participants were randomly assigned to one of three groups: a control group without labels, a process-based label group (“AI-generated”), or a harm-based label group (“Misleading”). Participants viewed twelve Instagram-style posts, six of which contained AI-generated or AI-altered content. Perceived authenticity was measured by asking whether the depicted events actually occurred. Our results show that both labeling strategies significantly reduced perceived authenticity of AI-generated images, with average reductions of about 0.27 standard deviations. We also find evidence of an implied authenticity effect: exposure to labeled content slightly increased perceived authenticity in unlabeled images (about one-fifth the size of the direct labeling effect). Exploratory analyses indicate that internet skills and age are associated with perceived authenticity differences. By embedding labels in Instagram-style posts, our study increases ecological validity compared to earlier work focused on headlines or generic stimuli. Situated in Germany, a frontrunner in digital platform regulation, the findings provide rare non-U.S. evidence on AI labeling and contribute directly to ongoing policy debates.</p></details>
+                <a href="https://doi.org/10.31235/osf.io/b3wp5_v1" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Misuse of AI-Generated Content in Academic and Religious Settings</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: a3bbc88835b6aaa07293</p>
+                <p><strong>Full-text evidence (HTML)</strong></p>
+                
+                <p class="reference-note">Joyzy Pius Egunjobi · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>Artificial Intelligence (AI) has revolutionized content generation across media, education, marketing, communication, and religion. However, the same technology harbors significant ethical risks when misused. This paper explores the darker dimensions of AI-generated content, including misinformation, cultural distortion, psychological manipulation, and the erosion of truth and trust through deepfakes, synthetic sermons, and auto-plagiarized papers. Special attention is on the misuse of AI in academic and religious settings. Drawing from current theoretical frameworks and literature, this article presents a critical evaluation of the moral implications, potential harms, and the urgent need for ethical oversight.</p></details>
+                <a href="https://doi.org/10.51244/ijrsi.2025.121500077p" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Artificial Intelligence and the Development of Academic Authorship: Analyzing AI-Generated Content, Ethical Issues, and Intellectual Property Challenges</strong><span>Relevance score: 3</span></div>
+                <p class="reference-note">Paper ID: 6c2997726dbba6727cf8</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Ismail Abdulwahhab Ismail · No date · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>This paper aims to analyze the impact of artificial intelligence (AI) on scholarly communication and authorship. It illustrates the challenges and possibilities of incorporating AI into research that focuses on authorship attribution, intellectual property (IP), ethics, and legal aspects. The paper explores recent literature findings and outlines AI applications in academic research, authorship, and IP policies. The approaches of analysis include case studies with a literature review. This study demonstrates that artificial intelligence technologies, such as natural language processing (NLP) systems and large language models (LLM), evolve in composition and responsibility into intellectual contribution by incorporating multidisciplinary aspects and analyzing previous authorship models (COPE, ICMJE, and CSE). The methodology gathers data, studies the case of AI applications, and delivers standards to follow for academic publication in the AI era. The findings suggest that existing authorship models are inappropriate for AI contributions and suggest revised criteria that consider the ethical and legal aspects of accountability and IP. Technological advances have implications in academic writing, a fact carried by AI tools to enhance productivity and speed with transparency and intellectual contribution concerns. As artificial intelligence continues to affect scholarly work, authorship, and writing, frameworks must evolve to provide credit verification and maintain the integrity of research findings.</p></details>
+                <a href="https://doi.org/10.2139/ssrn.5855022" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>A Tiered Framework for Copyright Ownership in AI-Generated Content​</strong><span>Relevance score: 1</span></div>
+                <p class="reference-note">Paper ID: 63791ac2b9ada97371f3</p>
+                <p><strong>Full-text evidence (PDF)</strong></p>
+                
+                <p class="reference-note">Ding Kaiming · 2025 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid proliferation of Artificial Intelligence Generated Content (AIGC) has precipitated an ontological crisis in copyright law, challenging its foundational anthropocentric principles. This study constructs a tripartite subjecthood framework to resolve attribution dilemmas across the autonomy spectrum of generative systems. Through doctrinal analysis of seminal cases (Naruto v. Slater, Feist v. Rural) and emergent legislation (EU AI Act, China’s Interim Measures), we demonstrate that granting AI legal personhood fundamentally conflicts with copyright’s utilitarian purpose. Crucially, we introduce a ​​Contribution Weight Matrix​​ (α·HI + β·AD + γ·UP) quantifying human-algorithmic collaboration in hybrid creation scenarios, validated against ISO/IEC 23053-2 documentation standards. Our legislative proposal advocates: Mandatory blockchain provenance registration(C2PA standard); Sui generis rights for transformative generativity; Developer strict liability-training data infringement. Empirical evidence from Vanity Fair v. AI Art Collective and Japan’s 2025 Copyright Act confirms the framework’s cross-jurisdictional viability. This research provides the first computational solution to AIGC copyright allocation while preserving creative incentives in the algorithmic age.</p></details>
+                <a href="https://doi.org/10.71411/eaou.2025.v1i1.583" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>The Impact of AI-Generated Marketing Content on Consumer Behavior</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 7bc8fa05896e6de32102</p>
+                <p><strong>Abstract-only evidence</strong></p>
+                
+                <p class="reference-note">Tasnia Husne Afrin, Atia Ahmed, Mosa. Layla Arzuman Banu, Aleya Jebin, Bebak More · 2026 · Crossref</p>
+                <p><strong>Below the relevance filter</strong></p>
+                <details><summary>Read abstract</summary><p>The rapid integration of artificial intelligence (AI) has transformed digital marketing by enabling brands to create personalized, automated, and data-driven promotional content. This study examines the impact of AI-generated marketing content on consumer behavior, with a specific focus on purchase intention. The study investigates how consumer perception, perceived credibility, perceived authenticity, and consumer trust influence consumers&#39; willingness to purchase products promoted through AI-generated marketing content. A quantitative research design was adopted, and primary data were collected through a structured online questionnaire using a five-point Likert scale. Out of 184 initial responses, 154 valid responses were retained after data screening. Data were analyzed using descriptive statistics, Cronbach&#39;s alpha reliability testing, Pearson correlation, and multiple regression analysis, supplemented by Variance Inflation Factor (VIF) diagnostics to assess multicollinearity and Harman&#39;s single-factor test to evaluate common method bias. The reliability results showed excellent internal consistency across all constructs (Cronbach&#39;s alpha &gt; 0.95). Although these uniformly high alpha values may reflect construct overlap rather than independent measurement, multicollinearity diagnostics confirmed that VIF values remained within acceptable thresholds (&lt; 5.0). Harman&#39;s single-factor test indicated that no single factor accounted for a majority of the total variance, providing partial assurance against common method bias. Correlation analysis revealed strong positive relationships between purchase intention and all four predictors. The regression model explained 81.9% of the variance in purchase intention. Perceived authenticity emerged as the strongest predictor (β = 0.388), followed by consumer trust (β = 0.265) and consumer perception (β = 0.228). Although perceived credibility demonstrated a strong bivariate correlation with purchase intention (r = 0.817, p &lt; 0.001), its direct effect became non-significant in the multivariate model (β = 0.077, p = 0.317), consistent with full mediation by consumer trust. These findings suggest that AI-generated marketing content can significantly influence consumer purchase intention—particularly among young, digitally active consumers—when it is perceived as authentic, trustworthy, and aligned with consumer expectations. The study contributes to AI marketing literature by highlighting the mediating role of trust in the credibility–purchase intention pathway and underscores the centrality of authenticity in consumer acceptance of AI-driven marketing communication.</p></details>
+                <a href="https://doi.org/10.47191/ijmra/v9-i6-60" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>AI-generated content and business English speaking: A mixed-methods study of SpeakGuru&#39;s impact on performance, motivation, and engagement</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 91a40ffa7be0acdd7b14</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Haowei Chen · 2026 · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.1016/j.actpsy.2026.106481" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+            <li>
+                <div class="ranked-heading"><strong>Visible Sources and Invisible Risks: Exploring the Impact of Ai Disclosure on Perceived Credibility of Ai-Generated Content</strong><span>Relevance score: 0</span></div>
+                <p class="reference-note">Paper ID: 776491454ec1860e0153</p>
+                <p><strong>Metadata-only</strong></p>
+                
+                <p class="reference-note">Teng Lin, Yiqing Zhang · No date · Crossref</p>
+                <p><strong>No usable text available; excluded from synthesis</strong></p>
+                <p class="reference-note">Abstract not supplied.</p>
+                <a href="https://doi.org/10.2139/ssrn.5080378" target="_blank" rel="noopener noreferrer">View source</a>
+            </li>
+        
+        </ol>
+        
+    </section>
+
+    <section id="activity-panel" role="tabpanel" aria-labelledby="activity-tab">
+        <h2>Audit</h2>
+        
+        <p>Run ID: d4536c87978e4136b4c76e72829b88b2 · Report ID: 60</p>
+        <p>Started: 2026-09-13 23:42:25 · Updated: 2026-09-13 23:44:25 (UTC)</p>
+        <h3>Investigation metrics</h3>
+        <p>Retrieval totals span all cycles; processing counts describe the latest accumulated corpus without double-counting.</p>
+        <dl class="metrics"><dt>Search cycles</dt><dd>1</dd><dt>Queries generated</dt><dd>2</dd><dt>Raw papers retrieved</dt><dd>20</dd><dt>Valid papers retained</dt><dd>20</dd><dt>Relevant papers retained</dt><dd>14</dd><dt>Duplicates removed</dt><dd>0</dd><dt>Noisy records removed</dt><dd>0</dd><dt>Irrelevant records removed</dt><dd>6</dd><dt>Evidence limit removed</dt><dd>4</dd><dt>Provider failures</dt><dd>1</dd><dt>Final evidence count</dt><dd>5</dd><dt>Elapsed seconds</dt><dd>119.698</dd><dt>Semantic scholar requests</dt><dd>1</dd><dt>Semantic scholar disabled</dt><dd>True</dd><dt>Fulltext papers resolved</dt><dd>3</dd><dt>Abstract fallbacks</dt><dd>6</dd><dt>Metadata only papers</dt><dd>11</dd><dt>Total chunks created</dt><dd>62</dd><dt>Chunks selected</dt><dd>6</dd><dt>Pdf extraction failures</dt><dd>0</dd><dt>Fulltext access failures</dt><dd>17</dd><dt>Html papers resolved</dt><dd>1</dd><dt>Pdf papers resolved</dt><dd>2</dd><dt>Papers discovered</dt><dd>20</dd><dt>Semantic retrieval seconds</dt><dd>42.913</dd><dt>Sources cited</dt><dd>4</dd></dl>
+        <h3>Critic decisions</h3>
+        
+        <article>
+            <p><strong>Sufficient evidence</strong></p>
+            <p>The evidence includes studies directly addressing generative AI&#39;s impact on learning outcomes, such as improved conceptual understanding and academic performance (S1), as well as discussions on AI integration challenges. However, the focus on academic integrity (S3) and social media authenticity (S4/S5) introduces tangential topics. The full-text paper (S2) provides context on AI-enhanced education but is truncated. Additional studies measuring specific learning outcomes like engagement or retention would strengthen coverage.</p>
+            <p>Next step: Generating report.</p>
+        </article>
+        
+        <h3>Hybrid evidence coverage</h3>
+        <dl class="metrics"><dt>Writing sources</dt><dd>5</dd><dt>Full text sources</dt><dd>1</dd><dt>Html sources</dt><dd>0</dd><dt>Pdf sources</dt><dd>1</dd><dt>Abstract only sources</dt><dd>4</dd><dt>Selected chunks</dt><dd>6</dd><dt>Retrieval mode</dt><dd>semantic</dd><dt>Access failures</dt><dd>17</dd><dt>Extraction failures</dt><dd>0</dd><dt>Provider failures</dt><dd>1</dd></dl>
+        
+    </section>
+    <section id="log-panel" role="tabpanel" aria-labelledby="log-tab">
+        <h2>Activity Log</h2>
+        
+        <div class="audit-table"><table>
+            <thead><tr><th>Timestamp (UTC)</th><th>Agent</th><th>Action</th><th>Activity</th></tr></thead>
+            <tbody>
+            <tr><td>2026-09-13 23:42:25</td><td>Planner<br>Cycle 1</td><td>started</td><td>Planning search</td></tr>
+            
+            <tr><td>2026-09-13 23:42:30</td><td>Planner<br>Cycle 1</td><td>completed</td><td>Search plan prepared.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:30</td><td>Retrieval<br>Cycle 1</td><td>started</td><td>Retrieving academic sources</td></tr>
+            
+            <tr><td>2026-09-13 23:42:38</td><td>Retrieval</td><td>provider paused</td><td>Semantic Scholar request limit reached or access unavailable; using other sources for the rest of this investigation.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:38</td><td>Retrieval</td><td>provider failed</td><td>Semantic Scholar: rate limit reached. Continuing with available sources. No further Semantic Scholar requests will be made in this investigation.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:38</td><td>Retrieval<br>Cycle 1</td><td>completed</td><td>Academic sources retrieved.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:38</td><td>Processing<br>Cycle 1</td><td>started</td><td>Processing evidence</td></tr>
+            
+            <tr><td>2026-09-13 23:42:38</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:38</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:39</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:39</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:39</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:40</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:42</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/s43621-026-04357-5" target="_blank" rel="noopener noreferrer">648f320408a61e5e177c</a> — Generative AI adoption predicts student empowerment and academic dependency through sustainable learning outcomes in UAE.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:43</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:44</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:44</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.18260/1-2--58076" target="_blank" rel="noopener noreferrer">0a928cf94df5e5bc8532</a> — Reinforcing Learning Through Generative AI: Investigating Student Outcomes and the Importance of Responsible Use in High.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:44</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:44</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:45</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:45</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.21275/sr241119221041" target="_blank" rel="noopener noreferrer">5c252d9d92c6ba33b73b</a> — AI - Driven Pedagogies: Enhancing Student Engagement and Learning Outcomes in Higher Education.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:45</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:45</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>html failed</td><td>No recognised HTML article body was found; checking abstract fallback. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.22371/05.2026.002" target="_blank" rel="noopener noreferrer">1506d90098ce5f8d5cc2</a> — Generative Ai and Student Engagement, Motivation, and Learning: Exploring The Use Of Generative Ai in Higher Education O.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1515/9783112206393-005" target="_blank" rel="noopener noreferrer">c2cfe37c8f10158f7d1a</a> — 81 How Gamified Pedagogies and AI Tools Influence Student Engagement and Retention in Higher Education Learning Environme.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:47</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1080/03075079.2025.2487570" target="_blank" rel="noopener noreferrer">998e31c15aa2ac777d1e</a> — Mastering knowledge: the impact of generative AI on student learning outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1515/9783112206393-006" target="_blank" rel="noopener noreferrer">578e1d746667b6c12f69</a> — 105 Intelligent Learning: Generative AI in Higher Education and Authentic Learning.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>html failed</td><td>The HTML host requires access verification; checking abstract fallback. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1007/978-3-031-60179-8_5" target="_blank" rel="noopener noreferrer">77fac735a1eb3b81a4b6</a> — Enhancing Personalised Learning and Student Engagement Using Generative AI.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:48</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:49</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:49</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.2139/ssrn.6113026" target="_blank" rel="noopener noreferrer">2f9cc1e9ab917178941e</a> — Evaluating the Impact of AI-Based Personalized Learning Systems on University Students&#39; Academic Performance: A Review a.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:49</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">674419ea1d211adca404</a> — AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:49</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">674419ea1d211adca404</a> — AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>html failed</td><td>The article metadata size limit was reached; checking abstract fallback. Paper <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">674419ea1d211adca404</a> — AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">674419ea1d211adca404</a> — AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">674419ea1d211adca404</a> — AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">f2f9d4687e8658ad2f92</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">f2f9d4687e8658ad2f92</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">f2f9d4687e8658ad2f92</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">f2f9d4687e8658ad2f92</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">f2f9d4687e8658ad2f92</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v1" target="_blank" rel="noopener noreferrer">84342b6a1f1e186aab53</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:51</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v1" target="_blank" rel="noopener noreferrer">84342b6a1f1e186aab53</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:52</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v1" target="_blank" rel="noopener noreferrer">84342b6a1f1e186aab53</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:52</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v1" target="_blank" rel="noopener noreferrer">84342b6a1f1e186aab53</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:52</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v1" target="_blank" rel="noopener noreferrer">84342b6a1f1e186aab53</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:52</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.51244/ijrsi.2025.121500077p" target="_blank" rel="noopener noreferrer">a3bbc88835b6aaa07293</a> — The Misuse of AI-Generated Content in Academic and Religious Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:52</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.51244/ijrsi.2025.121500077p" target="_blank" rel="noopener noreferrer">a3bbc88835b6aaa07293</a> — The Misuse of AI-Generated Content in Academic and Religious Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:54</td><td>Processing</td><td>html extracted</td><td>HTML article text extracted with section and paragraph provenance. Paper <a href="https://doi.org/10.51244/ijrsi.2025.121500077p" target="_blank" rel="noopener noreferrer">a3bbc88835b6aaa07293</a> — The Misuse of AI-Generated Content in Academic and Religious Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:54</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.51244/ijrsi.2025.121500077p" target="_blank" rel="noopener noreferrer">a3bbc88835b6aaa07293</a> — The Misuse of AI-Generated Content in Academic and Religious Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:54</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.2139/ssrn.5855022" target="_blank" rel="noopener noreferrer">6c2997726dbba6727cf8</a> — Artificial Intelligence and the Development of Academic Authorship: Analyzing AI-Generated Content, Ethical Issues, and .</td></tr>
+            
+            <tr><td>2026-09-13 23:42:54</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.2139/ssrn.5855022" target="_blank" rel="noopener noreferrer">6c2997726dbba6727cf8</a> — Artificial Intelligence and the Development of Academic Authorship: Analyzing AI-Generated Content, Ethical Issues, and .</td></tr>
+            
+            <tr><td>2026-09-13 23:42:55</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.2139/ssrn.5855022" target="_blank" rel="noopener noreferrer">6c2997726dbba6727cf8</a> — Artificial Intelligence and the Development of Academic Authorship: Analyzing AI-Generated Content, Ethical Issues, and .</td></tr>
+            
+            <tr><td>2026-09-13 23:42:55</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.2139/ssrn.5855022" target="_blank" rel="noopener noreferrer">6c2997726dbba6727cf8</a> — Artificial Intelligence and the Development of Academic Authorship: Analyzing AI-Generated Content, Ethical Issues, and .</td></tr>
+            
+            <tr><td>2026-09-13 23:42:55</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.2139/ssrn.5855022" target="_blank" rel="noopener noreferrer">6c2997726dbba6727cf8</a> — Artificial Intelligence and the Development of Academic Authorship: Analyzing AI-Generated Content, Ethical Issues, and .</td></tr>
+            
+            <tr><td>2026-09-13 23:42:55</td><td>Processing</td><td>fulltext located</td><td>Open-access full text located. Paper <a href="https://doi.org/10.71411/eaou.2025.v1i1.583" target="_blank" rel="noopener noreferrer">63791ac2b9ada97371f3</a> — A Tiered Framework for Copyright Ownership in AI-Generated Content​.</td></tr>
+            
+            <tr><td>2026-09-13 23:42:59</td><td>Processing</td><td>pdf downloaded</td><td>PDF downloaded; extracting page-aware text. Paper <a href="https://doi.org/10.71411/eaou.2025.v1i1.583" target="_blank" rel="noopener noreferrer">63791ac2b9ada97371f3</a> — A Tiered Framework for Copyright Ownership in AI-Generated Content​.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:00</td><td>Processing</td><td>pdf extracted</td><td>PDF text extracted with page references. Paper <a href="https://doi.org/10.71411/eaou.2025.v1i1.583" target="_blank" rel="noopener noreferrer">63791ac2b9ada97371f3</a> — A Tiered Framework for Copyright Ownership in AI-Generated Content​.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:00</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.71411/eaou.2025.v1i1.583" target="_blank" rel="noopener noreferrer">63791ac2b9ada97371f3</a> — A Tiered Framework for Copyright Ownership in AI-Generated Content​.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:00</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.47191/ijmra/v9-i6-60" target="_blank" rel="noopener noreferrer">7bc8fa05896e6de32102</a> — The Impact of AI-Generated Marketing Content on Consumer Behavior.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:00</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.47191/ijmra/v9-i6-60" target="_blank" rel="noopener noreferrer">7bc8fa05896e6de32102</a> — The Impact of AI-Generated Marketing Content on Consumer Behavior.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>html failed</td><td>The request timed out; checking abstract fallback. Paper <a href="https://doi.org/10.47191/ijmra/v9-i6-60" target="_blank" rel="noopener noreferrer">7bc8fa05896e6de32102</a> — The Impact of AI-Generated Marketing Content on Consumer Behavior.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>abstract fallback</td><td>Using abstract-only evidence. Paper <a href="https://doi.org/10.47191/ijmra/v9-i6-60" target="_blank" rel="noopener noreferrer">7bc8fa05896e6de32102</a> — The Impact of AI-Generated Marketing Content on Consumer Behavior.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.47191/ijmra/v9-i6-60" target="_blank" rel="noopener noreferrer">7bc8fa05896e6de32102</a> — The Impact of AI-Generated Marketing Content on Consumer Behavior.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.1016/j.actpsy.2026.106481" target="_blank" rel="noopener noreferrer">91a40ffa7be0acdd7b14</a> — AI-generated content and business English speaking: A mixed-methods study of SpeakGuru&#39;s impact on performance, motivati.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.1016/j.actpsy.2026.106481" target="_blank" rel="noopener noreferrer">91a40ffa7be0acdd7b14</a> — AI-generated content and business English speaking: A mixed-methods study of SpeakGuru&#39;s impact on performance, motivati.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>html failed</td><td>The HTML page could not be matched to this paper; checking abstract fallback. Paper <a href="https://doi.org/10.1016/j.actpsy.2026.106481" target="_blank" rel="noopener noreferrer">91a40ffa7be0acdd7b14</a> — AI-generated content and business English speaking: A mixed-methods study of SpeakGuru&#39;s impact on performance, motivati.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.1016/j.actpsy.2026.106481" target="_blank" rel="noopener noreferrer">91a40ffa7be0acdd7b14</a> — AI-generated content and business English speaking: A mixed-methods study of SpeakGuru&#39;s impact on performance, motivati.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>fulltext unavailable</td><td>Accessible full text unavailable. Paper <a href="https://doi.org/10.2139/ssrn.5080378" target="_blank" rel="noopener noreferrer">776491454ec1860e0153</a> — Visible Sources and Invisible Risks: Exploring the Impact of Ai Disclosure on Perceived Credibility of Ai-Generated Cont.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:17</td><td>Processing</td><td>html started</td><td>Checking openly accessible HTML article text. Paper <a href="https://doi.org/10.2139/ssrn.5080378" target="_blank" rel="noopener noreferrer">776491454ec1860e0153</a> — Visible Sources and Invisible Risks: Exploring the Impact of Ai Disclosure on Perceived Credibility of Ai-Generated Cont.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:18</td><td>Processing</td><td>html failed</td><td>The host denied access; checking abstract fallback. Paper <a href="https://doi.org/10.2139/ssrn.5080378" target="_blank" rel="noopener noreferrer">776491454ec1860e0153</a> — Visible Sources and Invisible Risks: Exploring the Impact of Ai Disclosure on Perceived Credibility of Ai-Generated Cont.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:18</td><td>Processing</td><td>chunks created</td><td>Evidence chunks created. Paper <a href="https://doi.org/10.2139/ssrn.5080378" target="_blank" rel="noopener noreferrer">776491454ec1860e0153</a> — Visible Sources and Invisible Risks: Exploring the Impact of Ai Disclosure on Perceived Credibility of Ai-Generated Cont.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:19</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.36948/ijfmr.2026.v08i03.81825" target="_blank" rel="noopener noreferrer">fd22f461ff5fdae7caa2</a> — Evaluating the Impact of Generative AI–Based Assessment and Feedback Systems on Student Learning Outcomes in Higher Educ.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:19</td><td>Processing</td><td>metadata checked</td><td>DOI metadata verification unavailable; retained the original reference metadata. Paper <a href="https://doi.org/10.65106/apubs.2025.2750" target="_blank" rel="noopener noreferrer">92dd8946b87050639400</a> — Using Generative AI to enhance higher education student and staff teaching and learning experiences and outcomes.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:19</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.33140/amlai.07.03.02" target="_blank" rel="noopener noreferrer">674419ea1d211adca404</a> — AI-Generated Text and Academic Integrity: A Systematic Review of Detection Tools in Educational Settings.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:19</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v2" target="_blank" rel="noopener noreferrer">f2f9d4687e8658ad2f92</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:43:19</td><td>Processing</td><td>metadata checked</td><td>Bibliographic metadata verified against its DOI record. Paper <a href="https://doi.org/10.31235/osf.io/b3wp5_v1" target="_blank" rel="noopener noreferrer">84342b6a1f1e186aab53</a> — Implied Authenticity Effect? The Impact of Explicit Labels on AI-Generated Content.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:02</td><td>Processing</td><td>chunks selected</td><td>Relevant passages selected.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:02</td><td>Processing</td><td>semantic completed</td><td>Hybrid evidence retrieval completed.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:02</td><td>Processing<br>Cycle 1</td><td>completed</td><td>Evidence validated, deduplicated and ranked.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:02</td><td>Critic<br>Cycle 1</td><td>started</td><td>Evaluating sufficiency</td></tr>
+            
+            <tr><td>2026-09-13 23:44:06</td><td>Critic<br>Cycle 1</td><td>completed</td><td>Evidence sufficiency evaluated. Evidence is sufficient for reporting.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:06</td><td>Reporter<br>Cycle 1</td><td>started</td><td>Generating report</td></tr>
+            
+            <tr><td>2026-09-13 23:44:06</td><td>Reporter</td><td>section started</td><td>Developing the summary.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:15</td><td>Reporter</td><td>section completed</td><td>Completed the summary.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:15</td><td>Reporter</td><td>section started</td><td>Developing the findings.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:21</td><td>Reporter</td><td>section completed</td><td>Completed the findings.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:21</td><td>Reporter</td><td>section started</td><td>Developing the limitations.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:25</td><td>Reporter</td><td>section completed</td><td>Completed the limitations.</td></tr>
+            
+            <tr><td>2026-09-13 23:44:25</td><td>Reporter<br>Cycle 1</td><td>completed</td><td>Report generated and saved.</td></tr>
+            </tbody>
+        </table></div>
+        
+    </section>
+    <p>Saved report ID: 60</p>
+    
+    <script>
+"use strict";
+
+const tablist = document.getElementById("report-tabs");
+const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+function selectTab(selected, focus = false) {
+    tabs.forEach((tab) => {
+        const active = tab === selected;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    if (focus) selected.focus();
+}
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+        if (event.key === "ArrowLeft") next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === "Home") next = tabs[0];
+        if (event.key === "End") next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); selectTab(next, true); }
+    });
+});
+tablist.hidden = false;
+selectTab(tabs[0]);
+
+</script>
+<script>
+"use strict";
+
+function paperUrlParts(text) {
+    const parts = [];
+    const pattern = /https?:\/\/[^\s<>"\u201c\u201d]+/gi;
+    let end = 0;
+    for (const match of text.matchAll(pattern)) {
+        let url = match[0].replace(/[.,;!?:]+$/, "");
+        while (url.endsWith(")") && (url.match(/\)/g) || []).length > (url.match(/\(/g) || []).length) url = url.slice(0, -1);
+        try { if (!new URL(url).hostname) continue; } catch (_) { continue; }
+        parts.push({text: text.slice(end, match.index)}, {text: url, url});
+        end = match.index + url.length;
+    }
+    parts.push({text: text.slice(end)});
+    return parts;
+}
+
+if (typeof module !== "undefined") module.exports = {paperUrlParts};
+if (typeof document !== "undefined") {
+    function linkUrls(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+            if (!node.parentElement || node.parentElement.closest("a,script,style,textarea,input,code,pre,[contenteditable]")) continue;
+            const parts = paperUrlParts(node.textContent);
+            if (!parts.some(part => part.url)) continue;
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+                if (!part.url) { fragment.append(document.createTextNode(part.text)); continue; }
+                const link = document.createElement("a");
+                link.href = part.url;
+                link.textContent = part.text;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                fragment.append(link);
+            }
+            node.replaceWith(fragment);
+        }
+    }
+    linkUrls(document.body);
+    new MutationObserver(() => linkUrls(document.body)).observe(document.body, {childList: true, subtree: true, characterData: true});
+}
+
+</script>
+</body>
+</html>
