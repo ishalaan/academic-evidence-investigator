@@ -23,20 +23,20 @@ Open a terminal in the folder where you want to save the project. On Windows, us
 
 ```text
 git clone git@github.com:ishalaan/academic-evidence-investigator.git
-cd academic-evidence-investigator
 ```
 
-The SSH command requires a key linked to a GitHub account with repository access. If SSH is not configured, use this HTTPS command instead, then run `cd academic-evidence-investigator`:
+The SSH command requires a key linked to a GitHub account with repository access. If SSH is not configured, use this HTTPS command instead:
 
 ```text
 git clone https://github.com/ishalaan/academic-evidence-investigator.git
 ```
 
-If using the submitted source archive or an existing checkout, skip cloning and open a terminal in `path/to/academic-evidence-investigator/`, replacing `path/to/` with the location where you saved the project. This is the project root containing `app.py` and `pyproject.toml`. All remaining commands run from that folder.
+If using the submitted source archive or an existing checkout, skip cloning and open a terminal in `path/to/academic-evidence-investigator/`, replacing `path/to/` with the location where you saved the project. This is the project root containing `app.py` and `pyproject.toml`. In the commands below, replace `path/to/academic-evidence-investigator/` with the actual project location before running them.
 
 ### Windows — Command Prompt (CMD)
 
 ```bat
+cd /d "path/to/academic-evidence-investigator/"
 python -m venv venv
 venv\Scripts\activate.bat
 python -m pip install -e ".[dev]"
@@ -47,6 +47,7 @@ If Windows recognises `py` instead of `python`, use `py -m venv venv` for the fi
 ### macOS — Terminal
 
 ```sh
+cd "path/to/academic-evidence-investigator/"
 python3 -m venv venv
 source venv/bin/activate
 python -m pip install -e ".[dev]"
@@ -55,6 +56,7 @@ python -m pip install -e ".[dev]"
 ### Linux — Terminal (Bash)
 
 ```sh
+cd "path/to/academic-evidence-investigator/"
 python3 -m venv venv
 source venv/bin/activate
 python -m pip install -e ".[dev]"
