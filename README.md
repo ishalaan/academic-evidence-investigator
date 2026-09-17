@@ -17,31 +17,50 @@ The Flask interface accepts a question and displays workflow progress. LangGraph
 
 Requirements: **Python 3.11+**, Git, internet access for retrieval and hosted inference, and a Hugging Face token with access to the configured inference service. The supplied final test run used Python 3.14.0 on Windows. Local embeddings require an initial model download and sufficient local memory.
 
-Clone the submitted GitHub repository, or extract the submitted source, and open a terminal in its root folder. For a clone, replace the placeholder with the submitted repository URL:
+Clone the submitted GitHub repository or extract the submitted source. If cloning, replace the placeholder with the submitted repository URL:
 
 ```text
 git clone <repository-url>
-cd academic-evidence-investigator
+```
+
+### Windows — Command Prompt (CMD)
+
+Open **Command Prompt** from the Start menu. If already in PowerShell, type `cmd` and press Enter first. Run the following commands, replacing the folder path if your project is elsewhere. Use `cd /d` to enter the folder; a folder path on its own is not a command.
+
+```bat
+cd /d "C:\Scripts\academic-evidence-investigator"
 python -m venv venv
-```
-
-Activate the environment:
-
-```powershell
-# Windows PowerShell
-.\venv\Scripts\Activate.ps1
-```
-
-```sh
-# macOS / Linux
-source venv/bin/activate
-```
-
-Install application and test dependencies:
-
-```text
+venv\Scripts\activate.bat
 python -m pip install -e ".[dev]"
 ```
+
+If `python` is unavailable but the Windows Python launcher is installed, use `py -m venv venv` for the environment-creation command. CMD activation does not require changing PowerShell's execution policy.
+
+### macOS — Terminal
+
+Replace `/path/to/academic-evidence-investigator` with your project folder:
+
+```sh
+cd "/path/to/academic-evidence-investigator"
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install -e ".[dev]"
+```
+
+### Linux — Terminal (Bash)
+
+Replace `/path/to/academic-evidence-investigator` with your project folder:
+
+```sh
+cd "/path/to/academic-evidence-investigator"
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install -e ".[dev]"
+```
+
+If Linux reports that `venv` is unavailable, install your distribution's Python venv package and retry environment creation.
+
+For an existing environment, skip creation and activate it using the command for your operating system. Repeat folder navigation and activation whenever opening a new terminal.
 
 `pyproject.toml` declares the dependencies; `requirements.txt` also lists them. SQLite is supplied through Python. No separate database server or local Qwen installation is required.
 
@@ -61,7 +80,7 @@ Omit optional entries when unused. Crossref needs no API key for this workflow. 
 
 ## Run the application
 
-With the environment activated, run:
+After completing configuration, run this from the project root in the activated environment on Windows CMD, macOS or Linux:
 
 ```text
 python app.py
@@ -71,7 +90,7 @@ The application initialises SQLite and opens [http://127.0.0.1:5000](http://127.
 
 ## Tests and current status
 
-Run all Python tests from the project root:
+Run all Python tests from the project root in the activated environment on any of the three operating systems. Stop the application first, or use another terminal with the same environment activated:
 
 ```text
 python -m pytest
