@@ -15,33 +15,38 @@ The Flask interface accepts a question and displays workflow progress. LangGraph
 
 ## Installation and dependencies
 
-Requirements: **Python 3.11+**, Git, internet access for retrieval and hosted inference, and a Hugging Face token with access to the configured inference service. The supplied final test run used Python 3.14.0 on Windows. Local embeddings require an initial model download and sufficient local memory.
+Install Python 3.11 or later and Git. Live use also requires internet access and a Hugging Face token with access to the configured inference service. The recorded test environment was Windows with Python 3.14.0; macOS and Linux commands are provided below, but those platforms have not been verified in the submitted test evidence.
 
-Clone the GitHub repository using the following command (requires GitHub SSH access), or extract the submitted source:
+### Get the source
+
+Open a terminal in the folder where you want to save the project. On Windows, use **Command Prompt (CMD)**; if PowerShell is already open, type `cmd` first. Run:
 
 ```text
 git clone git@github.com:ishalaan/academic-evidence-investigator.git
+cd academic-evidence-investigator
 ```
+
+The SSH command requires a key linked to a GitHub account with repository access. If SSH is not configured, use this HTTPS command instead, then run `cd academic-evidence-investigator`:
+
+```text
+git clone https://github.com/ishalaan/academic-evidence-investigator.git
+```
+
+If using the submitted source archive or an existing checkout, skip cloning and open a terminal inside the project folder containing `app.py` and `pyproject.toml`. All remaining commands run from that folder.
 
 ### Windows — Command Prompt (CMD)
 
-Open **Command Prompt** from the Start menu. If already in PowerShell, type `cmd` and press Enter first. Run the following commands, replacing the folder path if your project is elsewhere. Use `cd /d` to enter the folder; a folder path on its own is not a command.
-
 ```bat
-cd /d "C:\Scripts\academic-evidence-investigator"
 python -m venv venv
 venv\Scripts\activate.bat
 python -m pip install -e ".[dev]"
 ```
 
-If `python` is unavailable but the Windows Python launcher is installed, use `py -m venv venv` for the environment-creation command. CMD activation does not require changing PowerShell's execution policy.
+If Windows recognises `py` instead of `python`, use `py -m venv venv` for the first command. After activation, use `python` as shown. No PowerShell execution-policy change is needed.
 
 ### macOS — Terminal
 
-Replace `/path/to/academic-evidence-investigator` with your project folder:
-
 ```sh
-cd "/path/to/academic-evidence-investigator"
 python3 -m venv venv
 source venv/bin/activate
 python -m pip install -e ".[dev]"
@@ -49,24 +54,21 @@ python -m pip install -e ".[dev]"
 
 ### Linux — Terminal (Bash)
 
-Replace `/path/to/academic-evidence-investigator` with your project folder:
-
 ```sh
-cd "/path/to/academic-evidence-investigator"
 python3 -m venv venv
 source venv/bin/activate
 python -m pip install -e ".[dev]"
 ```
 
-If Linux reports that `venv` is unavailable, install your distribution's Python venv package and retry environment creation.
+If Linux reports that `venv` is unavailable, install the venv package for your Python version through your distribution's package manager, then retry.
 
-For an existing environment, skip creation and activate it using the command for your operating system. Repeat folder navigation and activation whenever opening a new terminal.
+Create the environment once. When returning to the project, open a terminal in its root folder and repeat only the activation command for your operating system.
 
-`pyproject.toml` declares the dependencies; `requirements.txt` also lists them. SQLite is supplied through Python. No separate database server or local Qwen installation is required.
+`pyproject.toml` declares application and development dependencies; `requirements.txt` also lists them. SQLite is included with Python. Qwen runs through hosted inference, while the embedding model runs locally and downloads on first use. No separate database server is required.
 
 ## Configuration
 
-Create a file named **`.env`** in the project root:
+Create a plain-text file named **`.env`** in the project root, alongside `app.py`. Replace the example token with your own credentials. On Windows, make sure the filename is `.env`, not `.env.txt`:
 
 ```dotenv
 HF_TOKEN=your_hugging_face_token
@@ -103,42 +105,44 @@ python -m pytest -v
 python -m pytest --cov=package --cov-report=term-missing
 ```
 
-**Final supplied test result: 263 Python tests passed in 25.13 seconds**, covering unit, integration and functional tests. This is the recorded project result, not a new execution performed for this README edit. Coverage includes validation, deduplication, retrieval failures, PDF/HTML extraction and fallback, embeddings, workflow routing, citation handling, persistence and Flask behaviour. Controlled test responses make failure cases reproducible; passing tests do not guarantee live API availability or factual correctness of every generated report.
+**Final recorded result: 263 Python tests passed**, across unit, integration and functional tests. The saved output is in [evidence/test_results/05_final_pytest_results.txt](evidence/test_results/05_final_pytest_results.txt). Coverage includes validation, deduplication, retrieval failures, PDF/HTML extraction and fallback, embeddings, workflow routing, citation handling, persistence and Flask behaviour. Controlled test responses make failure cases reproducible; passing tests do not guarantee live API availability or factual correctness of every generated report.
 
 Testing and remediation addressed:
 
 - **Service failures:** independent retrieval sources, bounded retries and clearer provider diagnostics; the active inference model is Qwen3-8B.
 - **Evidence access and relevance:** PDF-to-HTML-to-abstract fallback, article identity checks, duplicate-version handling and semantic passage selection.
-- **Report reliability:** metadata-derived references, citation normalisation, targeted grounding checks, bounded section retries and context-budget controls. Remaining quality weaknesses can be exposed as review notes.
+- **Report reliability:** metadata-derived references, citation normalisation, targeted grounding checks, bounded section retries and context-budget controls. In normal operation, unresolved quality weaknesses are recorded as review notes rather than always blocking completion; users must check these notes and the cited evidence.
 - **Traceability and interface:** persisted workflow decisions, safe progress/error messages and source-format-specific evidence locations.
 
-Execution screenshots, sample outputs and test-tool output belong in `evidence/`. Git history and the GitHub repository document incremental development and retain the final submission.
+Execution screenshots are in `evidence/screenshots/demo/`; debugging and final-test screenshots are in `evidence/screenshots/debugging/`. Saved reports and sample outputs are in `evidence/saved_reports/` and `evidence/sample_outputs/`. Git history records incremental development, with the source maintained on GitHub.
 
 ## Project structure
 
-```text
-app.py                         Local application entry point
-pyproject.toml / requirements.txt  Installation and dependency declarations
-src/package/
-  agents/                      Planner, retrieval, critic and reporter
-  workflow/                    Shared state, graph and routing
-  services/                    Inference, academic APIs and content retrieval
-  processing/ / rag/           Validation, ranking and passage retrieval
-  storage/                     SQLite persistence and audit records
-  prompts/                     Agent instructions
-  config.py / schemas.py / web.py  Configuration, validation and web routes
-templates/ / static/            HTML, CSS and JavaScript interface
-tests/                         Unit, integration, functional tests and fixtures
-data/                          Local runtime data
-evidence/                      Screenshots, test results and sample outputs
-```
+| Path | Purpose |
+| --- | --- |
+| `app.py` | Starts the local application. |
+| `pyproject.toml`, `requirements.txt` | Declare installation settings and dependencies. |
+| `src/package/agents/` | Planner, retrieval, critic and reporter logic. |
+| `src/package/workflow/` | Shared state and workflow routing. |
+| `src/package/services/` | Model access, academic APIs and content retrieval. |
+| `src/package/processing/` | Validation, deduplication, ranking and semantic passage selection. |
+| `src/package/rag/` | Prepares retrieved evidence within model context limits. |
+| `src/package/storage/` | SQLite persistence and audit records. |
+| `src/package/prompts/` | Agent prompt templates. |
+| `src/package/config.py` | Environment settings and search limits. |
+| `src/package/schemas.py` | Structured data models. |
+| `src/package/web.py` | Flask routes and request handling. |
+| `templates/`, `static/` | Browser interface and styling. |
+| `tests/` | Unit, integration and functional tests, with fixtures. |
+| `data/` | Local runtime data. |
+| `evidence/` | Test results, screenshots, saved reports and sample outputs. |
 
 ## Key design decisions
 
-- **Explicit agent workflow:** LangGraph makes conditional replanning and termination inspectable. Planning followed by tool use is informed by ReAct (Yao et al., 2023), without claiming an exact reproduction.
-- **Validated boundaries:** Pydantic validates plans, papers and agent outputs; deterministic code handles metadata, filtering and storage to improve testability and reduce unnecessary model dependence.
-- **Retrieval-grounded synthesis:** PDF/HTML passages and abstract fallback give the model identifiable evidence, following the RAG principle (Lewis et al., 2020). Local `all-MiniLM-L6-v2` embeddings with FAISS improve passage selection; lexical controls remain part of the hybrid approach. An explicitly recorded lexical fallback is used if embeddings cannot load.
-- **Bounded evidence and generation:** passage limits and section-level context budgets control input size, reflecting long-context reliability concerns (Liu et al., 2024). These limits can omit relevant material.
+- **Workflow control:** LangGraph makes conditional replanning and termination inspectable. Planning followed by tool use is informed by ReAct (Yao et al., 2023), without claiming an exact reproduction.
+- **Structured data:** Pydantic validates plans, papers and agent outputs; deterministic code handles metadata, filtering and storage to improve testability and reduce unnecessary model dependence.
+- **Evidence selection:** PDF/HTML passages and abstract fallback give the model identifiable evidence, following the RAG principle (Lewis et al., 2020). Local `all-MiniLM-L6-v2` embeddings with FAISS select passages by meaning alongside lexical relevance and paper-rank signals. An explicitly recorded lexical fallback is used if embeddings cannot load.
+- **Context limits:** passage limits and section-level context budgets control input size, reflecting long-context reliability concerns (Liu et al., 2024). These limits can omit relevant material.
 - **Traceable output:** metadata-derived references, source locators and audit records support human checking. Validation reduces hallucination risk but cannot eliminate it (Ji et al., 2023).
 - **Simple local deployment:** Flask with HTML/CSS/JavaScript and SQLite provides an inspectable demonstration without a separate frontend build or database service. Behavioural and failure-case tests complement successful-path testing (Ribeiro et al., 2020).
 
@@ -157,10 +161,10 @@ The implementation uses **Qwen3-8B** from the Qwen team through **Hugging Face**
 
 Ji, Z., Lee, N., Frieske, R., Yu, T., Su, D., Xu, Y., Ishii, E., Bang, Y., Madotto, A. and Fung, P. (2023) ‘Survey of hallucination in natural language generation’, *ACM Computing Surveys*, 55(12), article 248, pp. 1–38. Available at: [https://doi.org/10.1145/3571730](https://doi.org/10.1145/3571730) (Accessed: 16 September 2026).
 
-Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W.-T., Rocktäschel, T., Riedel, S. and Kiela, D. (2020) ‘Retrieval-augmented generation for knowledge-intensive NLP tasks’, *Advances in Neural Information Processing Systems*, 33, pp. 9459–9474. Available at: [NeurIPS proceedings](https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html) (Accessed: 16 September 2026).
+Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W.-T., Rocktäschel, T., Riedel, S. and Kiela, D. (2020) ‘Retrieval-augmented generation for knowledge-intensive NLP tasks’, *Advances in Neural Information Processing Systems*, 33, pp. 9459–9474. Available at: [https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html](https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html) (Accessed: 16 September 2026).
 
 Liu, N.F., Lin, K., Hewitt, J., Paranjape, A., Bevilacqua, M., Petroni, F. and Liang, P. (2024) ‘Lost in the middle: how language models use long contexts’, *Transactions of the Association for Computational Linguistics*, 12, pp. 157–173. Available at: [https://doi.org/10.1162/tacl_a_00638](https://doi.org/10.1162/tacl_a_00638) (Accessed: 16 September 2026).
 
 Ribeiro, M.T., Wu, T., Guestrin, C. and Singh, S. (2020) ‘Beyond accuracy: behavioral testing of NLP models with CheckList’, in *Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics*. Online, 5–10 July. Association for Computational Linguistics, pp. 4902–4912. Available at: [https://doi.org/10.18653/v1/2020.acl-main.442](https://doi.org/10.18653/v1/2020.acl-main.442) (Accessed: 16 September 2026).
 
-Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K. and Cao, Y. (2023) ‘ReAct: synergizing reasoning and acting in language models’, *The Eleventh International Conference on Learning Representations*. Kigali, Rwanda, 1–5 May. Available at: [OpenReview](https://openreview.net/forum?id=WE_vluYUL-X) (Accessed: 16 September 2026).
+Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K. and Cao, Y. (2023) ‘ReAct: synergizing reasoning and acting in language models’, *The Eleventh International Conference on Learning Representations*. Kigali, Rwanda, 1–5 May. Available at: [https://openreview.net/forum?id=WE_vluYUL-X](https://openreview.net/forum?id=WE_vluYUL-X) (Accessed: 16 September 2026).
