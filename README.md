@@ -32,7 +32,7 @@ The SSH command requires a key linked to a GitHub account with repository access
 git clone https://github.com/ishalaan/academic-evidence-investigator.git
 ```
 
-If using the submitted source archive or an existing checkout, skip cloning and open a terminal inside the project folder containing `app.py` and `pyproject.toml`. All remaining commands run from that folder.
+If using the submitted source archive or an existing checkout, skip cloning and open a terminal in `path/to/academic-evidence-investigator/`, replacing `path/to/` with the location where you saved the project. This is the project root containing `app.py` and `pyproject.toml`. All remaining commands run from that folder.
 
 ### Windows — Command Prompt (CMD)
 
