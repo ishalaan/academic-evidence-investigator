@@ -17,10 +17,10 @@ The Flask interface accepts a question and displays workflow progress. LangGraph
 
 Requirements: **Python 3.11+**, Git, internet access for retrieval and hosted inference, and a Hugging Face token with access to the configured inference service. The supplied final test run used Python 3.14.0 on Windows. Local embeddings require an initial model download and sufficient local memory.
 
-Clone the submitted GitHub repository or extract the submitted source. If cloning, replace the placeholder with the submitted repository URL:
+Clone the GitHub repository using the following command (requires GitHub SSH access), or extract the submitted source:
 
 ```text
-git clone <repository-url>
+git clone git@github.com:ishalaan/academic-evidence-investigator.git
 ```
 
 ### Windows — Command Prompt (CMD)
