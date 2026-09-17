@@ -9,7 +9,7 @@ The Flask interface accepts a question and displays workflow progress. LangGraph
 1. The Planner creates focused searches using **Qwen/Qwen3-8B via Hugging Face**.
 2. Retrieval searches **Crossref and Semantic Scholar** independently.
 3. Processing validates, deduplicates and filters records, then obtains **PDF full text, HTML article text or an abstract fallback**. Records without usable text remain visible as metadata rather than supporting synthesis.
-4. Local **sentence-transformer embeddings** and **FAISS** select relevant passages alongside deterministic relevance controls. Source locations remain attached to evidence.
+4. Local **all-MiniLM-L6-v2 sentence-transformer embeddings** and **FAISS** select relevant passages alongside deterministic relevance controls. Source locations remain attached to evidence.
 5. The Critic assesses sufficiency and can request replanning, retaining earlier evidence. A three-cycle limit bounds the search.
 6. The Reporter produces a briefing; references are rendered from retrieved metadata. **SQLite** stores reports and audit information for browser review.
 
@@ -66,7 +66,7 @@ If Linux reports that `venv` is unavailable, install the venv package for your P
 
 Create the environment once. When returning to the project, open a terminal in its root folder and repeat only the activation command for your operating system.
 
-`pyproject.toml` declares application and development dependencies; `requirements.txt` also lists them. SQLite is included with Python. Qwen runs through hosted inference, while the embedding model runs locally and downloads on first use. No separate database server is required.
+`pyproject.toml` declares application and development dependencies; `requirements.txt` also lists them. SQLite is included with Python. Qwen3-8B runs through hosted inference, while the embedding model runs locally and downloads on first use. No separate database server is required.
 
 ## Configuration
 
