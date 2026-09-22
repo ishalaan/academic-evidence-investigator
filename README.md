@@ -66,7 +66,19 @@ If Linux reports that `venv` is unavailable, install the venv package for your P
 
 Create the environment once. When returning to the project, open a terminal in its root folder and repeat only the activation command for your operating system.
 
-`pyproject.toml` declares application and development dependencies; `requirements.txt` also lists them. SQLite is included with Python. Qwen3-8B runs through hosted inference, while the embedding model runs locally and downloads on first use. No separate database server is required.
+`pyproject.toml` declares application and development dependencies; `requirements.txt` also lists them. SQLite is included with Python. Qwen3-8B runs through hosted inference, while the embedding model runs locally. No separate database server is required.
+
+### Set up the local embedding model
+
+After installing dependencies, run this once from the project root with the virtual environment activated (internet access required):
+
+```text
+python -m package.processing.embeddings
+```
+
+This downloads the sentence-transformer model used to select evidence passages by semantic similarity. Its cache in `data/cache/sentence_transformers/` is excluded from Git, so a fresh clone needs this setup step. Investigations do not download the model automatically; without it, passage selection falls back to keyword overlap and paper ranking.
+
+The application creates `data/` and an empty SQLite database automatically on startup, and temporary folders when needed. Existing reports and runtime data are not required to run a fresh clone.
 
 ## Configuration
 
