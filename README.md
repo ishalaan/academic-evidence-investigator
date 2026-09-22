@@ -2,7 +2,7 @@
 
 ## Purpose and overview
 
-Academic Evidence Investigator is an LLM-powered research-support prototype for postgraduate evidence gathering. It turns a research question into a structured briefing with a summary, findings, limitations and traceable references. It supports academic judgement; it does not provide an exhaustive systematic review.
+Academic Evidence Investigator is an LLM-powered research-support tool for postgraduate evidence gathering. It turns a research question into a structured briefing with a summary, findings, limitations and traceable references. It supports academic judgement; it does not provide an exhaustive systematic review.
 
 The Flask interface accepts a question and displays workflow progress. LangGraph coordinates planning, retrieval, processing, criticism and reporting through shared state:
 
