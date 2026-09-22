@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 5 items
+
+tests/integration/test_quality_updates.py::test_semantic_failure_limit_persists_across_replans PASSED [ 20%]
+tests/integration/test_quality_updates.py::test_semantic_successful_requests_are_bounded PASSED [ 40%]
+tests/integration/test_quality_updates.py::test_rate_limit_stops_immediately PASSED [ 60%]
+tests/integration/test_quality_updates.py::test_presentation_helpers PASSED [ 80%]
+tests/integration/test_quality_updates.py::test_paper_activity_has_identifier_and_formatted_time PASSED [100%]
+
+============================== 5 passed in 0.29s ==============================

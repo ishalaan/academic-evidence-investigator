@@ -1,0 +1,36 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 26 items
+
+tests/integration/test_hybrid_rag.py::test_pdf_extraction_preserves_page_numbers PASSED [  3%]
+tests/integration/test_hybrid_rag.py::test_malformed_pdf_rejected PASSED [  7%]
+tests/integration/test_hybrid_rag.py::test_chunk_overlap_order_and_provenance PASSED [ 11%]
+tests/integration/test_hybrid_rag.py::test_vector_relevance_and_diversity PASSED [ 15%]
+tests/integration/test_hybrid_rag.py::test_embedding_failure_is_explicit PASSED [ 19%]
+tests/integration/test_hybrid_rag.py::test_hybrid_types_audit_cleanup_and_metadata_persistence PASSED [ 23%]
+tests/integration/test_hybrid_rag.py::test_inaccessible_fulltext_falls_back_without_terminating[failure0] PASSED [ 26%]
+tests/integration/test_hybrid_rag.py::test_inaccessible_fulltext_falls_back_without_terminating[failure1] PASSED [ 30%]
+tests/integration/test_hybrid_rag.py::test_inaccessible_fulltext_falls_back_without_terminating[failure2] PASSED [ 34%]
+tests/integration/test_hybrid_rag.py::test_replan_reuses_extraction PASSED [ 38%]
+tests/integration/test_hybrid_rag.py::test_extraction_failure_separate_from_download_and_audited PASSED [ 42%]
+tests/integration/test_hybrid_rag.py::test_download_provenance_uses_final_pdf_url PASSED [ 46%]
+tests/integration/test_hybrid_rag.py::test_failure_activity_is_specific_but_legacy_events_still_render PASSED [ 50%]
+tests/integration/test_hybrid_rag.py::test_processing_deduplicates_before_chunks PASSED [ 53%]
+tests/integration/test_hybrid_rag.py::test_reporter_and_critic_receive_passages PASSED [ 57%]
+tests/integration/test_hybrid_rag.py::test_legacy_report_defaults PASSED [ 61%]
+tests/integration/test_hybrid_rag.py::test_ui_evidence_labels PASSED     [ 65%]
+tests/integration/test_hybrid_rag.py::test_runtime_path_cannot_escape PASSED [ 69%]
+tests/integration/test_hybrid_rag.py::test_download_checks_pdf_and_stays_in_runtime PASSED [ 73%]
+tests/integration/test_hybrid_rag.py::test_redirect_to_private_host_is_blocked PASSED [ 76%]
+tests/integration/test_hybrid_rag.py::test_replan_preserves_failure_counts PASSED [ 80%]
+tests/integration/test_hybrid_rag.py::test_public_https_rejects_local_addresses PASSED [ 84%]
+tests/integration/test_hybrid_rag.py::test_open_access_metadata_resolution PASSED [ 88%]
+tests/integration/test_hybrid_rag.py::test_download_rejects_non_pdf PASSED [ 92%]
+tests/integration/test_hybrid_rag.py::test_runtime_paths_are_gitignored PASSED [ 96%]
+tests/integration/test_hybrid_rag.py::test_real_local_embedding_semantics PASSED [100%]
+
+============================= 26 passed in 39.71s =============================

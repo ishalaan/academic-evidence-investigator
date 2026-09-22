@@ -1,0 +1,20 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 10 items
+
+tests/unit/test_report_format.py::test_lossless_summary_format_variations[{"summary":"First [S1].\\n\\nSecond [S2]."}] PASSED [ 10%]
+tests/unit/test_report_format.py::test_lossless_summary_format_variations[{"summary":"First [S1].\n\nSecond [S2]."}] PASSED [ 20%]
+tests/unit/test_report_format.py::test_lossless_summary_format_variations[Here is the section:\n{"summary":["First [S1].", "Second [S2]."]}] PASSED [ 30%]
+tests/unit/test_report_format.py::test_lossless_summary_format_variations[```json\n{"summary":["First [S1].", "Second [S2]."]}\n```] PASSED [ 40%]
+tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_rejected[{"summary":"unfinished] PASSED [ 50%]
+tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_rejected[{"wrong":"text"}] PASSED [ 60%]
+tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_rejected[{"summary":[{}]}] PASSED [ 70%]
+tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_rejected[{"summary":"Valid"} trailing claims] PASSED [ 80%]
+tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_rejected[Plain prose] PASSED [ 90%]
+tests/unit/test_report_format.py::test_incomplete_or_ambiguous_sections_are_rejected[{"summary":"one"}{"summary":"two"}] PASSED [100%]
+
+============================= 10 passed in 0.62s ==============================

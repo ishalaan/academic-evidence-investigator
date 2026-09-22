@@ -1,0 +1,21 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 11 items
+
+tests/integration/test_report57_fixes.py::test_school_population_excluded[AI learning in Grade 9 students] PASSED [  9%]
+tests/integration/test_report57_fixes.py::test_school_population_excluded[AI in secondary school] PASSED [ 18%]
+tests/integration/test_report57_fixes.py::test_cross_population_and_higher_education_retained PASSED [ 27%]
+tests/integration/test_report57_fixes.py::test_comparisons_survive_markup_cleaning[plain_abstract] PASSED [ 36%]
+tests/integration/test_report57_fixes.py::test_comparisons_survive_markup_cleaning[clean_abstract] PASSED [ 45%]
+tests/integration/test_report57_fixes.py::test_unsupported_report57_claims[A correlation was found (r = .503, p < .001) [S1].-unsupported_statistic] PASSED [ 54%]
+tests/integration/test_report57_fixes.py::test_unsupported_report57_claims[The analysis was truncated [S1].-truncation_as_study_limitation] PASSED [ 63%]
+tests/integration/test_report57_fixes.py::test_unsupported_report57_claims[Many studies used small samples [S1].-unsupported_sample_limitation] PASSED [ 72%]
+tests/integration/test_report57_fixes.py::test_unsupported_report57_claims[Studies reported negative effects [S1].-unsupported_outcome] PASSED [ 81%]
+tests/integration/test_report57_fixes.py::test_supported_statistic_and_limitation_accepted PASSED [ 90%]
+tests/integration/test_report57_fixes.py::test_findings_split_without_changing_claims_or_citations PASSED [100%]
+
+============================= 11 passed in 0.68s ==============================

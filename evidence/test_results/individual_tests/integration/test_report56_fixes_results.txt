@@ -1,0 +1,20 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 10 items
+
+tests/integration/test_report56_fixes.py::test_rejects_cross_source_details[A mixed-methods study involving 300 students reported benefits [S1].-unsupported_sample_size] PASSED [ 10%]
+tests/integration/test_report56_fixes.py::test_rejects_cross_source_details[A systematic review reported benefits [S1].-unsupported_study_design] PASSED [ 20%]
+tests/integration/test_report56_fixes.py::test_rejects_cross_source_details[The study used regression analysis [S1].-unsupported_study_design] PASSED [ 30%]
+tests/integration/test_report56_fixes.py::test_rejects_cross_source_details[A survey of 300 students reported benefits. Other evidence was available [S2].-missing_claim_citation] PASSED [ 40%]
+tests/integration/test_report56_fixes.py::test_rejects_cross_source_details[A survey of 300 students reported benefits (S1).-unsupported_sample_size] PASSED [ 50%]
+tests/integration/test_report56_fixes.py::test_accepts_correctly_attributed_details PASSED [ 60%]
+tests/integration/test_report56_fixes.py::test_parenthesised_ids_resolve_and_count PASSED [ 70%]
+tests/integration/test_report56_fixes.py::test_initials_ignore_parenthesis_punctuation PASSED [ 80%]
+tests/integration/test_report56_fixes.py::test_educational_british_spelling_preserves_computing PASSED [ 90%]
+tests/integration/test_report56_fixes.py::test_wrong_sample_triggers_targeted_regeneration PASSED [100%]
+
+============================= 10 passed in 0.68s ==============================

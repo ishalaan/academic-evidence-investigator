@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 5 items
+
+tests/functional/test_error_details.py::test_failure_diagnostics_are_safe[error0-model_timeout] PASSED [ 20%]
+tests/functional/test_error_details.py::test_failure_diagnostics_are_safe[error1-model_certificate] PASSED [ 40%]
+tests/functional/test_error_details.py::test_failure_diagnostics_are_safe[error2-invalid_json] PASSED [ 60%]
+tests/functional/test_error_details.py::test_failure_diagnostics_are_safe[error3-workflow_stage_failed] PASSED [ 80%]
+tests/functional/test_error_details.py::test_failed_status_identifies_agent_and_run PASSED [100%]
+
+============================== 5 passed in 1.72s ==============================

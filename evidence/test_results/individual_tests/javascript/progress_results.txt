@@ -1,0 +1,16 @@
+✔ submit, real status, repeated replanning and completion redirect (5.8129ms)
+✔ failed run removes overlay, restores form and stops polling (1.2262ms)
+✔ polling reconnects to the same run and survives page refresh (2.8074ms)
+✔ missing run stops polling and allows a fresh investigation (1.1938ms)
+✔ start rejection shows server error and allows retry (0.9109ms)
+✔ activity preserves history, avoids duplicates and highlights current action (9.7525ms)
+✔ tabs support click and keyboard selection with matching panel visibility (1.7544ms)
+✔ paper IDs in the live feed open the source in a new tab (1.7551ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 154.8109

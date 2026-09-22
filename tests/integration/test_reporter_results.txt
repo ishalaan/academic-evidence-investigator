@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 5 items
+
+tests/integration/test_reporter.py::test_reporter_returns_structured_report PASSED [ 20%]
+tests/integration/test_reporter.py::test_reporter_uses_real_metadata_for_citations_and_bibliography PASSED [ 40%]
+tests/integration/test_reporter.py::test_reporter_rejects_untraceable_text_before_saving[An invented citation [S99].] PASSED [ 60%]
+tests/integration/test_reporter.py::test_reporter_rejects_untraceable_text_before_saving[Uncited claims.] PASSED [ 80%]
+tests/integration/test_reporter.py::test_reporter_handles_no_evidence_without_fabricated_findings PASSED [100%]
+
+============================== 5 passed in 0.65s ==============================

@@ -1,0 +1,29 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 19 items
+
+tests/unit/test_pdf_retrieval.py::test_doi_landing_metadata_resolves_pdf_with_final_provenance PASSED [  5%]
+tests/unit/test_pdf_retrieval.py::test_http_redirect_is_upgraded_without_sending_http PASSED [ 10%]
+tests/unit/test_pdf_retrieval.py::test_no_guessing_links_or_challenge_bypass[<html>Client Challenge</html>] PASSED [ 15%]
+tests/unit/test_pdf_retrieval.py::test_no_guessing_links_or_challenge_bypass[<a href="/unrelated.pdf">Download</a>] PASSED [ 21%]
+tests/unit/test_pdf_retrieval.py::test_no_guessing_links_or_challenge_bypass[<meta name="citation_pdf_url" content="/a"><meta name="citation_pdf_url" content="/b">] PASSED [ 26%]
+tests/unit/test_pdf_retrieval.py::test_cross_host_metadata_rejected PASSED [ 31%]
+tests/unit/test_pdf_retrieval.py::test_private_metadata_rejected_before_request PASSED [ 36%]
+tests/unit/test_pdf_retrieval.py::test_permanent_or_rate_limit_response_not_retried[401] PASSED [ 42%]
+tests/unit/test_pdf_retrieval.py::test_permanent_or_rate_limit_response_not_retried[403] PASSED [ 47%]
+tests/unit/test_pdf_retrieval.py::test_permanent_or_rate_limit_response_not_retried[404] PASSED [ 52%]
+tests/unit/test_pdf_retrieval.py::test_permanent_or_rate_limit_response_not_retried[429] PASSED [ 57%]
+tests/unit/test_pdf_retrieval.py::test_transient_server_error_recovers_once PASSED [ 63%]
+tests/unit/test_pdf_retrieval.py::test_timeout_retry_is_bounded_and_sanitised PASSED [ 68%]
+tests/unit/test_pdf_retrieval.py::test_download_limits_cleanup[%PDF-1.7 long-MAX_BYTES-pdf_size_limit] PASSED [ 73%]
+tests/unit/test_pdf_retrieval.py::test_download_limits_cleanup[<html>long-MAX_HTML_BYTES-html_size_limit] PASSED [ 78%]
+tests/unit/test_pdf_retrieval.py::test_request_limit_stops_redirect_loop PASSED [ 84%]
+tests/unit/test_pdf_retrieval.py::test_blank_pdf_has_specific_extraction_reason PASSED [ 89%]
+tests/unit/test_pdf_retrieval.py::test_total_deadline_prevents_more_requests PASSED [ 94%]
+tests/unit/test_pdf_retrieval.py::test_retry_after_is_not_ignored PASSED [100%]
+
+============================= 19 passed in 0.48s ==============================

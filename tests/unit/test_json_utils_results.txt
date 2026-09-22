@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 3 items
+
+tests/unit/test_json_utils.py::test_removes_json_code_fence PASSED       [ 33%]
+tests/unit/test_json_utils.py::test_removes_generic_code_fence PASSED    [ 66%]
+tests/unit/test_json_utils.py::test_plain_json_is_unchanged PASSED       [100%]
+
+============================== 3 passed in 0.25s ==============================

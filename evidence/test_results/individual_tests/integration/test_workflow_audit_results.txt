@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 3 items
+
+tests/integration/test_workflow_audit.py::test_real_graph_replanning_metrics_critic_and_persistence PASSED [ 33%]
+tests/integration/test_workflow_audit.py::test_cycle_limit_records_insufficient_decision_and_actual_route PASSED [ 66%]
+tests/integration/test_workflow_audit.py::test_node_failure_is_persisted_without_exception_contents PASSED [100%]
+
+============================= 3 passed in 14.32s ==============================

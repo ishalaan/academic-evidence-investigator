@@ -1,0 +1,25 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 15 items
+
+tests/integration/test_reporter_recovery.py::test_invalid_report_gets_corrected_before_save[invalid0] PASSED [  6%]
+tests/integration/test_reporter_recovery.py::test_invalid_report_gets_corrected_before_save[invalid1] PASSED [ 13%]
+tests/integration/test_reporter_recovery.py::test_invalid_report_gets_corrected_before_save[invalid2] PASSED [ 20%]
+tests/integration/test_reporter_recovery.py::test_invalid_report_gets_corrected_before_save[invalid3] PASSED [ 26%]
+tests/integration/test_reporter_recovery.py::test_invalid_report_gets_corrected_before_save[invalid4] PASSED [ 33%]
+tests/integration/test_reporter_recovery.py::test_invalid_report_gets_corrected_before_save[invalid5] PASSED [ 40%]
+tests/integration/test_reporter_recovery.py::test_grouped_ids_and_known_author_year_formats_are_accepted PASSED [ 46%]
+tests/integration/test_reporter_recovery.py::test_retries_are_bounded_and_failure_reason_is_safe PASSED [ 53%]
+tests/integration/test_reporter_recovery.py::test_network_failure_has_safe_category PASSED [ 60%]
+tests/integration/test_reporter_recovery.py::test_remote_disconnect_retries_without_repeating_completed_content PASSED [ 66%]
+tests/integration/test_reporter_recovery.py::test_authentication_errors_are_not_retried PASSED [ 73%]
+tests/integration/test_reporter_recovery.py::test_missing_citation_retry_explains_defect PASSED [ 80%]
+tests/integration/test_reporter_recovery.py::test_persistent_unknown_citation_has_safe_diagnostic PASSED [ 86%]
+tests/integration/test_reporter_recovery.py::test_provider_402_is_reported_as_credits_required PASSED [ 93%]
+tests/integration/test_reporter_recovery.py::test_valid_short_section_is_not_rewritten_for_cosmetic_depth PASSED [100%]
+
+============================= 15 passed in 0.91s ==============================

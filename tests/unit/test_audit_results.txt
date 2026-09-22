@@ -1,0 +1,14 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 4 items
+
+tests/unit/test_audit.py::test_audit_persists_events_and_links_earlier_events_to_final_report PASSED [ 25%]
+tests/unit/test_audit.py::test_schema_initialisation_preserves_existing_reports_and_is_idempotent PASSED [ 50%]
+tests/unit/test_audit.py::test_unknown_run_does_not_create_orphan_event PASSED [ 75%]
+tests/unit/test_audit.py::test_runs_are_isolated_and_sql_content_is_data PASSED [100%]
+
+============================== 4 passed in 0.38s ==============================

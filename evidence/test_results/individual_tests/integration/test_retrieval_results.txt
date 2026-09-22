@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 3 items
+
+tests/integration/test_retrieval.py::test_retrieval_node PASSED          [ 33%]
+tests/integration/test_retrieval.py::test_retrieval_preserves_existing_papers PASSED [ 66%]
+tests/integration/test_retrieval.py::test_retrieval_continues_when_semantic_scholar_fails PASSED [100%]
+
+============================== 3 passed in 0.33s ==============================

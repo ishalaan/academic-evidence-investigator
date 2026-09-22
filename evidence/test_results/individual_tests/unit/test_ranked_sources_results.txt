@@ -1,0 +1,14 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 4 items
+
+tests/unit/test_ranked_sources.py::test_ranking_retains_below_threshold_sources_and_more_than_ten PASSED [ 25%]
+tests/unit/test_ranked_sources.py::test_exact_doi_keeps_abstract_from_second_provider_without_mutation PASSED [ 50%]
+tests/unit/test_ranked_sources.py::test_report_ranking_and_cited_ids_persist_and_legacy_rows_load PASSED [ 75%]
+tests/unit/test_ranked_sources.py::test_existing_database_schema_is_upgraded_without_losing_reports PASSED [100%]
+
+============================== 4 passed in 0.35s ==============================

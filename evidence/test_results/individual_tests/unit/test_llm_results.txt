@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 3 items
+
+tests/unit/test_llm.py::test_missing_hf_token_raises_error PASSED        [ 33%]
+tests/unit/test_llm.py::test_llm_client_is_created_when_token_exists PASSED [ 66%]
+tests/unit/test_llm.py::test_model_http_client_uses_verified_system_trust PASSED [100%]
+
+============================== 3 passed in 0.61s ==============================

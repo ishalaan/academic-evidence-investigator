@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 3 items
+
+tests/functional/test_report_sections.py::test_three_tabs_combine_overview_and_preserve_cited_references PASSED [ 33%]
+tests/functional/test_report_sections.py::test_older_report_does_not_get_fabricated_access_date PASSED [ 66%]
+tests/functional/test_report_sections.py::test_ranked_sources_show_all_records_but_references_show_only_cited_sources PASSED [100%]
+
+============================== 3 passed in 1.66s ==============================

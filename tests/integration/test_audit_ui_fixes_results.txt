@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 5 items
+
+tests/integration/test_audit_ui_fixes.py::test_osf_versions_deduplicate_without_merging_unrelated_dois PASSED [ 20%]
+tests/integration/test_audit_ui_fixes.py::test_non_education_social_media_record_is_ineligible PASSED [ 40%]
+tests/integration/test_audit_ui_fixes.py::test_activity_links_and_title_spacing PASSED [ 60%]
+tests/integration/test_audit_ui_fixes.py::test_saved_report_separate_log_and_historical_links PASSED [ 80%]
+tests/integration/test_audit_ui_fixes.py::test_no_date_suffix_spacing PASSED [100%]
+
+============================== 5 passed in 1.57s ==============================

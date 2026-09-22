@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 3 items
+
+tests/integration/test_critic_routing.py::test_routes_to_reporter_when_evidence_is_sufficient PASSED [ 33%]
+tests/integration/test_critic_routing.py::test_routes_to_planner_when_evidence_is_insufficient PASSED [ 66%]
+tests/integration/test_critic_routing.py::test_routes_to_reporter_when_max_cycles_reached PASSED [100%]
+
+============================== 3 passed in 1.27s ==============================

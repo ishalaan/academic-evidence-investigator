@@ -1,0 +1,20 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 10 items
+
+tests/integration/test_sectioned_report.py::test_all_sources_remain_available_and_only_cited_references_are_shown PASSED [ 10%]
+tests/integration/test_sectioned_report.py::test_invented_single_source_restrictions_are_rejected[The source is excluded as per the current constraint to use only [S1].] PASSED [ 20%]
+tests/integration/test_sectioned_report.py::test_invented_single_source_restrictions_are_rejected[This restriction to [S1] prevents discussion of the other evidence.] PASSED [ 30%]
+tests/integration/test_sectioned_report.py::test_invented_single_source_restrictions_are_rejected[The study [S2], excluded here, cannot be included due to the restriction to [S1].] PASSED [ 40%]
+tests/integration/test_sectioned_report.py::test_long_abstracts_do_not_overflow_each_section_context PASSED [ 50%]
+tests/integration/test_sectioned_report.py::test_uncited_source_label_in_prose_does_not_enter_references PASSED [ 60%]
+tests/integration/test_sectioned_report.py::test_temporary_failure_retries_only_current_section PASSED [ 70%]
+tests/integration/test_sectioned_report.py::test_summary_is_written_once_and_repeated_draft_is_retried PASSED [ 80%]
+tests/integration/test_sectioned_report.py::test_persistent_repetition_is_not_saved PASSED [ 90%]
+tests/integration/test_sectioned_report.py::test_findings_cannot_copy_summary_passages PASSED [100%]
+
+============================= 10 passed in 0.71s ==============================

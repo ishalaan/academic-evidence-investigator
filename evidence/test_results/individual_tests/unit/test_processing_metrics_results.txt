@@ -1,0 +1,12 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 2 items
+
+tests/unit/test_processing_metrics.py::test_metrics_distinguish_relevance_from_evidence_limit PASSED [ 50%]
+tests/unit/test_processing_metrics.py::test_empty_processing_records_zero_counts PASSED [100%]
+
+============================== 2 passed in 0.32s ==============================

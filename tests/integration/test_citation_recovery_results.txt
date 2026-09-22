@@ -1,0 +1,17 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 7 items
+
+tests/integration/test_citation_recovery.py::test_grouped_variants_share_tracking_and_rendering PASSED [ 14%]
+tests/integration/test_citation_recovery.py::test_date_range_is_not_an_author_citation PASSED [ 28%]
+tests/integration/test_citation_recovery.py::test_unknown_citations_rejected[(Unknown, 2025)] PASSED [ 42%]
+tests/integration/test_citation_recovery.py::test_unknown_citations_rejected[(Brown, 2024)] PASSED [ 57%]
+tests/integration/test_citation_recovery.py::test_unknown_citations_rejected[(Brown, 2026; Unknown, 2025)] PASSED [ 71%]
+tests/integration/test_citation_recovery.py::test_ambiguous_citation_not_guessed PASSED [ 85%]
+tests/integration/test_citation_recovery.py::test_normalised_citation_does_not_bypass_grounding PASSED [100%]
+
+============================== 7 passed in 0.73s ==============================

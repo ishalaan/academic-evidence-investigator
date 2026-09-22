@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 5 items
+
+tests/integration/test_stable_reporter.py::test_quality_weakness_completes_and_persists_review_note[A systematic review found benefits [S1].] PASSED [ 20%]
+tests/integration/test_stable_reporter.py::test_quality_weakness_completes_and_persists_review_note[Evidence improves learning S1.] PASSED [ 40%]
+tests/integration/test_stable_reporter.py::test_quality_weakness_completes_and_persists_review_note[A useful but uncited overview.] PASSED [ 60%]
+tests/integration/test_stable_reporter.py::test_quality_weakness_completes_and_persists_review_note[Evidence supports learning [S99].] PASSED [ 80%]
+tests/integration/test_stable_reporter.py::test_quality_weakness_completes_and_persists_review_note[Evidence supports learning (Unknown, 2026).] PASSED [100%]
+
+============================== 5 passed in 0.66s ==============================

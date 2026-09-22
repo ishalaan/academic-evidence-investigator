@@ -1,0 +1,16 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 6 items
+
+tests/integration/test_grounding_retry_fix.py::test_design_with_corroborating_citation PASSED [ 16%]
+tests/integration/test_grounding_retry_fix.py::test_method_separator_variants[-] PASSED [ 33%]
+tests/integration/test_grounding_retry_fix.py::test_method_separator_variants[ ] PASSED [ 50%]
+tests/integration/test_grounding_retry_fix.py::test_method_separator_variants[\u2011] PASSED [ 66%]
+tests/integration/test_grounding_retry_fix.py::test_method_separator_variants[\u2013] PASSED [ 83%]
+tests/integration/test_grounding_retry_fix.py::test_retry_identifies_claim_and_final_reason PASSED [100%]
+
+============================== 6 passed in 0.81s ==============================

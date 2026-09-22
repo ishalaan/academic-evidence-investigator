@@ -1,0 +1,32 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 22 items
+
+tests/integration/test_html_evidence.py::test_article_extraction_removes_boilerplate_and_preserves_locators PASSED [  4%]
+tests/integration/test_html_evidence.py::test_correction_notice_is_not_a_research_passage PASSED [  9%]
+tests/integration/test_html_evidence.py::test_unusable_or_wrong_html_is_rejected[<lambda>-html_identity_mismatch] PASSED [ 13%]
+tests/integration/test_html_evidence.py::test_unusable_or_wrong_html_is_rejected[<lambda>-html_access_blocked0] PASSED [ 18%]
+tests/integration/test_html_evidence.py::test_unusable_or_wrong_html_is_rejected[<lambda>-html_no_article_body0] PASSED [ 22%]
+tests/integration/test_html_evidence.py::test_unusable_or_wrong_html_is_rejected[<lambda>-html_insufficient_body] PASSED [ 27%]
+tests/integration/test_html_evidence.py::test_unusable_or_wrong_html_is_rejected[<lambda>-html_no_article_body1] PASSED [ 31%]
+tests/integration/test_html_evidence.py::test_unusable_or_wrong_html_is_rejected[<lambda>-html_access_blocked1] PASSED [ 36%]
+tests/integration/test_html_evidence.py::test_title_match_without_doi_metadata PASSED [ 40%]
+tests/integration/test_html_evidence.py::test_html_chunk_and_agent_payload_no_fake_pdf_pages PASSED [ 45%]
+tests/integration/test_html_evidence.py::test_html_live_path_with_controlled_http PASSED [ 50%]
+tests/integration/test_html_evidence.py::test_html_does_not_retry_access_controls[401] PASSED [ 54%]
+tests/integration/test_html_evidence.py::test_html_does_not_retry_access_controls[403] PASSED [ 59%]
+tests/integration/test_html_evidence.py::test_html_does_not_retry_access_controls[429] PASSED [ 63%]
+tests/integration/test_html_evidence.py::test_html_size_bound PASSED     [ 68%]
+tests/integration/test_html_evidence.py::test_html_redirect_private_destination_blocked PASSED [ 72%]
+tests/integration/test_html_evidence.py::test_html_workflow_persistence_ui_and_replan_cache PASSED [ 77%]
+tests/integration/test_html_evidence.py::test_html_failure_retains_abstract_fallback PASSED [ 81%]
+tests/integration/test_html_evidence.py::test_html_recovers_failed_pdf PASSED [ 86%]
+tests/integration/test_html_evidence.py::test_html_failure_without_abstract_is_metadata_only PASSED [ 90%]
+tests/integration/test_html_evidence.py::test_non_html_response_is_rejected PASSED [ 95%]
+tests/integration/test_html_evidence.py::test_html_redirect_loop_is_bounded PASSED [100%]
+
+============================= 22 passed in 1.90s ==============================

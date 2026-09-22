@@ -1,0 +1,27 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 17 items
+
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[queued] PASSED [  5%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[planner] PASSED [ 11%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[retrieval] PASSED [ 17%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[processing] PASSED [ 23%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[critic] PASSED [ 29%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[replanning] PASSED [ 35%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[reporter] PASSED [ 41%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[completed] PASSED [ 47%]
+tests/functional/test_audit_progress.py::test_status_returns_only_safe_stage_fields[failed] PASSED [ 52%]
+tests/functional/test_audit_progress.py::test_start_returns_before_workflow_finishes_and_can_be_polled PASSED [ 58%]
+tests/functional/test_audit_progress.py::test_report_tab_shows_persisted_critic_metrics_and_escapes_reason PASSED [ 64%]
+tests/functional/test_audit_progress.py::test_unknown_pending_and_invalid_requests PASSED [ 70%]
+tests/functional/test_audit_progress.py::test_background_failure_is_safe_and_durable PASSED [ 76%]
+tests/functional/test_audit_progress.py::test_loading_page_uses_stage_polling_and_accessible_status PASSED [ 82%]
+tests/functional/test_audit_progress.py::test_worker_capacity_returns_actionable_error PASSED [ 88%]
+tests/functional/test_audit_progress.py::test_activity_retains_short_stages_and_replanning_without_private_details PASSED [ 94%]
+tests/functional/test_audit_progress.py::test_report_failure_shows_safe_actionable_reason PASSED [100%]
+
+============================= 17 passed in 2.05s ==============================

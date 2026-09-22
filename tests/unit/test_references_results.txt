@@ -1,0 +1,28 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 18 items
+
+tests/unit/test_references.py::test_journal_reference_and_harvard_citation PASSED [  5%]
+tests/unit/test_references.py::test_author_counts[names0-Smith] PASSED   [ 11%]
+tests/unit/test_references.py::test_author_counts[names1-Smith, Jones and Green] PASSED [ 16%]
+tests/unit/test_references.py::test_author_counts[names2-Smith et al.] PASSED [ 22%]
+tests/unit/test_references.py::test_missing_metadata_and_unsafe_links_are_not_invented PASSED [ 27%]
+tests/unit/test_references.py::test_same_author_year_suffixes_match_reference_order PASSED [ 33%]
+tests/unit/test_references.py::test_invalid_or_missing_citations_rejected[Invented [S99].] PASSED [ 38%]
+tests/unit/test_references.py::test_invalid_or_missing_citations_rejected[Unsupported claim.] PASSED [ 44%]
+tests/unit/test_references.py::test_invalid_or_missing_citations_rejected[Claim [S1].\n\nUncited paragraph.] PASSED [ 50%]
+tests/unit/test_references.py::test_invalid_or_missing_citations_rejected[Claim [S1, S2].] PASSED [ 55%]
+tests/unit/test_references.py::test_invalid_or_missing_citations_rejected[Claim (Imaginary, 2025) [S1].] PASSED [ 61%]
+tests/unit/test_references.py::test_access_dates_and_extra_metadata_survive_database_round_trip PASSED [ 66%]
+tests/unit/test_references.py::test_doi_url_normalisation_and_fallback PASSED [ 72%]
+tests/unit/test_references.py::test_adjacent_citations_form_one_harvard_group[[S1][S2]] PASSED [ 77%]
+tests/unit/test_references.py::test_adjacent_citations_form_one_harvard_group[[S1] [S2]] PASSED [ 83%]
+tests/unit/test_references.py::test_adjacent_citations_form_one_harvard_group[[S1, S2]] PASSED [ 88%]
+tests/unit/test_references.py::test_adjacent_citations_form_one_harvard_group[[S1][S2][S1]] PASSED [ 94%]
+tests/unit/test_references.py::test_lowercase_citation_ids_preserve_reference_tracking PASSED [100%]
+
+============================= 18 passed in 0.34s ==============================

@@ -1,0 +1,30 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Scripts\academic-evidence-investigator\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Scripts\academic-evidence-investigator
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.12.2, cov-7.1.0
+collecting ... collected 20 items
+
+tests/integration/test_report55_fixes.py::test_catalogue_does_not_shadow_doi_or_open_landing PASSED [  5%]
+tests/integration/test_report55_fixes.py::test_candidate_limit_and_deduplication PASSED [ 10%]
+tests/integration/test_report55_fixes.py::test_session_free_url_preserves_document_query PASSED [ 15%]
+tests/integration/test_report55_fixes.py::test_oa_metadata_http_url_is_tried_as_https PASSED [ 20%]
+tests/integration/test_report55_fixes.py::test_rsis_body_selector_still_requires_article_identity PASSED [ 25%]
+tests/integration/test_report55_fixes.py::test_honorific_does_not_create_initial PASSED [ 30%]
+tests/integration/test_report55_fixes.py::test_explicit_article_number_not_page PASSED [ 35%]
+tests/integration/test_report55_fixes.py::test_british_words_preserve_bibliographic_citations PASSED [ 40%]
+tests/integration/test_report55_fixes.py::test_grounding_checks[GenAI enhances learning as demonstrated in practical applications [S1].-Expected Learning Benefit: improved learning.-expected_benefit_as_result] PASSED [ 45%]
+tests/integration/test_report55_fixes.py::test_grounding_checks[GenAI may enhance learning; these are expected benefits [S1].-Expected Learning Benefit: improved learning.-None] PASSED [ 50%]
+tests/integration/test_report55_fixes.py::test_grounding_checks[GenAI improves grades [S1].-Questionnaire responses correlated with perceived performance.-observational_as_causal] PASSED [ 55%]
+tests/integration/test_report55_fixes.py::test_grounding_checks[Reported grades were associated with GenAI use [S1].-Questionnaire responses correlated with perceived performance.-None] PASSED [ 60%]
+tests/integration/test_report55_fixes.py::test_grounding_checks[Gains were contingent on faculty training [S1].-A correlation with satisfaction was found.-unsupported_condition] PASSED [ 65%]
+tests/integration/test_report55_fixes.py::test_grounding_checks[The study recommends faculty training [S1].-The study recommends faculty training.-None] PASSED [ 70%]
+tests/integration/test_report55_fixes.py::test_grounding_checks[GenAI improves scores [S1].-A randomised controlled experiment measured improved scores.-None] PASSED [ 75%]
+tests/integration/test_report55_fixes.py::test_citation_specific_checks_do_not_borrow_uncited_result PASSED [ 80%]
+tests/integration/test_report55_fixes.py::test_summary_restatement_detected PASSED [ 85%]
+tests/integration/test_report55_fixes.py::test_doi_metadata_enrichment_is_identity_checked PASSED [ 90%]
+tests/integration/test_report55_fixes.py::test_malformed_registry_name_does_not_replace_existing_authors PASSED [ 95%]
+tests/integration/test_report55_fixes.py::test_grounding_failure_regenerates_current_section PASSED [100%]
+
+============================= 20 passed in 0.71s ==============================
