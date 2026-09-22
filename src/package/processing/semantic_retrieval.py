@@ -15,12 +15,16 @@ def select_chunks(question, chunks, ranks, limit=12, per_paper=2, encoder=None):
         import faiss
         vectors = (encoder or encode)([question] + [c.text for c in chunks])
         vectors = np.ascontiguousarray(vectors, dtype="float32")
+        # Unit-length vectors make inner-product scores comparable as cosine
+        # similarity, regardless of the encoder supplied by the caller.
         faiss.normalize_L2(vectors)
         index = faiss.IndexFlatIP(vectors.shape[1])
         index.add(vectors[1:])
         scores, positions = index.search(vectors[:1], len(chunks))
         for score, position in zip(scores[0], positions[0]):
             semantic[position] = score
+    # Evidence is still usable without FAISS or local weights. Report the
+    # fallback explicitly so the audit does not imply semantic retrieval ran.
     except (ImportError, OSError, RuntimeError, ValueError):
         mode = "lexical_fallback"
     scored = []

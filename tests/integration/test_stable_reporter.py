@@ -13,6 +13,8 @@ from package.storage.database import load_report
  'Evidence supports learning (Unknown, 2026).',
 ])
 def test_quality_weakness_completes_and_persists_review_note(monkeypatch,summary):
+ # Exercise the normal completion policy here; strict-policy retry cases live
+ # in separate tests so a review note is not mistaken for a failed report.
  calls=[]
  class Client:
   def chat_completion(self,**kw):

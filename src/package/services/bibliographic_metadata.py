@@ -18,6 +18,8 @@ def enrich_paper(paper):
         title = (record.get('title') or [''])[0]
         expected = set(re.findall(r'\w+', paper.title.lower()))
         observed = set(re.findall(r'\w+', title.lower()))
+        # Check both identifiers and title overlap before accepting enrichment;
+        # plausible metadata from a different paper would corrupt attribution.
         if record.get('DOI', '').lower() != doi.lower() or not expected or len(expected & observed)/len(expected) < .8:
             return paper, 'identity_mismatch'
         fields = {'journal': (record.get('container-title') or [None])[0], 'volume':record.get('volume'),
@@ -40,5 +42,7 @@ def enrich_paper(paper):
 
 
 def enrich_writing_sources(items):
+    # A small worker pool keeps DOI checks from adding ten sequential waits.
+    # map preserves input order for pairing each result with its source.
     with ThreadPoolExecutor(max_workers=4) as pool:
         return list(pool.map(enrich_paper, [item.paper for item in items]))

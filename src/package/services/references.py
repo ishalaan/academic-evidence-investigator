@@ -13,6 +13,8 @@ def without_title(name):
 
 
 def author_parts(paper):
+    # Prefer provider-supplied name parts when they match the author list; the
+    # fallback split cannot reliably identify every surname convention.
     if paper.author_details and len(paper.author_details) == len(paper.authors):
         return [(without_title(a.family or a.given), without_title(a.given) if a.family else "") for a in paper.author_details]
     parts = []
@@ -69,6 +71,8 @@ def reference_entries(papers):
         entry = {"id": f"S{index}", "paper": paper, "author": label, "year": year}
         entries.append(entry)
         groups[(label.casefold(), year)].append(entry)
+    # Same-author, same-year papers need stable suffixes in both citations and
+    # references. Sorting by title keeps the two views in agreement.
     for group in groups.values():
         if len(group) > 1:
             for index, entry in enumerate(sorted(group, key=lambda e: (e["paper"].title.casefold(), e["id"]))):

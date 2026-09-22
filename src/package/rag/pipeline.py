@@ -24,6 +24,8 @@ def build_evidence(state, ranked):
                    fulltext_access_failures=0, html_papers_resolved=0, pdf_papers_resolved=0,
                    papers_discovered=len(state.get("raw_papers", [])))
     chunks, types, ranks = [], {}, {}
+    # Replanning revisits the accumulated corpus. Reuse extraction results and
+    # failure categories instead of downloading the same papers every cycle.
     cache = dict(state.get("rag_cache", {}))
     failures = dict(state.get("rag_failures", {}))
     paper_titles = {paper_key(item.paper): item.paper.title for item in ranked}
@@ -69,6 +71,8 @@ def build_evidence(state, ranked):
                     failures[key] = "pdf_extraction_failures" if phase == "extraction" else "fulltext_access_failures"
                     event("pdf_failed" if url else "fulltext_unavailable", paper_id=key,
                           **failure_details(exc, phase))
+                # A failed PDF download does not rule out an accessible article
+                # body. Try HTML before reducing the evidence to its abstract.
                 for html_url in html_candidates(paper, url) if not paper_chunks else []:
                     try:
                         event("html_started", paper_id=key, source_url=stable_url(html_url))
@@ -106,6 +110,8 @@ def build_evidence(state, ranked):
             item.paper = verified
             event("metadata_checked", paper_id=paper_key(verified), status=status)
         papers = [item.paper for item in eligible]
+        # Assign citation IDs only after the writing set is final. Reusing the
+        # earlier ranking positions would attach passages to the wrong sources.
         for item in ranked:
             item.selected = item in eligible
             item.source_id = f"S{eligible.index(item) + 1}" if item.selected else None

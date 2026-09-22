@@ -59,6 +59,8 @@ def failure_details(error):
         code = "invalid_structure"
     elif isinstance(error, sqlite3.Error):
         code = "database_error"
+    # Return a known message rather than str(error), which may contain request
+    # details, model output or a remote response body.
     details = {"error_code": code, "message": REPORT_ERRORS[code]}
     reason = getattr(error, "validation_reason", None)
     if reason in {"missing_citation", "unknown_source", "author_year_format", "invalid_syntax"}:

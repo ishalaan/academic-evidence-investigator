@@ -25,6 +25,8 @@ def configure_nodes(monkeypatch, *, sufficient_after=2):
     def unavailable(*args, **kwargs):
         raise RuntimeError("SECRET token and provider response")
 
+    # Control agent answers and provider failures but keep the real graph and
+    # database, so routing and durable audit records are tested together.
     monkeypatch.setattr(graph, "planner_node", planner)
     monkeypatch.setattr(graph, "critic_node", critic)
     monkeypatch.setattr(graph, "reporter_node", reporter)

@@ -9,6 +9,8 @@ import re
 
 
 def activity_events(events, papers=None):
+    # Older audit events did not store a paper URL. Where report sources are
+    # available, recover the link using the same stable paper key.
     urls = {paper_key(p): source_url(p) for p in (papers or [])}
     activity = []
     for event in events:
@@ -107,6 +109,8 @@ def activity_events(events, papers=None):
             title = re.sub(r"^(\d+)(?=[A-Za-z])", r"\1 ", title)
             message += f" Paper {paper_id}" + (f" — {title}." if title else ".")
         paper_url = details.get('paper_url') or urls.get(paper_id)
+        # These URLs become clickable browser links; only ordinary web schemes
+        # belong in the public activity feed.
         try:
             parsed = urlsplit(paper_url or '')
             if parsed.scheme not in ('http', 'https') or not parsed.netloc:

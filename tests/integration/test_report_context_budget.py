@@ -9,6 +9,8 @@ from package.services.references import reference_entries
 
 
 def test_final_json_budget_includes_escaping_and_metadata():
+    # Quotes and backslashes expand in JSON; plain repeated letters would miss
+    # the overflow that occurred after evidence was serialised.
     chunks=[EvidenceChunk(source_id=f'S{i%10+1}',paper_id=str(i),title='Long title '*40,chunk_index=i,
              source_format='html',section_title='Heading '*60,paragraph_number=i+1,html_anchor='anchor'*100,
              source_url='https://publisher.test/'+'path/'*200,evidence_type='full_text',text=('Quoted "evidence"\n\\data '*1000)) for i in range(12)]

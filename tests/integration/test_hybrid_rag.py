@@ -17,6 +17,8 @@ from package.rag import runtime
 def rag_runtime(tmp_path, monkeypatch):
     root = tmp_path / 'data' / 'tmp'
     monkeypatch.setattr(runtime, 'RUNTIME_ROOT', root)
+    # Fixed vectors keep workflow assertions independent of model downloads
+    # and embedding quality; the semantic ranking tests use their own encoder.
     monkeypatch.setattr('package.processing.semantic_retrieval.encode', lambda texts: np.array([[1., 0.]] * len(texts), dtype='float32'))
     monkeypatch.setattr('package.rag.pipeline.resolve_fulltext', lambda paper: paper.open_access_url)
     return root

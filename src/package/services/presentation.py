@@ -14,6 +14,8 @@ def display_timestamp(value):
         return "Time unavailable"
 
 
+# Strip markup without using a broad <...> match, which could remove reported
+# comparisons such as p < 0.05 from the evidence.
 def plain_abstract(value):
     return " ".join(re.sub(r"</?[A-Za-z][A-Za-z0-9:._-]*(?:\s+[^<>]*?)?\s*/?>", " ", html.unescape(value or "")).split())
 

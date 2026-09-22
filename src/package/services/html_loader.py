@@ -24,6 +24,8 @@ def extract_article(markup, paper, source_url):
         raise PdfFailure('html_access_blocked')
     if soup.select_one('input[type="password"], #challenge-form, #cf-challenge-running'):
         raise PdfFailure('html_access_blocked')
+    # Redirects can end on another article or a catalogue page. Establish the
+    # paper identity before treating any of the page as research evidence.
     doi_meta = soup.find('meta', attrs={'name': re.compile(r'^(citation_doi|dc.identifier.doi)$', re.I)})
     doi = (doi_meta.get('content', '') if doi_meta else '').strip().lower()
     doi = re.sub(r'^(https?://(dx\.)?doi.org/|doi:\s*)', '', doi)
@@ -42,6 +44,8 @@ def extract_article(markup, paper, source_url):
     for tag in list(soup.find_all(style=True)):
         if tag.attrs and re.search(r'display\s*:\s*none|visibility\s*:\s*hidden', tag.get('style', ''), re.I):
             tag.decompose()
+    # Whole-page text includes navigation, related papers and references, which
+    # can otherwise be mistaken for findings from this article.
     roots = soup.select('[itemprop="articleBody"], .article-body, .jats-body, .c-article-body, .sj-article-detail_content, #artText, .ltx_document, article')
     if not roots:
         raise PdfFailure('html_no_article_body')
@@ -68,6 +72,8 @@ def extract_article(markup, paper, source_url):
                            'paragraph_number': len(paragraphs) + 1, 'html_anchor': (anchor or '')[:200] or None})
         if len(paragraphs) >= MAX_PARAGRAPHS:
             break
+    # A landing page can match the title while exposing only a short teaser.
+    # Require enough body structure and text before calling it full-text evidence.
     if body_headings < 1 or len(paragraphs) < 3 or sum(len(p['text'].split()) for p in paragraphs) < 300:
         raise PdfFailure('html_insufficient_body')
     return paragraphs

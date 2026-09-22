@@ -67,6 +67,8 @@ def search_crossref(
                 authors=authors,
                 abstract=item.get("abstract"),
                 doi=item.get("DOI"),
+                # A PDF link alone does not establish open access; require the
+                # accompanying licence metadata before offering it for retrieval.
                 open_access_url=next((link.get("URL") for link in item.get("link", [])
                     if link.get("content-type") == "application/pdf" and
                     any("creativecommons.org/licenses/" in licence.get("URL", "") for licence in item.get("license", []))), None),

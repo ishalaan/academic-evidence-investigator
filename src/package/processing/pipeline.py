@@ -51,6 +51,8 @@ def process_papers(
                 relevance_score=_relevance_score(paper, research_question)[0],
                 eligible=paper in relevant, selected=selected,
                 source_id=f"S{retained.index(paper) + 1}" if selected else None))
+    # Count losses at each boundary so the audit can distinguish poor relevance
+    # from duplicates or papers excluded only by the writing limit.
     if metrics is not None:
         metrics.update(
             valid_papers_retained=len(validated),

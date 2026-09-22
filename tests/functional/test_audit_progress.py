@@ -29,6 +29,8 @@ def test_status_returns_only_safe_stage_fields(stage):
 
 
 def test_start_returns_before_workflow_finishes_and_can_be_polled(monkeypatch):
+    # Events hold the worker at a known stage. Sleeps would make this depend on
+    # machine speed rather than prove the request returns before completion.
     entered, release, finished = Event(), Event(), Event()
 
     class FakeWorkflow:

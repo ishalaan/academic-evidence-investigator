@@ -12,6 +12,8 @@ def public_https(url):
     parsed = urlsplit(url)
     if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password or parsed.port not in (None, 443):
         raise ValueError("Only public HTTPS resources are allowed")
+    # Provider URLs are external input. Reject private and loopback destinations
+    # so article retrieval cannot be used to request local services.
     addresses = socket.getaddrinfo(parsed.hostname, 443, type=socket.SOCK_STREAM)
     if not addresses or any(not ipaddress.ip_address(a[4][0]).is_global for a in addresses):
         raise ValueError("Non-public address")
@@ -19,6 +21,8 @@ def public_https(url):
 
 
 def http_client():
+    # Use system certificate trust while keeping redirects manual: the loaders
+    # must validate each destination, not just the first URL.
     return httpx.Client(verify=truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT),
                         timeout=10, follow_redirects=False, trust_env=False)
 

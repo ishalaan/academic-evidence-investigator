@@ -29,6 +29,8 @@ def grounding_issue(text, context):
         return None
     if not isinstance(rows, list):
         return None
+    # Keep passages grouped by citation ID. Pooling all paper text would let a
+    # claim borrow a sample size or result from an unrelated source.
     sources = {}
     for row in rows:
         key = row.get('source_id') or row.get('id')
@@ -58,6 +60,8 @@ def grounding_issue(text, context):
             if not evidence:
                 continue
             claim = sentence.lower()
+            # A number mentioned elsewhere in the evidence set is not enough;
+            # each attached citation must support the stated sample size.
             for count in re.findall(r'\b(\d[\d,]*)\s+(?:students|participants|respondents)\b', claim):
                 number = count.replace(',', '')
                 if not all(re.search(r'(?<!\d)' + re.escape(number) + r'(?!\d)', ' '.join(sources.get(sid, [])).replace(',', '')) for sid in ids):

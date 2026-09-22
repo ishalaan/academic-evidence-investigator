@@ -27,6 +27,8 @@ def create_app() -> Flask:
         static_folder="../../static",
     )
     initialise_database()
+    # Limit background investigations in this app instance so repeated clicks
+    # cannot create an unbounded number of model requests and worker threads.
     available_workers = BoundedSemaphore(2)
 
     @app.context_processor
@@ -81,6 +83,8 @@ def create_app() -> Flask:
             events=activity_events(run["events"]),
             report_url=url_for("run_report", run_id=run_id) if run["status"] == "completed" else None,
         )
+        # A cached polling response could leave the page showing an old stage
+        # after the investigation has already completed.
         response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -96,6 +100,7 @@ def create_app() -> Flask:
             abort(404)
         return render_template("report.html", report=report, report_id=run["report_id"], audit=run)
 
+    # Keep a normal form submission path for clients that do not use JavaScript.
     @app.route("/", methods=["GET", "POST"])
     def index():
         if request.method == "POST":

@@ -30,6 +30,8 @@ def public_reason(reason):
 def observed_node(component, node, route=None):
     @wraps(node)
     def invoke(state):
+        # Work on a copy so observation does not mutate the state handed to us
+        # by the graph; the wrapper returns its additions with the node result.
         state = dict(state)
         run_id = state.setdefault("run_id", None) or create_run()
         state["run_id"] = run_id
@@ -91,5 +93,6 @@ def observed_node(component, node, route=None):
             metrics["elapsed_seconds"] = round(perf_counter() - started, 3)
             record_event(run_id, component.title(), "failed", failure_details(exc),
                          stage="failed", status="failed", metrics=metrics)
+            # Recording a failure must not turn it into a successful node result.
             raise
     return invoke

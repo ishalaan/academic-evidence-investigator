@@ -8,6 +8,8 @@ def stable_url(url):
     if not url:
         return url
     parts = urlsplit(url)
+    # Provenance should remain reusable after a session expires. Remove known
+    # session credentials while retaining query fields that identify the document.
     path = re.sub(r';(?:jsessionid|phpsessid|aspsessionid)=[^/;?]*', '', parts.path, flags=re.I)
     query = [(k,v) for k,v in parse_qsl(parts.query, keep_blank_values=True)
              if k.lower() not in {'jsessionid','phpsessid','sessionid','session_id','sid','access_token','token'}]

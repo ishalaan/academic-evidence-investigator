@@ -6,6 +6,8 @@ from package.rag.budget import fit_evidence
 def evidence_payload(chunks, budget=14000):
     if not chunks:
         return "[]"
+    # Reserve an initial share for each passage and its locators; fit_evidence
+    # then checks the actual JSON size rather than relying on this estimate.
     allowance = max(100, budget // len(chunks) - 350)
     context = json.dumps([{"source_id": c.source_id, "paper_id": c.paper_id,
         "chunk_index": c.chunk_index, "title": c.title[:220], "page_number": c.page_number,

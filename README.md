@@ -109,6 +109,19 @@ python -m pytest --cov=package --cov-report=term-missing
 
 **Final recorded result: 263 Python tests passed**, across unit, integration and functional tests. The saved output is in [evidence/test_results/05_final_pytest_results.txt](evidence/test_results/05_final_pytest_results.txt). Coverage includes validation, deduplication, retrieval failures, PDF/HTML extraction and fallback, embeddings, workflow routing, citation handling, persistence and Flask behaviour. Controlled test responses make failure cases reproducible; passing tests do not guarantee live API availability or factual correctness of every generated report.
 
+### Individual test outputs
+
+Saved results for individual test files are in [`evidence/test_results/individual_tests/`](evidence/test_results/individual_tests/). The 41 text files are organised to match the test source folders:
+
+| Output folder | Saved files | Contents |
+| --- | ---: | --- |
+| [`functional/`](evidence/test_results/individual_tests/functional/) | 4 | Application routes, audit/progress behaviour, error details and report sections. |
+| [`integration/`](evidence/test_results/individual_tests/integration/) | 22 | Agent and workflow integration, retrieval services, evidence processing, report generation and recovery. |
+| [`javascript/`](evidence/test_results/individual_tests/javascript/) | 2 | Paper links and browser progress behaviour: `paper-links_results.txt` and `progress_results.txt`. |
+| [`unit/`](evidence/test_results/individual_tests/unit/) | 13 | Individual components, including validation, ranking, deduplication, database access, PDF retrieval and reference formatting. |
+
+Python output files use `<test_module>_results.txt`, for example `test_app_results.txt` corresponds to `tests/functional/test_app.py`. JavaScript outputs correspond to the `.test.cjs` files in `tests/javascript/`. These files record separate test-file runs; the combined final Python suite result remains in [`05_final_pytest_results.txt`](evidence/test_results/05_final_pytest_results.txt). JavaScript results are separate from the recorded Python test total.
+
 Testing and remediation addressed:
 
 - **Service failures:** independent retrieval sources, bounded retries and clearer provider diagnostics; the active inference model is Qwen3-8B.
@@ -135,9 +148,11 @@ Execution screenshots are in `evidence/screenshots/demo/`; debugging and final-t
 | `src/package/schemas.py` | Structured data models. |
 | `src/package/web.py` | Flask routes and request handling. |
 | `templates/`, `static/` | Browser interface and styling. |
-| `tests/` | Unit, integration and functional tests, with fixtures. |
+| `tests/` | Python unit, integration and functional tests, JavaScript tests, and fixtures. |
 | `data/` | Local runtime data. |
 | `evidence/` | Test results, screenshots, saved reports and sample outputs. |
+| `evidence/test_results/` | Combined final Python results and other saved test runs. |
+| `evidence/test_results/individual_tests/` | Separate text outputs in `functional/`, `integration/`, `javascript/` and `unit/`. |
 
 ## Key design decisions
 

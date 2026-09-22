@@ -45,6 +45,8 @@ def initialise_database() -> None:
             """
         )
 
+        # Add the richer payload without rebuilding the table, so reports saved
+        # by earlier versions remain available after an upgrade.
         columns = {row[1] for row in connection.execute("PRAGMA table_info(reports)")}
         if "report_payload" not in columns:
             connection.execute("ALTER TABLE reports ADD COLUMN report_payload TEXT")
@@ -121,6 +123,8 @@ def load_report(report_id: int) -> ResearchReport | None:
             return None
         if "report_payload" in row.keys() and row["report_payload"]:
             return ResearchReport.model_validate_json(row["report_payload"])
+        # Older rows predate the full payload. Rebuild only the fields they
+        # actually stored and let the schema supply defaults for newer fields.
         return ResearchReport(
             research_question=row["research_question"], summary=row["summary"],
             findings=json.loads(row["findings"])["findings"],

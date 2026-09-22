@@ -9,6 +9,8 @@ def no_live_html_in_workflow_tests(monkeypatch):
     def unavailable(*args, **kwargs):
         raise ValueError('No HTML fixture supplied')
     monkeypatch.setattr('package.rag.pipeline.load_html_article', unavailable)
+    # Metadata lookup is also external I/O. Individual tests can replace this
+    # default when they need to exercise a particular registry response.
     monkeypatch.setattr('package.rag.pipeline.enrich_writing_sources', lambda items:[(i.paper,'not_applicable') for i in items])
 
 

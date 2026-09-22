@@ -21,6 +21,8 @@ def processing_node(state: ResearchState) -> dict:
         ranked_sources=ranked_sources,
     )
 
+    # Ranking establishes eligibility; full-text retrieval then determines which
+    # sources have usable passages for the Critic and Reporter.
     hybrid = build_evidence(state, ranked_sources)
     metrics.update(hybrid.pop("rag_metrics"))
     return {

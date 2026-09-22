@@ -6,11 +6,14 @@ from package.rag.runtime import MODEL_CACHE
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 
+# Loading weights is expensive; reuse the CPU model across investigations.
 @lru_cache(maxsize=1)
 def get_model():
     if not MODEL_CACHE.exists():
         raise OSError("Local embedding model is not installed")
     from sentence_transformers import SentenceTransformer
+    # A research run must not trigger an unexpected model download. Installation
+    # is separate, and retrieval can fall back when the local model is absent.
     return SentenceTransformer(MODEL_NAME, cache_folder=str(MODEL_CACHE),
                                local_files_only=True, device="cpu")
 

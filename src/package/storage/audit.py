@@ -16,6 +16,8 @@ def utc_now():
 @contextmanager
 def connection():
     database.DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # Each caller owns its connection; background workers and polling requests
+    # must not share a SQLite connection across threads.
     db = sqlite3.connect(database.DATABASE_PATH, timeout=30)
     db.row_factory = sqlite3.Row
     try:
@@ -51,6 +53,8 @@ def record_event(run_id, component, action, details, *, stage, status="running",
     """Commit each event and its progress snapshot together, before polling."""
     now = utc_now()
     with connection() as db:
+        # Update the snapshot and append the event in the same transaction so
+        # polling cannot see progress that has no matching audit entry.
         cursor = db.execute("""UPDATE investigation_runs SET updated_at=?, stage=?, status=?,
             metrics=COALESCE(?, metrics), report_id=COALESCE(?, report_id) WHERE id=?""",
             (now, stage, status, json.dumps(metrics) if metrics is not None else None,
@@ -71,6 +75,8 @@ def get_run(run_id, *, include_events=True):
         run["metrics"] = json.loads(run["metrics"])
         if include_events:
             run["events"] = []
+            # Event IDs preserve insertion order even when fast stages share
+            # the same millisecond timestamp.
             for row in db.execute("SELECT * FROM investigation_events WHERE run_id=? ORDER BY id", (run_id,)):
                 event = dict(row)
                 event["details"] = json.loads(event["details"])

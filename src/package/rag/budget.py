@@ -38,6 +38,8 @@ def fit_evidence(context, budget):
                     row['metadata_truncated'] = True
     if len(encode(low)) > budget:
         raise ValueError('Evidence metadata and minimum excerpts exceed the available budget')
+    # Search for the largest shared excerpt cap that fits the encoded JSON.
+    # Counting raw text alone misses escaping and provenance overhead.
     high = max([low] + [len(row[key]) for row in records for key in TEXT_FIELDS if isinstance(row.get(key),str)])
     while low < high:
         middle = (low + high + 1) // 2
@@ -49,6 +51,8 @@ def fit_evidence(context, budget):
 
 
 def previous_excerpt(previous, budget=2500):
+    # Earlier sections provide continuity, but must not crowd out the evidence
+    # needed to write the next section.
     text = '\n\n'.join(previous[-3:])
     def encode(cap):
         return json.dumps({'excerpt':text[:cap], 'truncated':len(text)>cap}, ensure_ascii=False, separators=(',', ':'))

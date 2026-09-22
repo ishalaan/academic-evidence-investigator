@@ -29,5 +29,6 @@ if __name__ == "__main__":
 
     app.run(
         debug=True,
+        # The reloader would start a second process and open the browser twice.
         use_reloader=False,
     )

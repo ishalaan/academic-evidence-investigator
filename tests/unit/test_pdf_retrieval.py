@@ -12,6 +12,8 @@ def mock_http(monkeypatch):
             calls.append(str(request.url))
             return handler(request)
         monkeypatch.setattr(pdf, 'http_client', lambda: httpx.Client(transport=httpx.MockTransport(handle)))
+        # The .test hosts belong to the mock transport, not public DNS. URL
+        # rejection cases install their own check before exercising the loader.
         monkeypatch.setattr(pdf, 'public_https', lambda url: url)
         return calls
     return install

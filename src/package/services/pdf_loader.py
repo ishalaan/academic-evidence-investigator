@@ -77,6 +77,8 @@ def download_pdf(url, directory, name, metadata=None):
                 remaining = MAX_SECONDS - (monotonic() - started)
                 if remaining <= 0:
                     raise PdfFailure('download_time_limit')
+                # Recheck every redirect target; a public starting URL can still
+                # redirect to a private address or an unsupported scheme.
                 url = _https_target(url)
                 try:
                     with client.stream('GET', url, headers={'Accept': 'application/pdf, text/html;q=0.8'},
@@ -97,6 +99,8 @@ def download_pdf(url, directory, name, metadata=None):
                                 size += len(part)
                                 if monotonic() - started > MAX_SECONDS:
                                     raise PdfFailure('download_time_limit')
+                                # Some publishers return HTML with a PDF-looking
+                                # URL. Inspect the bytes before saving it as a PDF.
                                 if is_pdf is None:
                                     is_pdf = part[:1024].lstrip().startswith(b'%PDF-')
                                 if size > (MAX_BYTES if is_pdf else MAX_HTML_BYTES):
@@ -115,6 +119,8 @@ def download_pdf(url, directory, name, metadata=None):
                         parser = _PdfMetadata()
                         parser.feed(body.decode('utf-8', errors='replace'))
                         candidates = list(dict.fromkeys(parser.urls))
+                        # Follow only an unambiguous declared PDF on this host;
+                        # guessing from arbitrary links can fetch another paper.
                         if len(candidates) != 1:
                             raise PdfFailure('no_pdf_metadata')
                         candidate = _https_target(urljoin(url, candidates[0]))
@@ -142,6 +148,8 @@ def extract_pages(path):
         if len(document) > MAX_PAGES:
             raise PdfFailure('page_limit')
         pages = [(i + 1, page.get_text('text', sort=True).strip()) for i, page in enumerate(document)]
+        # Image-only scans need OCR, which this pipeline does not provide. Let
+        # the caller use fallback evidence instead of treating blank text as success.
         if not any(len(text.split()) >= 10 for _, text in pages):
             raise PdfFailure('no_usable_text')
         return [(number, text[:60000]) for number, text in pages if text.strip()]
