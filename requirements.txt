@@ -1,4 +1,4 @@
--e git+ssh://git@github.com/ishalaan/academic-evidence-investigator.git@9adbadf42a5c278aac33b7573fdd87133d8150ae#egg=academic_evidence_investigator
+-e git+ssh://git@github.com/ishalaan/academic-evidence-investigator.git@fe44ce902f93137858f4cc96cced3df65d84a029#egg=academic_evidence_investigator
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
